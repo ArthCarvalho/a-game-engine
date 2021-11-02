@@ -11,11 +11,6 @@
 .section .data
         
   .global load_symbol
-  .global vab_hdata
-  .global vab_bdata
-	.global seq_data
-  /*.global test_tim
-  ;.global test_sgm*/
   .global player_tim
   .global player_agm
   .global player_anm
@@ -47,35 +42,14 @@
   .global test_image2_tim
   .global test_image3_tim
   .global test_image4_tim
-  .global test_obj_chara_sgm2
-  .global test_obj_chara_tim
 
 
 load_symbol:
-  .incbin "data/graphics/system/LOAD_SYMBOL.TIM"
+  .incbin "../AGAME_PCDATA/graphics/system/LOAD_SYMBOL.TIM"
   .balign 16
-
-vab_hdata:
-	.incbin "data/sound/ZOOT_V3.VH"
-  .balign 16
-
-vab_bdata:
-	.incbin "data/sound/ZOOT_V3.VB"
-  .balign 16
-
-seq_data:
-  .incbin "data/sound/ZOOT_ST6.SEQ"
-  .balign 16
-/*test_tim:
-;  .incbin "data/graphics/REPLACE_BLOCK.TIM"
-;  .balign 16
-;test_sgm:
-;  .incbin "data/graphics/test_player_model.sgm"
-;  .balign 16
-*/
 
 player_tim:
-  .incbin "data/graphics/player_area_composite.TIM"
+  .incbin "../AGAME_PCDATA/graphics/player_area_composite.TIM"
   .balign 16
 
 player_agm:
@@ -91,16 +65,16 @@ sword_sg2:
   .balign 16
 
 scene_tim:
-  .incbin "data/graphics/replace_block-psnew2225.tim"
+  .incbin "../AGAME_PCDATA/graphics/replace_block-psnew2225.tim"
   .balign 16
 
 scene_col:
-  .incbin "data/graphics/TestRoom_C000-colbb-fixed-optimized.col2"
+  .incbin "../AGAME_PCDATA/graphics/TestRoom_C000-colbb-fixed-optimized.col2"
   .balign 16
 
 scene_room00_sg2:
   .incbin "../AGAME_PCDATA/Map/Test/room_000.sgm2"
-/*;  .incbin "../AGAME_PCDATA/TestRoom_C000-colbb-fixed.sgm2"*/
+  .balign 16
 
 scene_room01_sg2:
   .incbin "../AGAME_PCDATA/Map/Test/room_001.sgm2"
@@ -194,12 +168,4 @@ test_image3_tim:
   .balign 16
 test_image4_tim:
   .incbin "../AGAME_PCDATA/item_icons/bow-multi-pal.tim"
-  .balign 16
-  
-test_obj_chara_sgm2:
-  .incbin "../AGAME_PCDATA/test_obj_chara.sgm2"
-  .balign 16
-
-test_obj_chara_tim:
-  .incbin "../AGAME_PCDATA/test_obj_chara.tim"
   .balign 16

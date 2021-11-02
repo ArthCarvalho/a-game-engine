@@ -11,8 +11,6 @@
 /* global.h */
 #ifndef _GLOBAL_H
 #define _GLOBAL_H
-/* CD ROM LBAs */
-#include "../cdromdata.h"
 
 /* PSX Library Files */
 #include <memory.h>

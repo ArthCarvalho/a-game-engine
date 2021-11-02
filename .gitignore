@@ -1,0 +1,10 @@
+# Object files
+*.o
+
+# Linker output
+*.map
+*.dep
+
+# Executables
+*.exe
+*.elf
