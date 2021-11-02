@@ -8,7 +8,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. 
  */
 
-#include "archive/ARC.h"
+#include "archive/arc.h"
 
 
 void ARC_Decompress(unsigned long * dest, ARC_Header * src){

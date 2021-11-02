@@ -10,8 +10,8 @@
 
 #include "model/agm.h"
 
-#include<inline_n.h>
-#include<GTEMAC.h>
+#include <inline_n.h>
+#include <gtemac.h>
 
 char compare_bit = 0;
 

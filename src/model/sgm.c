@@ -12,7 +12,7 @@
 
 #include <libgte.h>
 #include <inline_n.h>
-#include <GTEMAC.h>
+#include <gtemac.h>
 
 u_char subdiv_enable = 0;
 u_char subdiv_level0 = 1;

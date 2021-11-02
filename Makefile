@@ -37,8 +37,9 @@ $(SRC_DIR)/lz77.S                 \
 $(SRC_DIR)/asmdata.S                      
 
 CPPFLAGS += -flto -Wno-deprecated \
--I../psyq/include 								\
--I$(INC_DIR)                  		\
+-I../psyq/include 				  \
+-I../nugget/psyq/include 		  \
+-I$(INC_DIR)                  	  \
 
 LDFLAGS += -L../psyq/lib -flto -Wno-deprecated
 LDFLAGS += -Wl,--start-group
