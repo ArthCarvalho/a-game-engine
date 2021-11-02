@@ -45,7 +45,7 @@
 
 
 load_symbol:
-  .incbin "../AGAME_PCDATA/graphics/system/LOAD_SYMBOL.TIM"
+  .incbin "../AGAME_PCDATA/graphics/system/LOAD_SYMBOL.tim"
   .balign 16
 
 player_tim:
