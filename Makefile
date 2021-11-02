@@ -1,4 +1,4 @@
-TYPE=ps-exe
+TYPE=exe
 
 TARGET = test
 
@@ -67,4 +67,5 @@ LDFLAGS += -lspu
 LDFLAGS += -ltap
 LDFLAGS += -Wl,--end-group
 
+LDSCRIPT ?= $(ROOTDIR)/ps-$(TYPE).ld
 include ../nugget/common.mk
