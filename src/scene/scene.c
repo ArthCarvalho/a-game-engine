@@ -78,10 +78,6 @@ extern unsigned long test_image2_tim[];
 extern unsigned long test_image3_tim[];
 extern unsigned long test_image4_tim[];
 
-extern unsigned long test_obj_chara_sgm2[];
-extern unsigned long test_obj_chara_tim[];
-
-
 /*SGM2_File * current_room = NULL; //
 SGM2_File * previous_room = NULL; /* Previous room rendering, if null, skip rendering
                                    * This is used in the transition between two rooms
@@ -590,8 +586,6 @@ void SceneLoad() {
   load_texture_pos((unsigned long)test_image2_tim, 64+(13*1), 256, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+9);
   load_texture_pos((unsigned long)test_image3_tim, 64+(13*2), 256, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+10);
   load_texture_pos((unsigned long)test_image4_tim, 64+(13*3), 256, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+13);
-
-  load_texture_pos((unsigned long)test_obj_chara_tim, 128, 0, 512, 241);
 
   anim_tex_flame_src = (RECT) {FLAME_TEX_X_SRC, FLAME_TEX_Y_SRC, FLAME_TEX_W, FLAME_TEX_H};
   anim_tex_flame_dest = (RECT) {FLAME_TEX_X, FLAME_TEX_Y, FLAME_TEX_W, FLAME_TEX_H*2};

@@ -1,4 +1,4 @@
-TYPE=exe
+TYPE=ps-exe
 
 TARGET = test
 
