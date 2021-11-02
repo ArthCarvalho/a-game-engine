@@ -11,7 +11,7 @@
 #include "actor/a_obj_syokudai.h"
 #include "scene/scene.h"
 
-#include "SPADSTK.h"
+#include "spadstk.h"
 
 struct SGM2 * obj_syokudai_model;
 struct SGM2 * obj_flame_model;

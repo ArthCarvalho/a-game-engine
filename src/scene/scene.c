@@ -10,7 +10,7 @@
 
 #include "scene/scene.h"
 
-#include "SPADSTK.h"
+#include "spadstk.h"
 
 #include "texture/texture.h"
 

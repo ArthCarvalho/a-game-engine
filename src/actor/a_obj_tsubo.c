@@ -11,7 +11,7 @@
 #include "actor/a_obj_tsubo.h"
 #include "scene/scene.h"
 
-#include "SPADSTK.h"
+#include "spadstk.h"
 
 struct SGM2 * obj_tsubo_model;
 struct SGM2 * obj_tsubo_far_model;

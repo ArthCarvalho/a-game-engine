@@ -11,7 +11,7 @@
 #include "actor/a_obj_grass.h"
 #include "scene/scene.h"
 
-#include "SPADSTK.h"
+#include "spadstk.h"
 
 struct SGM2 * obj_grass_model;
 struct SGM2 * obj_grass_far_model;

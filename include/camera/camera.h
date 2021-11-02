@@ -13,7 +13,7 @@
 
 #include "global.h"
 
-#include "ACTOR\actors.h"
+#include "actor/actors.h"
 
 #define Camera_SetPosition(camera, x, y, z) ({ \
     (camera)->position.vx = x; \

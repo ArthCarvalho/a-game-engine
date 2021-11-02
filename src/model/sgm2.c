@@ -10,8 +10,8 @@
 
 #include "model/sgm2.h"
 
-#include<inline_n.h>
-#include<GTEMAC.h>
+#include <inline_n.h>
+#include <gtemac.h>
 
 #define SGM2_SUBDIV_LV1 180
 #define SGM2_SUBDIV_LV2 80

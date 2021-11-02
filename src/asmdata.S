@@ -49,7 +49,7 @@ load_symbol:
   .balign 16
 
 player_tim:
-  .incbin "../AGAME_PCDATA/graphics/player_area_composite.TIM"
+  .incbin "../AGAME_PCDATA/graphics/player_area_composite.tim"
   .balign 16
 
 player_agm:

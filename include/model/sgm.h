@@ -11,7 +11,7 @@
 #ifndef SGM_H
 #define SGM_H
 
-#include "SUBDIV.h"
+#include "subdiv.h"
 #include "global.h"
 //#include "camera.h"
 #include "model/clip.h"

@@ -10,7 +10,7 @@
 
 #include "particles/particles.h"
 
-#include "SPADSTK.h"
+#include "spadstk.h"
 
 /*
 SVECTOR pos = { particle.x, particle.y particle.z };

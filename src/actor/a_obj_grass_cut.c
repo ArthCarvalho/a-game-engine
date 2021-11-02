@@ -11,7 +11,7 @@
 #include "actor/a_obj_grass_cut.h"
 #include "scene/scene.h"
 
-#include "SPADSTK.h"
+#include "spadstk.h"
 
 #define GRASS_CUT_REGROW_SCALE 1024
 

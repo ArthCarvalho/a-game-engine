@@ -10,7 +10,7 @@
 
 #include "actor/a_player.h"
 
-#include "SPADSTK.h"
+#include "spadstk.h"
 
 #include "../../AGAME_PCDATA/player_new.agm.anm.h"
 
