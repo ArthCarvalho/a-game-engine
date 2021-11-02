@@ -1,0 +1,205 @@
+/*
+ * A Game Engine
+ *
+ * (C) 2021 Arthur Carvalho de Souza Lima
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. 
+ */
+
+.section .data
+        
+  .global load_symbol
+  .global vab_hdata
+  .global vab_bdata
+	.global seq_data
+  /*.global test_tim
+  ;.global test_sgm*/
+  .global player_tim
+  .global player_agm
+  .global player_anm
+  .global sword_sg2
+  .global scene_tim
+  .global scene_col
+  .global scene_room00_sg2
+  .global scene_room01_sg2
+  .global scene_room02_sg2
+  .global scene_room03_sg2
+  .global scene_room04_sg2
+  .global obj_syokudai_tim
+  .global obj_syokudai_sgm2
+  .global obj_flame_tim
+  .global obj_flame_pal_tim
+  .global obj_flame_sgm2
+  .global obj_flame_high_sgm2
+  .global obj_tsubo_tim
+  .global obj_tsubo_sgm2
+  .global obj_tsubo_low_sgm2
+  .global obj_grass_tim
+  .global obj_grass_sgm2
+  .global obj_grass_low_sgm2
+  .global obj_grass_low2_sgm2
+  .global obj_grass_cut_tim
+  .global obj_grass_cut_full_sgm2
+  .global obj_grass_cut_half_sgm2
+  .global test_image_tim
+  .global test_image2_tim
+  .global test_image3_tim
+  .global test_image4_tim
+  .global test_obj_chara_sgm2
+  .global test_obj_chara_tim
+
+
+load_symbol:
+  .incbin "data/graphics/system/LOAD_SYMBOL.TIM"
+  .balign 16
+
+vab_hdata:
+	.incbin "data/sound/ZOOT_V3.VH"
+  .balign 16
+
+vab_bdata:
+	.incbin "data/sound/ZOOT_V3.VB"
+  .balign 16
+
+seq_data:
+  .incbin "data/sound/ZOOT_ST6.SEQ"
+  .balign 16
+/*test_tim:
+;  .incbin "data/graphics/REPLACE_BLOCK.TIM"
+;  .balign 16
+;test_sgm:
+;  .incbin "data/graphics/test_player_model.sgm"
+;  .balign 16
+*/
+
+player_tim:
+  .incbin "data/graphics/player_area_composite.TIM"
+  .balign 16
+
+player_agm:
+  .incbin "../AGAME_PCDATA/player_new.agm"
+  .balign 16
+
+player_anm:
+  .incbin "../AGAME_PCDATA/player_new.agm.anm"
+  .balign 16
+
+sword_sg2:
+  .incbin "../AGAME_PCDATA/prop_swerd.sgm2"
+  .balign 16
+
+scene_tim:
+  .incbin "data/graphics/replace_block-psnew2225.tim"
+  .balign 16
+
+scene_col:
+  .incbin "data/graphics/TestRoom_C000-colbb-fixed-optimized.col2"
+  .balign 16
+
+scene_room00_sg2:
+  .incbin "../AGAME_PCDATA/Map/Test/room_000.sgm2"
+/*;  .incbin "../AGAME_PCDATA/TestRoom_C000-colbb-fixed.sgm2"*/
+
+scene_room01_sg2:
+  .incbin "../AGAME_PCDATA/Map/Test/room_001.sgm2"
+  .balign 16
+
+scene_room02_sg2:
+  .incbin "../AGAME_PCDATA/Map/Test/room_002.sgm2"
+  .balign 16
+
+scene_room03_sg2:
+  .incbin "../AGAME_PCDATA/Map/Test/room_003.sgm2"
+  .balign 16
+
+scene_room04_sg2:
+  .incbin "../AGAME_PCDATA/Map/Test/room_004.sgm2"
+  .balign 16
+
+obj_syokudai_tim:
+  .incbin "../AGAME_PCDATA/obj_syokudai.tim"
+  .balign 16
+
+obj_syokudai_sgm2:
+  .incbin "../AGAME_PCDATA/obj_syokudai.sgm2"
+  .balign 16
+
+obj_flame_tim:
+  .incbin "../AGAME_PCDATA/obj_flame.tim"
+  .balign 16
+
+obj_flame_pal_tim:
+  .incbin "../AGAME_PCDATA/obj_flame_pa-24.tim"
+  .balign 16
+
+obj_flame_sgm2:
+  .incbin "../AGAME_PCDATA/obj_flame.sgm2"
+  .balign 16
+
+obj_flame_high_sgm2:
+  .incbin "../AGAME_PCDATA/obj_flame_high.sgm2"
+  .balign 16
+
+obj_tsubo_tim:
+  .incbin "../AGAME_PCDATA/obj_tsubo.tim"
+  .balign 16
+
+obj_tsubo_sgm2:
+  .incbin "../AGAME_PCDATA/obj_tsubo.sgm2"
+  .balign 16
+
+obj_tsubo_low_sgm2:
+  .incbin "../AGAME_PCDATA/obj_tsubo_low.sgm2"
+  .balign 16
+
+obj_grass_tim:
+  .incbin "../AGAME_PCDATA/obj_grass_multiclut.tim"
+  .balign 16
+
+obj_grass_sgm2:
+  .incbin "../AGAME_PCDATA/obj_grass.sgm2"
+  .balign 16
+
+obj_grass_low_sgm2:
+  .incbin "../AGAME_PCDATA/obj_grass_low.sgm2"
+  .balign 16
+
+obj_grass_low2_sgm2:
+  .incbin "../AGAME_PCDATA/obj_grass_low2.sgm2"
+  .balign 16
+
+obj_grass_cut_tim:
+  .incbin "../AGAME_PCDATA/obj_grass_cut.tim"
+  .balign 16
+
+obj_grass_cut_full_sgm2:
+  .incbin "../AGAME_PCDATA/obj_grass_cut_full.sgm2"
+  .balign 16
+
+obj_grass_cut_half_sgm2:
+  .incbin "../AGAME_PCDATA/obj_grass_cut_half.sgm2"
+  .balign 16
+
+test_image_tim:
+  .incbin "../AGAME_PCDATA/item_icons/dekunuts-alpha-fs8.tim"
+  .balign 16
+
+test_image2_tim:
+  .incbin "../AGAME_PCDATA/item_icons/letter-alpha-fs8.tim"
+  .balign 16
+test_image3_tim:
+  .incbin "../AGAME_PCDATA/item_icons/triple_img.tim"
+  .balign 16
+test_image4_tim:
+  .incbin "../AGAME_PCDATA/item_icons/bow-multi-pal.tim"
+  .balign 16
+  
+test_obj_chara_sgm2:
+  .incbin "../AGAME_PCDATA/test_obj_chara.sgm2"
+  .balign 16
+
+test_obj_chara_tim:
+  .incbin "../AGAME_PCDATA/test_obj_chara.tim"
+  .balign 16
