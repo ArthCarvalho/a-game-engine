@@ -141,6 +141,10 @@ void PlayerCreateInstance(Actor * a, void * col_ctx) {
   actor->base.pos.vx = 43 * 256;
   actor->base.pos.vy = 0;
   actor->base.pos.vz = 0;
+
+  actor->base.rot.vx = 0;
+  actor->base.rot.vy = 3072;
+  actor->base.rot.vz = 0;
   actor->x_position = actor->base.pos.vx << 12;
   actor->y_position = actor->base.pos.vz << 12;
   actor->z_position = actor->base.pos.vz << 12;
@@ -149,6 +153,9 @@ void PlayerCreateInstance(Actor * a, void * col_ctx) {
 
   actor->y_rotation = 3072;
   actor->y_move_dir = actor->y_rotation;
+
+  actor->base.child = NULL;
+  actor->base.parent = NULL;
 
   // Place player on ground
   {
