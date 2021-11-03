@@ -30,6 +30,8 @@
 #include <inline_n.h>
 #include <gtemac.h>
 
+#define VIDEO_MODE MODE_NTSC
+
 extern u_long *DivideGT3( SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, u_long *uv0, u_long *uv1, u_long
 *uv2, CVECTOR *rgb0, CVECTOR *rgb1, CVECTOR *rgb2, POLY_GT3 *s, u_long *ot, DIVPOLYGON3
 *divp);

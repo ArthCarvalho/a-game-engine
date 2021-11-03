@@ -346,7 +346,6 @@ void SceneLoad() {
     Scene_ActorList[i].end = NULL;
   }
 
-
   for(int i = 0; i < MAX_PARTICLE_EMITTERS; i++) {
     particle_list[i].flags = 0;
   }
@@ -382,7 +381,7 @@ void SceneLoad() {
     // Allocate
     scene->transition_actors[0] = LStack_Alloc(sizeof(Actor_SwapPlane));
     Scene_AddActor(&Scene_ActorList[ACTORTYPE_DOOR], scene->transition_actors[0]);
-    //printf("Printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
+    //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
     // Create each transition actor
     Actor_SwapPlane_Init(scene->transition_actors[0], &newactor, scene);
   }
@@ -411,7 +410,7 @@ void SceneLoad() {
 
     // Allocate
     scene->transition_actors[1] = LStack_Alloc(sizeof(Actor_SwapPlane));
-    //printf("Printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
+    //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
     // Create each transition actor
     Scene_AddActor(&Scene_ActorList[ACTORTYPE_DOOR], scene->transition_actors[1]);
     Actor_SwapPlane_Init(scene->transition_actors[1], &newactor, scene);
@@ -442,7 +441,7 @@ void SceneLoad() {
 
     // Allocate
     scene->transition_actors[2] = LStack_Alloc(sizeof(Actor_SwapPlane));
-    //printf("Printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
+    //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
     // Create each transition actor
     Scene_AddActor(&Scene_ActorList[ACTORTYPE_DOOR], scene->transition_actors[2]);
     Actor_SwapPlane_Init(scene->transition_actors[2], &newactor, scene);
@@ -472,7 +471,7 @@ void SceneLoad() {
 
     // Allocate
     scene->transition_actors[3] = LStack_Alloc(sizeof(Actor_SwapPlane));
-    //printf("Printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
+    //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
     // Create each transition actor
     Scene_AddActor(&Scene_ActorList[ACTORTYPE_DOOR], scene->transition_actors[3]);
     Actor_SwapPlane_Init(scene->transition_actors[3], &newactor, scene);
@@ -998,6 +997,7 @@ void SceneMain() {
     Actor * current = Scene_ActorList[i].start;
     if(Scene_ActorList[i].length == 0) continue;
     while(current) {
+      Actor * next = current->next;
       if((current->room == 0xFF || current->room == scene->current_room_id) && current->Update) {
         SetSpadStack(SPAD_STACK_ADDR);
         SVECTOR tdist = playerActor->base.pos;
@@ -1016,9 +1016,8 @@ void SceneMain() {
         Scene_RemoveActor(&Scene_ActorList[i], current);
         current->Destroy(current, scene);
         Arena_Free(current);
-
       }
-      current = current->next;
+      current = next;
     }
   }
 
@@ -1221,25 +1220,13 @@ void * Scene_AllocActor(ActorList * list, u_char type, u_long size) {
   Actor * actor = Arena_Malloc(size);
   actor->type = type;
   actor->size = size;
-  list->length++;
-  if(list->start == NULL) {
-    list->start = actor;
-    list->end = actor;
-    actor->prev = NULL;
-    actor->next = NULL;
-  } else {
-    // Get last actor and append new actor to it
-    Actor * last_actor = list->end;
-    list->end = last_actor->next = actor;
-    actor->prev = last_actor;
-    actor->next = NULL;
-  }
+  Scene_AddActor(list, actor);
   return actor;
 }
 
 void * Scene_AddActor(ActorList * list, Actor * actor) {
   list->length++;
-  if(list->start == NULL) {
+  if(!list->start) {
     list->start = actor;
     list->end = actor;
     actor->prev = NULL;
@@ -1249,6 +1236,7 @@ void * Scene_AddActor(ActorList * list, Actor * actor) {
     Actor * last_actor = list->end;
     list->end = last_actor->next = actor;
     actor->prev = last_actor;
+    actor->next = NULL;
   }
   return actor;
 }

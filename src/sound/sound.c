@@ -11,7 +11,12 @@ int SoundInit(){
   SsInit ();
   SsSetTableSize (seq_table, 4, 5); /* keep seq data table area */
   
-  SsSetTickMode(SS_TICK60);
+  if(VIDEO_MODE) {
+    SsSetTickMode(SS_TICK50);
+  } else {
+    SsSetTickMode(SS_TICK60);
+  }
+  
   SsStart2();
 }
 

@@ -77,9 +77,9 @@ short player_head_updown_limit = 512;
 
 u_long last_state = 0;
 
-u_short interp = 2048;
-
 u_long anim_interp = 0;
+
+u_short interp = 2048;
 
 Col2 * col_context_pl;
 

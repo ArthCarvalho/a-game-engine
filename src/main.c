@@ -10,7 +10,6 @@
 
 #include "global.h"
 
-
 /* TEMPORARY STATIC DATA FILES */
 extern unsigned long load_symbol[];
 //extern unsigned long test_tim[];
@@ -20,7 +19,6 @@ extern unsigned long load_symbol[];
 //extern unsigned long test_playerobj[];
 //extern unsigned long test_cube[];
 //extern unsigned long test_room_collision[];
-
 
 /* END OF TEMPORARY FILES */
 
@@ -85,7 +83,7 @@ void main() {
   SetDispMask(0);
   
   /* FORCE NTSC */
-	SetVideoMode(0);
+	SetVideoMode(VIDEO_MODE);
   /* Initializes all system callbacks. OTHERWISE THE SYSTEM MAY HANG */
 	ResetCallback();
   /* Init Decompressor */
@@ -133,6 +131,12 @@ void main() {
   
   G.Disp_env[0].isinter = G.Disp_env[1].isinter = 0; // Interlace
 	G.Disp_env[0].isrgb24 = G.Disp_env[1].isrgb24= 0; // 24 bit
+
+  if(VIDEO_MODE) {
+    // PAL Vertical Fix
+    G.Disp_env[0].screen.y += 24;
+    G.Disp_env[1].screen.y += 24;
+  }
   
   G.Draw_env[0].dfe = G.Draw_env[1].dfe = 1; // Enable Drawing
 	G.Draw_env[0].dtd = G.Draw_env[1].dtd = 1; // Enable Dithering
