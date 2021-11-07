@@ -106,11 +106,12 @@ typedef struct SGM2 {
 	SGM2_POLYGT3 * poly_gt3;
 } SGM2_File;
 
-#define SGM2_RENDER_ABE      (1<<0)
-#define SGM2_RENDER_SUBDIV   (1<<1)
-#define SGM2_RENDER_NO_NCLIP (1<<2)
-#define SGM2_RENDER_BUMPCLUT (1<<3)
-#define SGM2_RENDER_AMBIENT  (1<<4)
+#define SGM2_RENDER_ABE     		(1<<0)
+#define SGM2_RENDER_SUBDIV  		(1<<1)
+#define SGM2_RENDER_NO_NCLIP		(1<<2)
+#define SGM2_RENDER_BUMPCLUT 		(1<<3)
+#define SGM2_RENDER_AMBIENT  		(1<<4)
+#define SGM2_RENDER_SUBDIV_HIGH	(1<<5)
 
 SGM2_File * SGM2_LoadFile(u_long * addr);
 

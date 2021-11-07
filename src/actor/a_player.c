@@ -303,7 +303,7 @@ void PlayerUpdate(Actor * a, void * scene) {
     actor->xzvector.vy = icos(actor->y_move_dir);
 
   
-    #define FLOOR_RAY_SIZE 4096
+    #define FLOOR_RAY_SIZE 4096*2
 
     // Collide against geometry
     {

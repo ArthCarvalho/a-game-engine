@@ -271,11 +271,11 @@ void Camera_Update(struct Camera * cam){
 					pforward.vy = cam->target_pos.vy + 512;
 					pforward.vz = cam->target_pos.vz - (cam->zaxis.vz * 700 >> 12);
 
-					Col_GroundCheckPoint(col_context, &pforward, 4096, &col_result);
+					Col_GroundCheckPoint(col_context, &pforward, 4096*2, &col_result);
 					if(col_result.face >= 0) p_floor_a = (col_result.position.vy - cam->target_pos.vy);
 					pforward.vx = cam->target_pos.vx - (cam->zaxis.vx * 400 >> 12); // vx >> 3
 					pforward.vz = cam->target_pos.vz - (cam->zaxis.vz * 400 >> 12);
-					Col_GroundCheckPoint(col_context, &pforward, 4096, &col_result);
+					Col_GroundCheckPoint(col_context, &pforward, 4096*2, &col_result);
 					if(col_result.face >= 0) p_floor_b = (col_result.position.vy - cam->target_pos.vy);
 					if(p_floor_a > 1000) p_floor_a = 1000;
 					if(p_floor_a < -1000) p_floor_a = -1000;

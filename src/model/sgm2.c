@@ -16,6 +16,9 @@
 #define SGM2_SUBDIV_LV1 180
 #define SGM2_SUBDIV_LV2 80
 
+#define SGM2_SUBDIV_HIGH_LV1 400
+#define SGM2_SUBDIV_HIGH_LV2 200
+
 SGM2_File * SGM2_LoadFile(u_long * addr) {
   // Parse the offsets inside the file and change them to memory addresses instead of offsets.
   SGM2_File * dest = (SGM2_File *)addr;
@@ -64,12 +67,26 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
   u_long tpageid;
   u_long clutid;
   u_long pg_count;
+  u_short current_mat;
+  u_short last_mat;
   DIVPOLYGON4 * divprop = (DIVPOLYGON4 *)(SCRATCH_PAD+0xC0);
   DIVPOLYGON3 * divprop3 = (DIVPOLYGON3 *)(SCRATCH_PAD+0xC0);
   Scene_Ctx * scenectx = (Scene_Ctx*)scene;
   u_char ambient_r = scenectx->ambient.r; // >> 7
   u_char ambient_g = scenectx->ambient.g; // >> 7
   u_char ambient_b = scenectx->ambient.b; // >> 7
+
+  u_short subdiv_lvl1 = SGM2_SUBDIV_LV1;
+  u_short subdiv_lvl2 = SGM2_SUBDIV_LV2;
+  u_char subdiv_n1 = 1;
+  u_char subdiv_n2 = 2;
+
+  if(flags & SGM2_RENDER_SUBDIV_HIGH) {
+    subdiv_lvl1 = SGM2_SUBDIV_HIGH_LV1;
+    subdiv_lvl2 = SGM2_SUBDIV_HIGH_LV2;
+    subdiv_n1 = 2;
+    subdiv_n2 = 3;
+  }
   
 
   divprop->pih = SCREEN_W;
@@ -82,9 +99,9 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
 
   //tpageid = getTPage(1, 0, 0,0);
   //clutid = GetClut(TEST_CLX,TEST_CLY);
-  
+  /*
   clutid = (u_long)(model->material[0].clut + ((flags & SGM2_RENDER_BUMPCLUT) << 3)) << 16;
-  tpageid = (u_long)model->material[0].tpage << 16;
+  tpageid = (u_long)model->material[0].tpage << 16;*/
 
   //clutid = model->material[0].clut;
   //tpageid = model->material[0].tpage;
@@ -104,6 +121,9 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
     SVECTOR * vec1 = &TransformBuffer[pgt4_ptr->idx1];
     SVECTOR * vec2 = &TransformBuffer[pgt4_ptr->idx2];
     SVECTOR * vec3 = &TransformBuffer[pgt4_ptr->idx3];
+
+    clutid = (u_long)(model->material[pgt4_ptr->material].clut + ((flags & SGM2_RENDER_BUMPCLUT) << 3)) << 16;
+    tpageid = (u_long)model->material[pgt4_ptr->material].tpage << 16;
 
     //if(quad_clip( (DVECTOR*)&vec0->vx,
     //              (DVECTOR*)&vec1->vx,
@@ -136,12 +156,19 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
     // Reduce OTZ size
     otz = (otz >> OTSUBDIV)+depth_offset;
     //otz = 50;
-    if (otz > OTMIN && otz < OTSIZE) {
-      if(otz < SGM2_SUBDIV_LV1 && flags & SGM2_RENDER_SUBDIV) {
+    if(otz >= OTSIZE) otz = OTSIZE-1;
+
+    if (otz > OTMIN) {
+      if(otz < subdiv_lvl1 && flags & SGM2_RENDER_SUBDIV) {
         u_long uvcode0, uvcode1, uvcode2, uvcode3;
         //CVECTOR colcode;
-        divprop->ndiv = 1;
-        if(otz < SGM2_SUBDIV_LV2) divprop->ndiv = 2;
+        
+        if(otz < subdiv_lvl2) {
+          divprop->ndiv = subdiv_n2;
+        } else {
+          divprop->ndiv = subdiv_n1;
+        }
+        
         vec0 = &model->vertex_data[pgt4_ptr->idx0];
         vec1 = &model->vertex_data[pgt4_ptr->idx1];
         vec2 = &model->vertex_data[pgt4_ptr->idx2];
@@ -237,6 +264,9 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
       SVECTOR * vec0 = &TransformBuffer[pgt3_ptr->idx0];
       SVECTOR * vec1 = &TransformBuffer[pgt3_ptr->idx1];
       SVECTOR * vec2 = &TransformBuffer[pgt3_ptr->idx2];
+
+      clutid = (u_long)(model->material[pgt3_ptr->material].clut + ((flags & SGM2_RENDER_BUMPCLUT) << 3)) << 16;
+      tpageid = (u_long)model->material[pgt3_ptr->material].tpage << 16;
       
       // Clip quads that are offscreen before any other operation
       //if(tri_clip((DVECTOR*)vec0,
@@ -267,11 +297,16 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
       // Reduce OTZ size
       otz = (otz >> OTSUBDIV)+depth_offset;
       //otz = 50;
-      if (otz > OTMIN && otz < OTSIZE) {
-        if(otz < SGM2_SUBDIV_LV1 && flags & SGM2_RENDER_SUBDIV) {
+      if(otz >= OTSIZE) otz = OTSIZE-1;
+      if (otz > OTMIN) {
+        if(otz < subdiv_lvl1 && flags & SGM2_RENDER_SUBDIV) {
           u_long uvcode0, uvcode1, uvcode2;
-          divprop->ndiv = 1;
-          if(otz < SGM2_SUBDIV_LV2) divprop->ndiv = 2;
+          if(otz < subdiv_lvl2) {
+            divprop->ndiv = subdiv_n2;
+          } else {
+            divprop->ndiv = subdiv_n1;
+          }
+        
           vec0 = &model->vertex_data[pgt3_ptr->idx0];
           vec1 = &model->vertex_data[pgt3_ptr->idx1];
           vec2 = &model->vertex_data[pgt3_ptr->idx2];

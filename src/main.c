@@ -9,8 +9,10 @@
  */
 
 #include "global.h"
+#include "texture/texture.h"
 
 /* TEMPORARY STATIC DATA FILES */
+extern unsigned long saveicon[];
 extern unsigned long load_symbol[];
 //extern unsigned long test_tim[];
 //extern unsigned long test_sgm[];
@@ -21,6 +23,49 @@ extern unsigned long load_symbol[];
 //extern unsigned long test_room_collision[];
 
 /* END OF TEMPORARY FILES */
+
+/* Memory Card Stuff */
+/*
+// Single Block, 3 icons
+typedef struct {
+	char	Magic[2];
+	char	Type;
+	char	BlockEntry;
+	char	Title[64];
+	char	reserve[28];
+	char	Clut[0x20];
+	char	Icon[3][0x80];
+  char  Data[0x1E00];
+} _CARD;
+*/
+
+// Single Block, 1 icon
+typedef struct {
+	char	Magic[2];
+	char	Type;
+	char	BlockEntry;
+	char	Title[64];
+	char	reserve[28];
+	char	Clut[0x20];
+	char	Icon[0x80];
+  char  Data[0x1F00];
+} _CARD;
+
+
+typedef struct {
+  unsigned short curent_map;
+  SVECTOR pos;
+  SVECTOR rot;
+  unsigned short max_life;
+  unsigned short max_magic;
+  unsigned short life;
+  unsigned short magic;
+  char name[16];
+  unsigned long checksum;
+} _SAVEDATA; // Max 7680 (0x1E00) bytes
+
+TIMIMAGE save_tim;
+static _CARD HEAD;
 
 /* TODO: Check for a button combo to start additional debug menu */
 void module_debug_start() {
@@ -94,6 +139,8 @@ void main() {
   DsInit();
   DsSetDebug(0);
   /* Initialize Input Related Stuff Here*/
+  MemCardInit(1);
+  MemCardStart();
   InputInit();
   /* Init Graph */
 	ResetGraph(0);	
@@ -167,6 +214,90 @@ void main() {
   
   /* Set Display Mask to Display (enable display output) */
 	SetDispMask(1);
+
+  
+  /* Memory Card Debug Generate Save */
+  /*GetTimInfo(saveicon,&save_tim);
+  printf("Waiting for memory card...\n");
+  {
+    long channel = 0;
+    unsigned long result;
+
+    _SAVEDATA save;
+
+    typedef struct {
+  unsigned short curent_map;
+  SVECTOR pos;
+  SVECTOR rot;
+  unsigned short max_life;
+  unsigned short max_magic;
+  unsigned short life;
+  unsigned short magic;
+  char name[16];
+  unsigned long checksum;
+} _SAVEDATA; // Max 7680 (0x1E00) bytes
+
+
+    save.curent_map = 0xFF27;
+    save.pos.vx = 5161;
+    save.pos.vy = 512;
+    save.pos.vz = -5661;
+    save.rot.vx = 0;
+    save.rot.vy = 3072;
+    save.rot.vz = 0;
+    save.max_life = 16;
+    save.max_magic = 128;
+    save.life = 14;
+    save.magic = 128;
+    save.checksum = 0xFAEFFAEF;
+    strcpy(save.name, "Kirbo");
+
+
+
+    // Open Channel 0 (Memory Card A)
+
+    MemCardSync(0,0,&result);
+    printf("Mem result 0x%02X\n", result);
+
+    printf("Opening Memory Card A...\n");
+    MemCardAccept(channel);
+    // Wait for results, stall
+    MemCardSync(0,0,&result);
+    printf("Syncing...\n");
+
+    if(result != McErrNone && result != McErrNewCard) {
+      // Memory card error
+      printf("Memory card error: 0x%02x\n", result);
+    } else {
+      printf("Creating Memory Card File...\n");
+      // Create file
+      result = MemCardCreateFile(channel, "BASLUS-27588ZELDAMM", 1);
+      if(result != McErrNone) {
+        // Error!
+        printf("Memory card error creating file: 0x%02x\n", result);
+      } else {
+        HEAD.Magic[0] = 'S';
+        HEAD.Magic[1] = 'C';
+        HEAD.Type = 0x11;
+        HEAD.BlockEntry = 1;
+        strcpy(HEAD.Title, "\x82\x73\x82\x88\x82\x85\x81\x40\x82\x6B\x82\x85\x82\x87\x82\x85\x82\x8E\x82\x84\x81\x40\x82\x8F\x82\x86\x81\x40\x82\x73\x82\x85\x82\x93\x82\x94\x81\x40\x81\x7C\x81\x40\x82\x65\x82\x89\x82\x8C\x82\x85\x81\x40\x30\x31");
+        memcpy( HEAD.Clut, save_tim.clut, 32 );
+        memcpy( HEAD.Icon[0], save_tim.pixel, 128);
+        memcpy( HEAD.Icon[1], save_tim.pixel, 128);
+        memcpy( HEAD.Icon[2], save_tim.pixel, 128);
+        memcpy( HEAD.Data, &save, sizeof(_SAVEDATA));
+
+        MemCardWriteFile(channel, "BASLUS-27588ZELDAMM", (long*)&HEAD, 0, sizeof(HEAD));
+
+        MemCardSync(0,0,&result);
+
+        if(result != McErrNone) {
+          printf("Memory card error writing: 0x%02x", result);
+          return;
+        }
+      }
+    }
+  }*/
   
   /* Start on DEBUG module */
   G.module = MODULE_DEBUG_START;

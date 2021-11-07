@@ -8,6 +8,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. 
  */
 
+#include "screen/screen.h"
+
 #include "scene/scene.h"
 
 #include "spadstk.h"
@@ -29,7 +31,7 @@ SGM2_File * player_prop_sword;
 
 // Map Data
 Col2 * map_col;
-SGM2_File * map_model[5];
+SGM2_File * map_model[7];
 
 // Camera
 MATRIX local_identity;
@@ -67,16 +69,24 @@ extern unsigned long player_agm[];
 extern unsigned long player_anm[];
 extern unsigned long sword_sg2[];
 extern unsigned long scene_tim[];
+extern unsigned long iwakabe_tim[];
+extern unsigned long iwakabe_far_tim[];
+extern unsigned long iwayuka_tim[];
 extern unsigned long scene_col[];
 extern unsigned long scene_room00_sg2[];
 extern unsigned long scene_room01_sg2[];
 extern unsigned long scene_room02_sg2[];
 extern unsigned long scene_room03_sg2[];
 extern unsigned long scene_room04_sg2[];
+extern unsigned long scene_room05_sg2[];
+extern unsigned long scene_room05_sg2_ext[];
 extern unsigned long test_image_tim[];
 extern unsigned long test_image2_tim[];
 extern unsigned long test_image3_tim[];
 extern unsigned long test_image4_tim[];
+extern unsigned long screen_lifebar_tim[];
+extern unsigned long texture_data_start[];
+extern unsigned long texture_data_end[];
 
 /*SGM2_File * current_room = NULL; //
 SGM2_File * previous_room = NULL; /* Previous room rendering, if null, skip rendering
@@ -495,6 +505,8 @@ void SceneLoad() {
   map_model[2] = (SGM2_File*)scene_room02_sg2;
   map_model[3] = (SGM2_File*)scene_room03_sg2;
   map_model[4] = (SGM2_File*)scene_room04_sg2;
+  map_model[5] = (SGM2_File*)scene_room05_sg2;
+  map_model[6] = (SGM2_File*)scene_room05_sg2_ext;
 
   printf("Col_LoadFile\n");
 
@@ -516,11 +528,36 @@ void SceneLoad() {
   map_model[2] = SGM2_LoadFile((u_long*)map_model[2]);
   map_model[3] = SGM2_LoadFile((u_long*)map_model[3]);
   map_model[4] = SGM2_LoadFile((u_long*)map_model[4]);
+  map_model[5] = SGM2_LoadFile((u_long*)map_model[5]);
+  map_model[6] = SGM2_LoadFile((u_long*)map_model[6]);
 
   for(int i = 0; i < 5; i++) {
     map_model[i]->material[0].clut = GetClut(MAP_TEXTURE_CLUT_X, MAP_TEXTURE_CLUT_Y);
     map_model[i]->material[0].tpage = getTPage(1, 0, 0, 0);
   }
+
+  map_model[5]->material[0].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y);
+  map_model[5]->material[0].tpage = getTPage(0, 0, 128, 0);
+  //map_model[5]->material[1].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32+16, MAP_TEXTURE_CLUT_Y);
+  map_model[5]->material[1].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y);
+  map_model[5]->material[1].tpage = getTPage(0, 0, 128, 0);
+  map_model[6]->material[0].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y+8);
+  map_model[6]->material[0].tpage = getTPage(0, 0, 128, 0);
+  map_model[6]->material[1].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y+10);
+  map_model[6]->material[1].tpage = getTPage(0, 0, 128, 0);
+  //map_model[6]->material[2].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32+16, MAP_TEXTURE_CLUT_Y+13);
+  map_model[6]->material[2].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y+13);
+  map_model[6]->material[2].tpage = getTPage(0, 0, 128, 0);
+
+  
+
+  //map_model[6]->material[1].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y+10);
+  //map_model[6]->material[1].tpage = getTPage(0, 0, 128, 0);
+
+  printf("Room 005 Model Material Count: %d\n", map_model[5]->mat_count);
+
+  printf("Material 0: clut 0x%04X tpage 0x%04X\n", map_model[6]->material[0].clut, map_model[6]->material[0].tpage);
+  printf("Material 0: clut 0x%04X tpage 0x%04X\n", map_model[6]->material[1].clut, map_model[6]->material[1].tpage);
 
   // Initialize player object
   playerActor = LStack_Alloc(sizeof(struct PlayerActor));
@@ -540,6 +577,15 @@ void SceneLoad() {
   G.clear.r = 98;
   G.clear.g = 66;
   G.clear.b = 30;
+
+  //G.clear.r = 50;
+  //G.clear.g = 115;
+  //G.clear.b = 213;
+
+  G.clear.r = 164;
+  G.clear.g = 209;
+  G.clear.b = 255;
+
 
   // Initialize transition objects
   // Set Rooms
@@ -568,9 +614,15 @@ void SceneLoad() {
 
   // Load map (global) textures
   //file_load_temp_noalloc("\\DATA\\TEST.TIM;1", dataptr);
-  SetFarColor(255,255,255);
+  //SetFarColor(255,255,255);
+  //SetFarColor(98,66,30);
+  // Sky blue
+  SetFarColor(50,115,213);
   //load_texture_pos_fog((unsigned long)dataptr, 0, 0, 512, 496,16);
   load_texture_pos_fog((unsigned long)scene_tim, 0, 0, MAP_TEXTURE_CLUT_X, MAP_TEXTURE_CLUT_Y,16);
+  load_texture_pos_fog((unsigned long)iwakabe_tim, 128, 0, MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y,16);
+  //load_texture_pos_fog((unsigned long)iwayuka_tim, 128+32, 0, MAP_TEXTURE_CLUT_X+256+32+16, MAP_TEXTURE_CLUT_Y,16);
+  //load_tex_noclut_pos((unsigned long)iwakabe_far_tim, 128+32+16, 0, 0, 0);
   // Load animated fire textures
   // Syokudai
   load_texture_pos((unsigned long)obj_flame_tim, FLAME_TEX_X_SRC, FLAME_TEX_Y_SRC, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y);
@@ -585,6 +637,8 @@ void SceneLoad() {
   load_texture_pos((unsigned long)test_image2_tim, 64+(13*1), 256, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+9);
   load_texture_pos((unsigned long)test_image3_tim, 64+(13*2), 256, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+10);
   load_texture_pos((unsigned long)test_image4_tim, 64+(13*3), 256, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+13);
+
+  load_texture_pos((unsigned long)screen_lifebar_tim, LIFEMETER_TEX_X, LIFEMETER_TEX_Y, LIFEMETER_CLUT_X, LIFEMETER_CLUT_Y);
 
   anim_tex_flame_src = (RECT) {FLAME_TEX_X_SRC, FLAME_TEX_Y_SRC, FLAME_TEX_W, FLAME_TEX_H};
   anim_tex_flame_dest = (RECT) {FLAME_TEX_X, FLAME_TEX_Y, FLAME_TEX_W, FLAME_TEX_H*2};
@@ -697,12 +751,63 @@ void SceneLoad() {
     ObjTsuboActorInitialize((Actor*) actor, NULL, scene);
   }
 
+  {
+    ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjGrassCutActor));
+      actor->base.room = 0;
+      actor->base.pos.vx = 2013;
+      actor->base.pos.vy = -3763;
+      actor->base.pos.vz = -23509;
+      actor->base.rot.vx = 0;
+      actor->base.rot.vy = rand() >> 4;
+      actor->base.rot.vz = 0;
+      ObjGrassCutActorInitialize((Actor*)actor, NULL, scene);
+  }
+
+  {
+    ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjGrassCutActor));
+      actor->base.room = 0;
+      actor->base.pos.vx = 1862;
+      actor->base.pos.vy = -3763;
+      actor->base.pos.vz = -22836;
+      actor->base.rot.vx = 0;
+      actor->base.rot.vy = rand() >> 4;
+      actor->base.rot.vz = 0;
+      ObjGrassCutActorInitialize((Actor*)actor, NULL, scene);
+  }
+
+  {
+    ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjGrassCutActor));
+      actor->base.room = 0;
+      actor->base.pos.vx = 6570;
+      actor->base.pos.vy = -3763;
+      actor->base.pos.vz = -23650;
+      actor->base.rot.vx = 0;
+      actor->base.rot.vy = rand() >> 4;
+      actor->base.rot.vz = 0;
+      ObjGrassCutActorInitialize((Actor*)actor, NULL, scene);
+  }
+
+  {
+    ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjGrassCutActor));
+      actor->base.room = 0;
+      actor->base.pos.vx = 6782;
+      actor->base.pos.vy = -3763;
+      actor->base.pos.vz = -23163;
+      actor->base.rot.vx = 0;
+      actor->base.rot.vy = rand() >> 4;
+      actor->base.rot.vz = 0;
+      ObjGrassCutActorInitialize((Actor*)actor, NULL, scene);
+  }
+
+
   printf("Last actor pointer: 0x%0X\n", actptr);  
   scene->draw_dist = 1024;
 
   scene->ambient.r = 207>>1;
   scene->ambient.g = 191>>1;
   scene->ambient.b = 139>>1;
+
+  printf("Texture Data Start: 0x%08X End: 0x%08X (Size: %d)\n", texture_data_start, texture_data_end, texture_data_end - texture_data_start);
 }
     //printf("a actor: 0x%08X <<prev [0x%08X] next>> 0x%08X\n", current->prev, current, current->next);
 /* __attribute__((optimize("O0"))) */
@@ -1030,8 +1135,9 @@ void SceneMain() {
 void SceneDraw() {
   u_char * packet_b_ptr;
   MATRIX local_identity;
+  MATRIX local_identity_far;
 
-  local_identity = m_identity;
+  local_identity_far = local_identity = m_identity;
 
   BeginDraw();
 
@@ -1039,6 +1145,23 @@ void SceneDraw() {
   packet_b_ptr = G.pBuffer;
 
   CompMatrixLV(&camera->matrix, &m_identity, &local_identity);
+
+  //VECTOR bgscale = {4096*2,4096*2,4096*2,0};
+  //ScaleMatrixL(&local_identity_far, &bgscale);
+  
+  //CompMatrixLV(&camera->matrix, &local_identity_far, &local_identity_far);
+
+  local_identity_far = local_identity;
+  local_identity_far.t[0] = local_identity.t[0] >> 3;
+  local_identity_far.t[1] = local_identity.t[1] >> 3;
+  local_identity_far.t[2] = local_identity.t[2] >> 3;
+
+  gte_SetRotMatrix(&local_identity_far);
+  gte_SetTransMatrix(&local_identity_far);
+
+  SetSpadStack(SPAD_STACK_ADDR);
+  packet_b_ptr = SGM2_UpdateModel(map_model[6], packet_b_ptr, (u_long*)G.pOt, 2048, NULL, scene);
+  ResetSpadStack();
 
   gte_SetRotMatrix(&local_identity);
   gte_SetTransMatrix(&local_identity);
@@ -1057,9 +1180,11 @@ void SceneDraw() {
   // Flame texture
   Scene_ScrollTexture2x(&anim_tex_flame_src, &anim_tex_flame_dest, 0x3F - ((scene_counter<<1) & 0x3F));
 
+  //FntPrint("X: %d Y:%d Z:%d\n", playerActor->base.pos.vx, playerActor->base.pos.vy, playerActor->base.pos.vz);
 
   SetSpadStack(SPAD_STACK_ADDR);
   packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 20, SGM2_RENDER_SUBDIV, scene);
+  packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH, scene);
   ResetSpadStack();
   if(scene->previous_room_m != NULL && scene->previous_room_m != scene->current_room_m){
     SetSpadStack(SPAD_STACK_ADDR);
@@ -1140,6 +1265,8 @@ void SceneDraw() {
   setDrawTPage((DR_TPAGE*)packet_b_ptr, 1, 0, getTPage(0, 0, 64, 256));
   addPrim(G.pOt, packet_b_ptr);
   packet_b_ptr += sizeof(DR_TPAGE);
+
+  packet_b_ptr = Screen_LifeMeterDraw(packet_b_ptr);
 
   if(scene->camera->target_mode) {
     cinema_mode++;

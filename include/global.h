@@ -12,9 +12,11 @@
 #ifndef _GLOBAL_H
 #define _GLOBAL_H
 
+#include <string.h>
 /* PSX Library Files */
 #include <memory.h>
 #include <sys/types.h>
+#include <libapi.h>
 /*#include <libmath.h>*/
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,6 +28,7 @@
 #include <libcd.h>
 #include <libds.h>
 #include <libsnd.h>
+#include <libmcrd.h>
 
 #include <inline_n.h>
 #include <gtemac.h>
@@ -108,6 +111,8 @@ POLY_GT4 *s, u_long *ot, DIVPOLYGON4 *divp);
 #define OTMINCHAR 1
 //#define PACKET_SIZE 0x19000
 #define PACKET_SIZE 0x50000
+
+#define RGBPACK32(r,g,b) (r | (g<<8) | (b<<16))
 
 typedef struct tagGsEnv
 {
