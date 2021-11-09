@@ -226,8 +226,14 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
           *(long*)(&dest_pgt4_ptr->r2) = temp3;
           *(long*)(&dest_pgt4_ptr->r3) = temp0;
         }
-        
 
+        if(flags & SGM2_RENDER_CLUTFOG){
+          long fog = (otz-512) >> 8;
+          if(fog < 0) fog = 0;
+          if(fog > 15) fog = 15;
+          clutid = clutid + (fog<<(6+16));
+        }
+        
         // Texture Coordinates
         // Set Texture Coordinates
         temp1 = *(short*)(&pgt4_ptr->u0);
@@ -352,6 +358,13 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
             *(u_long*)(&dest_pgt3_ptr->r0) = temp0;
             *(u_long*)(&dest_pgt3_ptr->r1) = temp1;
             *(u_long*)(&dest_pgt3_ptr->r2) = temp2;
+          }
+
+          if(flags & SGM2_RENDER_CLUTFOG){
+            long fog = (otz-512) >> 8;
+            if(fog < 0) fog = 0;
+            if(fog > 15) fog = 15;
+            clutid = clutid + (fog<<(6+16));
           }
 
           // Set Texture Coordinates

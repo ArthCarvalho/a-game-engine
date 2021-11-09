@@ -426,8 +426,6 @@ void PlayerUpdate(Actor * a, void * scene) {
   local_rotate.vz = actor->base.rot.vz;
 
   RotMatrixZYX_gte(&local_rotate,&local_identity);
-  /*static VECTOR scale = { 4096>>2, 4096>>2, 4096>>2, 0 };
-  ScaleMatrixL(&local_identity, &scale);*/
 
   interp = interp % 4096;
 

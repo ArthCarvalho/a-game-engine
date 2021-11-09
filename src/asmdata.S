@@ -150,7 +150,7 @@ scene_tim:
   .balign 16
 
 iwakabe_tim:
-  .incbin "../AGAME_PCDATA/iwakabeyuka_composite-15bit.tim"
+  .incbin "../AGAME_PCDATA/iwakabeyuka_composite_v2.tim"
   .balign 16
 
 iwakabe_far_tim:

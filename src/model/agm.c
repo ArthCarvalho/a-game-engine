@@ -82,9 +82,6 @@ void AGM_LoadModel(AGM_model * model, u_long * addr){
       
       bonemtxptr = &model->file->skeleton->matrix_list[boneptr->matrix_idx];
 
-      //static VECTOR scale = { 4096<<2, 4096<<2, 4096<<2, 0 };
-      //ScaleMatrixL(bonemtxptr, &scale);
-
       //bonemtxptr->t[0] <<=2;
       //bonemtxptr->t[1] <<=2;
       //bonemtxptr->t[2] <<=2;
@@ -534,7 +531,7 @@ void AGM_ProcessBoneToWorld(AGM_BONE * bones, u_short current_bone, MATRIX * mat
       temp->t[2] = matrix->t[2];
     }
     //gte_CompMatrix(parentMat, &temp, AGM_MatrixStackPointer);
-    //static VECTOR scale = { 4096<<2, 4096<<2, 4096<<2, 0 };
+    //static VECTOR scale = { 4096>>1, 4096>>1, 4096>>1, 0 };
     //ScaleMatrixL(temp, &scale);
     gte_CompMatrix(parentMat, temp, AGM_MatrixStackPointer);
     

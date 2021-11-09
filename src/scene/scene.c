@@ -581,10 +581,14 @@ void SceneLoad() {
   //G.clear.r = 50;
   //G.clear.g = 115;
   //G.clear.b = 213;
-
+  // Sky Blue
   G.clear.r = 164;
   G.clear.g = 209;
   G.clear.b = 255;
+  // Night
+  //G.clear.r = 21;
+  //G.clear.g = 27;
+  //G.clear.b = 98;
 
 
   // Initialize transition objects
@@ -615,9 +619,15 @@ void SceneLoad() {
   // Load map (global) textures
   //file_load_temp_noalloc("\\DATA\\TEST.TIM;1", dataptr);
   //SetFarColor(255,255,255);
+  //SetFarColor(128,128,128);
   //SetFarColor(98,66,30);
   // Sky blue
   SetFarColor(50,115,213);
+  //SetBackColor(50,115,213);
+  // Dusky dusk
+  //SetFarColor(156,68,31);
+  // Night
+  //SetFarColor(12,15,50);
   //load_texture_pos_fog((unsigned long)dataptr, 0, 0, 512, 496,16);
   load_texture_pos_fog((unsigned long)scene_tim, 0, 0, MAP_TEXTURE_CLUT_X, MAP_TEXTURE_CLUT_Y,16);
   load_texture_pos_fog((unsigned long)iwakabe_tim, 128, 0, MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y,16);
@@ -1184,6 +1194,7 @@ void SceneDraw() {
 
   SetSpadStack(SPAD_STACK_ADDR);
   packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 20, SGM2_RENDER_SUBDIV, scene);
+  //packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_CLUTFOG, scene);
   packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH, scene);
   ResetSpadStack();
   if(scene->previous_room_m != NULL && scene->previous_room_m != scene->current_room_m){

@@ -112,6 +112,7 @@ typedef struct SGM2 {
 #define SGM2_RENDER_BUMPCLUT 		(1<<3)
 #define SGM2_RENDER_AMBIENT  		(1<<4)
 #define SGM2_RENDER_SUBDIV_HIGH	(1<<5)
+#define SGM2_RENDER_CLUTFOG			(1<<6)
 
 SGM2_File * SGM2_LoadFile(u_long * addr);
 
