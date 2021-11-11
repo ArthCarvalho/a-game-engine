@@ -24,6 +24,74 @@
 
 unsigned int __DEBUG_TOGGLE;
 
+u_char daytime_segment = 0;
+u_short daytime_seg_interp = 0;
+CVECTOR daytime_sky, daytime_fog, daytime_sun;
+
+  // Daybreak
+  //G.clear.r = 237;
+  //G.clear.g = 192;
+  //G.clear.b = 255;
+  //SetFarColor(134,134,215);
+  //SetBackColor(227,217,255);
+#define DAYTIME_DAYBREAK_SKY_R 237
+#define DAYTIME_DAYBREAK_SKY_G 192
+#define DAYTIME_DAYBREAK_SKY_B 255
+#define DAYTIME_DAYBREAK_FOG_R 134
+#define DAYTIME_DAYBREAK_FOG_G 134
+#define DAYTIME_DAYBREAK_FOG_B 215
+#define DAYTIME_DAYBREAK_SUN_R 227
+#define DAYTIME_DAYBREAK_SUN_G 217
+#define DAYTIME_DAYBREAK_SUN_B 255
+
+  // Sky blue
+  //G.clear.r = 164;
+  //G.clear.g = 209;
+  //G.clear.b = 255;
+  //SetFarColor(50,115,213);
+  //SetBackColor(255,255,255);
+#define DAYTIME_NOON_SKY_R 164
+#define DAYTIME_NOON_SKY_G 209
+#define DAYTIME_NOON_SKY_B 255
+#define DAYTIME_NOON_FOG_R 50
+#define DAYTIME_NOON_FOG_G 115
+#define DAYTIME_NOON_FOG_B 213
+#define DAYTIME_NOON_SUN_R 255
+#define DAYTIME_NOON_SUN_G 255
+#define DAYTIME_NOON_SUN_B 255
+
+  // Dusky dusk
+  //G.clear.r = 239;
+  //G.clear.g = 139;
+  //G.clear.b = 39;
+  //SetFarColor(176,88,51);
+  //SetBackColor(176,88,51);
+#define DAYTIME_DUSK_SKY_R 239
+#define DAYTIME_DUSK_SKY_G 139
+#define DAYTIME_DUSK_SKY_B 39
+#define DAYTIME_DUSK_FOG_R 176
+#define DAYTIME_DUSK_FOG_G 88
+#define DAYTIME_DUSK_FOG_B 51
+#define DAYTIME_DUSK_SUN_R 176
+#define DAYTIME_DUSK_SUN_G 88
+#define DAYTIME_DUSK_SUN_B 51
+
+  // Night
+  //G.clear.r = 21;
+  //G.clear.g = 27;
+  //G.clear.b = 98;
+  //SetFarColor(0,3,30);
+  //SetBackColor(89,140,255);
+#define DAYTIME_NIGHT_SKY_R 21
+#define DAYTIME_NIGHT_SKY_G 27
+#define DAYTIME_NIGHT_SKY_B 98
+#define DAYTIME_NIGHT_FOG_R 0
+#define DAYTIME_NIGHT_FOG_G 3
+#define DAYTIME_NIGHT_FOG_B 15
+#define DAYTIME_NIGHT_SUN_R 89
+#define DAYTIME_NIGHT_SUN_G 140
+#define DAYTIME_NIGHT_SUN_B 255
+
 // Player Data
 AGM_model * player_model;
 ANM_ANIMATION * player_anime;
@@ -581,14 +649,8 @@ void SceneLoad() {
   //G.clear.r = 50;
   //G.clear.g = 115;
   //G.clear.b = 213;
-  // Sky Blue
-  G.clear.r = 164;
-  G.clear.g = 209;
-  G.clear.b = 255;
-  // Night
-  //G.clear.r = 21;
-  //G.clear.g = 27;
-  //G.clear.b = 98;
+
+  
 
 
   // Initialize transition objects
@@ -621,13 +683,31 @@ void SceneLoad() {
   //SetFarColor(255,255,255);
   //SetFarColor(128,128,128);
   //SetFarColor(98,66,30);
+  // Daybreak
+  G.clear.r = 237;
+  G.clear.g = 192;
+  G.clear.b = 255;
+  SetFarColor(134,134,215);
+  SetBackColor(227,217,255);
+  SetFarColor(164/2, 205/2, 230/2);
   // Sky blue
-  SetFarColor(50,115,213);
-  //SetBackColor(50,115,213);
+  //G.clear.r = 164;
+  //G.clear.g = 209;
+  //G.clear.b = 255;
+  //SetFarColor(50,115,213);
+  //SetBackColor(255,255,255);
   // Dusky dusk
-  //SetFarColor(156,68,31);
+  //G.clear.r = 239;
+  //G.clear.g = 139;
+  //G.clear.b = 39;
+  //SetFarColor(176,88,51);
+  //SetBackColor(176,88,51);
   // Night
-  //SetFarColor(12,15,50);
+  //G.clear.r = 21;
+  //G.clear.g = 27;
+  //G.clear.b = 98;
+  //SetFarColor(0,3,30);
+  //SetBackColor(89,140,255);
   //load_texture_pos_fog((unsigned long)dataptr, 0, 0, 512, 496,16);
   load_texture_pos_fog((unsigned long)scene_tim, 0, 0, MAP_TEXTURE_CLUT_X, MAP_TEXTURE_CLUT_Y,16);
   load_texture_pos_fog((unsigned long)iwakabe_tim, 128, 0, MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y,16);
@@ -879,8 +959,8 @@ void SceneMain() {
     }
   }
 
-  if(g_pad & PAD_START) scene->draw_dist++;
-  if(g_pad & PAD_SELECT) scene->draw_dist--;
+  //if(g_pad & PAD_START) scene->draw_dist++;
+  //if(g_pad & PAD_SELECT) scene->draw_dist--;
 
   //FntPrint("DRAW DIST: %d\n", scene->draw_dist);
 
@@ -1149,6 +1229,100 @@ void SceneDraw() {
 
   local_identity_far = local_identity = m_identity;
 
+  daytime_seg_interp += 16;
+  if(daytime_seg_interp > 4096) {
+    daytime_seg_interp = 0;
+    daytime_segment++;
+    if(daytime_segment > 6) daytime_segment = 0;
+  }
+
+  switch(daytime_segment) {
+    case 0:
+      daytime_sky.r = fix12_lerp(DAYTIME_DAYBREAK_SKY_R, DAYTIME_NOON_SKY_R, daytime_seg_interp);
+      daytime_sky.g = fix12_lerp(DAYTIME_DAYBREAK_SKY_G, DAYTIME_NOON_SKY_G, daytime_seg_interp);
+      daytime_sky.b = fix12_lerp(DAYTIME_DAYBREAK_SKY_B, DAYTIME_NOON_SKY_B, daytime_seg_interp);
+
+      daytime_fog.r = fix12_lerp(DAYTIME_DAYBREAK_FOG_R, DAYTIME_NOON_FOG_R, daytime_seg_interp);
+      daytime_fog.g = fix12_lerp(DAYTIME_DAYBREAK_FOG_G, DAYTIME_NOON_FOG_G, daytime_seg_interp);
+      daytime_fog.b = fix12_lerp(DAYTIME_DAYBREAK_FOG_B, DAYTIME_NOON_FOG_B, daytime_seg_interp);
+
+      daytime_sun.r = fix12_lerp(DAYTIME_DAYBREAK_SUN_R, DAYTIME_NOON_SUN_R, daytime_seg_interp);
+      daytime_sun.g = fix12_lerp(DAYTIME_DAYBREAK_SUN_G, DAYTIME_NOON_SUN_G, daytime_seg_interp);
+      daytime_sun.b = fix12_lerp(DAYTIME_DAYBREAK_SUN_B, DAYTIME_NOON_SUN_B, daytime_seg_interp);
+      break;
+    case 1:
+      daytime_sky.r = DAYTIME_NOON_SKY_R;
+      daytime_sky.g = DAYTIME_NOON_SKY_G;
+      daytime_sky.b = DAYTIME_NOON_SKY_B;
+
+      daytime_fog.r = DAYTIME_NOON_FOG_R;
+      daytime_fog.g = DAYTIME_NOON_FOG_G;
+      daytime_fog.b = DAYTIME_NOON_FOG_B;
+
+      daytime_sun.r = DAYTIME_NOON_SUN_R;
+      daytime_sun.g = DAYTIME_NOON_SUN_G;
+      daytime_sun.b = DAYTIME_NOON_SUN_B;
+    break;
+    case 2:
+      daytime_sky.r = fix12_lerp(DAYTIME_NOON_SKY_R, DAYTIME_DUSK_SKY_R, daytime_seg_interp);
+      daytime_sky.g = fix12_lerp(DAYTIME_NOON_SKY_G, DAYTIME_DUSK_SKY_G, daytime_seg_interp);
+      daytime_sky.b = fix12_lerp(DAYTIME_NOON_SKY_B, DAYTIME_DUSK_SKY_B, daytime_seg_interp);
+
+      daytime_fog.r = fix12_lerp(DAYTIME_NOON_FOG_R, DAYTIME_DUSK_FOG_R, daytime_seg_interp);
+      daytime_fog.g = fix12_lerp(DAYTIME_NOON_FOG_G, DAYTIME_DUSK_FOG_G, daytime_seg_interp);
+      daytime_fog.b = fix12_lerp(DAYTIME_NOON_FOG_B, DAYTIME_DUSK_FOG_B, daytime_seg_interp);
+
+      daytime_sun.r = fix12_lerp(DAYTIME_NOON_SUN_R, DAYTIME_DUSK_SUN_R, daytime_seg_interp);
+      daytime_sun.g = fix12_lerp(DAYTIME_NOON_SUN_G, DAYTIME_DUSK_SUN_G, daytime_seg_interp);
+      daytime_sun.b = fix12_lerp(DAYTIME_NOON_SUN_B, DAYTIME_DUSK_SUN_B, daytime_seg_interp);
+      break;
+    case 3:
+      daytime_sky.r = fix12_lerp(DAYTIME_DUSK_SKY_R, DAYTIME_NIGHT_SKY_R, daytime_seg_interp);
+      daytime_sky.g = fix12_lerp(DAYTIME_DUSK_SKY_G, DAYTIME_NIGHT_SKY_G, daytime_seg_interp);
+      daytime_sky.b = fix12_lerp(DAYTIME_DUSK_SKY_B, DAYTIME_NIGHT_SKY_B, daytime_seg_interp);
+
+      daytime_fog.r = fix12_lerp(DAYTIME_DUSK_FOG_R, DAYTIME_NIGHT_FOG_R, daytime_seg_interp);
+      daytime_fog.g = fix12_lerp(DAYTIME_DUSK_FOG_G, DAYTIME_NIGHT_FOG_G, daytime_seg_interp);
+      daytime_fog.b = fix12_lerp(DAYTIME_DUSK_FOG_B, DAYTIME_NIGHT_FOG_B, daytime_seg_interp);
+
+      daytime_sun.r = fix12_lerp(DAYTIME_DUSK_SUN_R, DAYTIME_NIGHT_SUN_R, daytime_seg_interp);
+      daytime_sun.g = fix12_lerp(DAYTIME_DUSK_SUN_G, DAYTIME_NIGHT_SUN_G, daytime_seg_interp);
+      daytime_sun.b = fix12_lerp(DAYTIME_DUSK_SUN_B, DAYTIME_NIGHT_SUN_B, daytime_seg_interp);
+      break;
+    case 4:
+      daytime_sky.r = DAYTIME_NIGHT_SKY_R;
+      daytime_sky.g = DAYTIME_NIGHT_SKY_G;
+      daytime_sky.b = DAYTIME_NIGHT_SKY_B;
+
+      daytime_fog.r = DAYTIME_NIGHT_FOG_R;
+      daytime_fog.g = DAYTIME_NIGHT_FOG_G;
+      daytime_fog.b = DAYTIME_NIGHT_FOG_B;
+
+      daytime_sun.r = DAYTIME_NIGHT_SUN_R;
+      daytime_sun.g = DAYTIME_NIGHT_SUN_G;
+      daytime_sun.b = DAYTIME_NIGHT_SUN_B;
+    break;
+    case 5:
+      daytime_sky.r = fix12_lerp(DAYTIME_NIGHT_SKY_R, DAYTIME_DAYBREAK_SKY_R, daytime_seg_interp);
+      daytime_sky.g = fix12_lerp(DAYTIME_NIGHT_SKY_G, DAYTIME_DAYBREAK_SKY_G, daytime_seg_interp);
+      daytime_sky.b = fix12_lerp(DAYTIME_NIGHT_SKY_B, DAYTIME_DAYBREAK_SKY_B, daytime_seg_interp);
+
+      daytime_fog.r = fix12_lerp(DAYTIME_NIGHT_FOG_R, DAYTIME_DAYBREAK_FOG_R, daytime_seg_interp);
+      daytime_fog.g = fix12_lerp(DAYTIME_NIGHT_FOG_G, DAYTIME_DAYBREAK_FOG_G, daytime_seg_interp);
+      daytime_fog.b = fix12_lerp(DAYTIME_NIGHT_FOG_B, DAYTIME_DAYBREAK_FOG_B, daytime_seg_interp);
+
+      daytime_sun.r = fix12_lerp(DAYTIME_NIGHT_SUN_R, DAYTIME_DAYBREAK_SUN_R, daytime_seg_interp);
+      daytime_sun.g = fix12_lerp(DAYTIME_NIGHT_SUN_G, DAYTIME_DAYBREAK_SUN_G, daytime_seg_interp);
+      daytime_sun.b = fix12_lerp(DAYTIME_NIGHT_SUN_B, DAYTIME_DAYBREAK_SUN_B, daytime_seg_interp);
+      break;
+  }
+
+  G.clear.r = daytime_sky.r;
+  G.clear.g = daytime_sky.g;
+  G.clear.b = daytime_sky.b;
+  SetFarColor(daytime_fog.r, daytime_fog.g, daytime_fog.b);
+  SetBackColor(daytime_sun.r, daytime_sun.g, daytime_sun.b);
+
   BeginDraw();
 
   //packet_b_ptr = (u_char *)&gpu_packet[G.OTag_id];
@@ -1170,7 +1344,7 @@ void SceneDraw() {
   gte_SetTransMatrix(&local_identity_far);
 
   SetSpadStack(SPAD_STACK_ADDR);
-  packet_b_ptr = SGM2_UpdateModel(map_model[6], packet_b_ptr, (u_long*)G.pOt, 2048, NULL, scene);
+  packet_b_ptr = SGM2_UpdateModel(map_model[6], packet_b_ptr, (u_long*)G.pOt, 2048, SGM2_RENDER_AMBIENT, scene);
   ResetSpadStack();
 
   gte_SetRotMatrix(&local_identity);
@@ -1182,7 +1356,7 @@ void SceneDraw() {
   prof_update = prof_current_val - prof_last_counter;
   prof_last_counter = prof_current_val;
 
-  if(g_pad_press & PAD_START) __DEBUG_TOGGLE = !__DEBUG_TOGGLE;
+  if(g_pad_press & PAD_TRIANGLE) __DEBUG_TOGGLE = !__DEBUG_TOGGLE;
   //if(g_pad_press & PAD_START) __DEBUG_TOGGLE++;// = !__DEBUG_TOGGLE;
   //if(__DEBUG_TOGGLE >= 5) __DEBUG_TOGGLE = 0;
 
@@ -1193,9 +1367,14 @@ void SceneDraw() {
   //FntPrint("X: %d Y:%d Z:%d\n", playerActor->base.pos.vx, playerActor->base.pos.vy, playerActor->base.pos.vz);
 
   SetSpadStack(SPAD_STACK_ADDR);
-  packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 20, SGM2_RENDER_SUBDIV, scene);
+  if(__DEBUG_TOGGLE){ 
+    packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 20, SGM2_RENDER_SUBDIV | SGM2_RENDER_AMBIENT, scene);
+  } else {
+    packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 20, SGM2_RENDER_SUBDIV, scene);
+  }
+  
   //packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_CLUTFOG, scene);
-  packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH, scene);
+  packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_AMBIENT, scene);
   ResetSpadStack();
   if(scene->previous_room_m != NULL && scene->previous_room_m != scene->current_room_m){
     SetSpadStack(SPAD_STACK_ADDR);

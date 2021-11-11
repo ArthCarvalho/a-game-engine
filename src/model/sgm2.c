@@ -161,6 +161,7 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
     if (otz > OTMIN) {
       if(otz < subdiv_lvl1 && flags & SGM2_RENDER_SUBDIV) {
         u_long uvcode0, uvcode1, uvcode2, uvcode3;
+        CVECTOR col0, col1, col2, col3;
         //CVECTOR colcode;
         
         if(otz < subdiv_lvl2) {
@@ -179,10 +180,31 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
         uvcode3 = *(u_short*)&pgt4_ptr->u3;
         uvcode0 = (uvcode0 & 0xFFFF) | clutid;
         uvcode1 = (uvcode1 & 0xFFFF) | tpageid;
+
+        col0 = *(CVECTOR*)&pgt4_ptr->r0;
+        col1 = *(CVECTOR*)&pgt4_ptr->r1;
+        col2 = *(CVECTOR*)&pgt4_ptr->r2;
+        col3 = *(CVECTOR*)&pgt4_ptr->r3;
+
+        if(flags & SGM2_RENDER_AMBIENT) { // !!! TODO - Change this to use GTE/BackLight !!!
+          gte_ldrgb((CVECTOR*)&col0);
+          gte_cc();
+          gte_strgb((CVECTOR*)&col0);
+          gte_ldrgb((CVECTOR*)&col1);
+          gte_cc();
+          gte_strgb((CVECTOR*)&col1);
+          gte_ldrgb((CVECTOR*)&col2);
+          gte_cc();
+          gte_strgb((CVECTOR*)&col2);
+          gte_ldrgb((CVECTOR*)&col3);
+          gte_cc();
+          gte_strgb((CVECTOR*)&col3);
+        }
+
         dest_pgt4_ptr = (POLY_GT4 *)DivideGT4(
         vec0, vec1, vec2, vec3,
         &uvcode0, &uvcode1, &uvcode2, &uvcode3, 
-        (CVECTOR*)&pgt4_ptr->r0, (CVECTOR*)&pgt4_ptr->r1, (CVECTOR*)&pgt4_ptr->r2, (CVECTOR*)&pgt4_ptr->r3,
+        (CVECTOR*)&col0, (CVECTOR*)&col1, (CVECTOR*)&col2, (CVECTOR*)&col3,
         dest_pgt4_ptr, (u_long *)(ot+otz), divprop);
         } else {
         u_long temp0, temp1, temp2, temp3;
@@ -204,7 +226,22 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
         *(long*)(&dest_pgt4_ptr->r2) = temp3;
         *(long*)(&dest_pgt4_ptr->r3) = temp0;*/
         if(flags & SGM2_RENDER_AMBIENT) { // !!! TODO - Change this to use GTE/BackLight !!!
-          dest_pgt4_ptr->r0 = (pgt4_ptr->r0 * ambient_r) >> 7;
+          gte_ldrgb((CVECTOR*)&pgt4_ptr->r0);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pgt4_ptr->r0);
+          gte_ldrgb((CVECTOR*)&pgt4_ptr->r1);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pgt4_ptr->r1);
+          gte_ldrgb((CVECTOR*)&pgt4_ptr->r2);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pgt4_ptr->r2);
+          gte_ldrgb((CVECTOR*)&pgt4_ptr->r3);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pgt4_ptr->r3);
+          //gte_ldrgb3((CVECTOR*)&pgt4_ptr->r0, (CVECTOR*)&pgt4_ptr->r1, (CVECTOR*)&pgt4_ptr->r2);
+          //gte_n
+          //gte_strgb3_g4(dest_pgt4_ptr);
+          /*dest_pgt4_ptr->r0 = (pgt4_ptr->r0 * ambient_r) >> 7;
           dest_pgt4_ptr->g0 = (pgt4_ptr->g0 * ambient_g) >> 7;
           dest_pgt4_ptr->b0 = (pgt4_ptr->b0 * ambient_b) >> 7;
           dest_pgt4_ptr->r1 = (pgt4_ptr->r1 * ambient_r) >> 7;
@@ -215,7 +252,7 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
           dest_pgt4_ptr->b2 = (pgt4_ptr->b2 * ambient_b) >> 7;
           dest_pgt4_ptr->r3 = (pgt4_ptr->r3 * ambient_r) >> 7;
           dest_pgt4_ptr->g3 = (pgt4_ptr->g3 * ambient_g) >> 7;
-          dest_pgt4_ptr->b3 = (pgt4_ptr->b3 * ambient_b) >> 7;
+          dest_pgt4_ptr->b3 = (pgt4_ptr->b3 * ambient_b) >> 7;*/
         } else {
           temp1 = *(long*)(&pgt4_ptr->r0);
           temp2 = *(long*)(&pgt4_ptr->r1);
@@ -307,12 +344,13 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
       if (otz > OTMIN) {
         if(otz < subdiv_lvl1 && flags & SGM2_RENDER_SUBDIV) {
           u_long uvcode0, uvcode1, uvcode2;
+          CVECTOR col0, col1, col2;
           if(otz < subdiv_lvl2) {
             divprop->ndiv = subdiv_n2;
           } else {
             divprop->ndiv = subdiv_n1;
           }
-        
+
           vec0 = &model->vertex_data[pgt3_ptr->idx0];
           vec1 = &model->vertex_data[pgt3_ptr->idx1];
           vec2 = &model->vertex_data[pgt3_ptr->idx2];
@@ -321,10 +359,27 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
           uvcode2 = *(u_short*)&pgt3_ptr->u2;
           uvcode0 = (uvcode0 & 0xFFFF) | clutid;
           uvcode1 = (uvcode1 & 0xFFFF) | tpageid;
+
+          col0 = *(CVECTOR*)&pgt3_ptr->r0;
+          col1 = *(CVECTOR*)&pgt3_ptr->r1;
+          col2 = *(CVECTOR*)&pgt3_ptr->r2;
+
+          if(flags & SGM2_RENDER_AMBIENT) {
+            gte_ldrgb((CVECTOR*)&col0);
+            gte_cc();
+            gte_strgb((CVECTOR*)&col0);
+            gte_ldrgb((CVECTOR*)&col1);
+            gte_cc();
+            gte_strgb((CVECTOR*)&col1);
+            gte_ldrgb((CVECTOR*)&col2);
+            gte_cc();
+            gte_strgb((CVECTOR*)&col2);
+          }
+
           dest_pgt3_ptr = (POLY_GT3 *)DivideGT3(
           vec0, vec1, vec2,
           &uvcode0, &uvcode1, &uvcode2, 
-          (CVECTOR*)&pgt3_ptr->r0, (CVECTOR*)&pgt3_ptr->r1, (CVECTOR*)&pgt3_ptr->r2,
+          (CVECTOR*)&col0, (CVECTOR*)&col1, (CVECTOR*)&col2,
           dest_pgt3_ptr, (u_long *)(ot+otz), divprop3);
         } else {
           u_long temp0, temp1, temp2;
@@ -342,7 +397,16 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
           *(u_long*)(&dest_pgt3_ptr->r2) = temp2;*/
 
           if(flags & SGM2_RENDER_AMBIENT) { // !!! TODO - Change this to use GTE/BackLight !!!
-            dest_pgt3_ptr->r0 = (pgt3_ptr->r0 * ambient_r) >> 7;
+            gte_ldrgb((CVECTOR*)&pgt3_ptr->r0);
+            gte_cc();
+            gte_strgb((CVECTOR*)&dest_pgt3_ptr->r0);
+            gte_ldrgb((CVECTOR*)&pgt3_ptr->r1);
+            gte_cc();
+            gte_strgb((CVECTOR*)&dest_pgt3_ptr->r1);
+            gte_ldrgb((CVECTOR*)&pgt3_ptr->r2);
+            gte_cc();
+            gte_strgb((CVECTOR*)&dest_pgt3_ptr->r2);
+            /*dest_pgt3_ptr->r0 = (pgt3_ptr->r0 * ambient_r) >> 7;
             dest_pgt3_ptr->g0 = (pgt3_ptr->g0 * ambient_g) >> 7;
             dest_pgt3_ptr->b0 = (pgt3_ptr->b0 * ambient_b) >> 7;
             dest_pgt3_ptr->r1 = (pgt3_ptr->r1 * ambient_r) >> 7;
@@ -350,7 +414,7 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
             dest_pgt3_ptr->b1 = (pgt3_ptr->b1 * ambient_b) >> 7;
             dest_pgt3_ptr->r2 = (pgt3_ptr->r2 * ambient_r) >> 7;
             dest_pgt3_ptr->g2 = (pgt3_ptr->g2 * ambient_g) >> 7;
-            dest_pgt3_ptr->b2 = (pgt3_ptr->b2 * ambient_b) >> 7;
+            dest_pgt3_ptr->b2 = (pgt3_ptr->b2 * ambient_b) >> 7;*/
           } else {
             temp0 = *(u_long*)(&pgt3_ptr->r0);
             temp1 = *(u_long*)(&pgt3_ptr->r1);

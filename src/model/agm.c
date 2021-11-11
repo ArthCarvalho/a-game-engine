@@ -750,14 +750,27 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
         *(long*)(&dest_pg4_ptr->x3) = temp0;
         //*(long*)(&dest_pg4_ptr->x3) = *(long*)(&vec3->vx);
         // Vertex Colors
-        temp1 = *(long*)(&pg4_ptr->r0);
+        /*temp1 = *(long*)(&pg4_ptr->r0);
         temp2 = *(long*)(&pg4_ptr->r1);
         temp3 = *(long*)(&pg4_ptr->r2);
         temp0 = *(long*)(&pg4_ptr->r3);
         *(long*)(&dest_pg4_ptr->r0) = temp1;
         *(long*)(&dest_pg4_ptr->r1) = temp2;
         *(long*)(&dest_pg4_ptr->r2) = temp3;
-        *(long*)(&dest_pg4_ptr->r3) = temp0;
+        *(long*)(&dest_pg4_ptr->r3) = temp0;*/
+
+        gte_ldrgb((CVECTOR*)&pg4_ptr->r0);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pg4_ptr->r0);
+        gte_ldrgb((CVECTOR*)&pg4_ptr->r1);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pg4_ptr->r1);
+        gte_ldrgb((CVECTOR*)&pg4_ptr->r2);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pg4_ptr->r2);
+        gte_ldrgb((CVECTOR*)&pg4_ptr->r3);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pg4_ptr->r3);
 
         /*dest_pg4_ptr->r0 = (pg4_ptr->r0 * 64) >> 8;
         dest_pg4_ptr->g0 = (pg4_ptr->g0 * 64) >> 8;
@@ -834,9 +847,19 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
                    (long*)&dest_pg3_ptr->x1,
                    (long*)&dest_pg3_ptr->x2);
         // Vertex Colors
-        *(long*)(&dest_pg3_ptr->r0) = *(long*)(&pg3_ptr->r0);
-        *(long*)(&dest_pg3_ptr->r1) = *(long*)(&pg3_ptr->r1);
-        *(long*)(&dest_pg3_ptr->r2) = *(long*)(&pg3_ptr->r2);
+        //*(long*)(&dest_pg3_ptr->r0) = *(long*)(&pg3_ptr->r0);
+        //*(long*)(&dest_pg3_ptr->r1) = *(long*)(&pg3_ptr->r1);
+        //*(long*)(&dest_pg3_ptr->r2) = *(long*)(&pg3_ptr->r2);
+
+        gte_ldrgb((CVECTOR*)&pg3_ptr->r0);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pg3_ptr->r0);
+        gte_ldrgb((CVECTOR*)&pg3_ptr->r1);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pg3_ptr->r1);
+        gte_ldrgb((CVECTOR*)&pg3_ptr->r2);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pg3_ptr->r2);
 
         /*dest_pg3_ptr->r0 = (pg3_ptr->r0 * 64) >> 8;
         dest_pg3_ptr->g0 = (pg3_ptr->g0 * 64) >> 8;
@@ -914,14 +937,27 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
         // Vertex Colors
 
 
-        temp1 = *(long*)(&pgt4_ptr->r0);
+        /*temp1 = *(long*)(&pgt4_ptr->r0);
         temp2 = *(long*)(&pgt4_ptr->r1);
         temp3 = *(long*)(&pgt4_ptr->r2);
         temp0 = *(long*)(&pgt4_ptr->r3);
         *(long*)(&dest_pgt4_ptr->r0) = temp1;
         *(long*)(&dest_pgt4_ptr->r1) = temp2;
         *(long*)(&dest_pgt4_ptr->r2) = temp3;
-        *(long*)(&dest_pgt4_ptr->r3) = temp0;
+        *(long*)(&dest_pgt4_ptr->r3) = temp0;*/
+
+        gte_ldrgb((CVECTOR*)&pgt4_ptr->r0);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pgt4_ptr->r0);
+        gte_ldrgb((CVECTOR*)&pgt4_ptr->r1);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pgt4_ptr->r1);
+        gte_ldrgb((CVECTOR*)&pgt4_ptr->r2);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pgt4_ptr->r2);
+        gte_ldrgb((CVECTOR*)&pgt4_ptr->r3);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pgt4_ptr->r3);
 
         /*dest_pgt4_ptr->r0 = (pgt4_ptr->r0 * 64) >> 8;
         dest_pgt4_ptr->g0 = (pgt4_ptr->g0 * 64) >> 8;
@@ -1020,12 +1056,21 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
                    (long*)&dest_pgt3_ptr->x1,
                    (long*)&dest_pgt3_ptr->x2);
         // Vertex Colors
-        temp0 = *(long*)(&pgt3_ptr->r0);
+        /*temp0 = *(long*)(&pgt3_ptr->r0);
         temp1 = *(long*)(&pgt3_ptr->r1);
         temp2 = *(long*)(&pgt3_ptr->r2);
         *(long*)(&dest_pgt3_ptr->r0) = temp0;
         *(long*)(&dest_pgt3_ptr->r1) = temp1;
-        *(long*)(&dest_pgt3_ptr->r2) = temp2;
+        *(long*)(&dest_pgt3_ptr->r2) = temp2;*/
+        gte_ldrgb((CVECTOR*)&pgt3_ptr->r0);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pgt3_ptr->r0);
+        gte_ldrgb((CVECTOR*)&pgt3_ptr->r1);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pgt3_ptr->r1);
+        gte_ldrgb((CVECTOR*)&pgt3_ptr->r2);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pgt3_ptr->r2);
 
         /*dest_pgt3_ptr->r0 = (pgt3_ptr->r0 * 64) >> 8;
         dest_pgt3_ptr->g0 = (pgt3_ptr->g0 * 64) >> 8;
@@ -1052,6 +1097,7 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
         *(short*)(&dest_pgt3_ptr->u0) = temp0;
         *(short*)(&dest_pgt3_ptr->u1) = temp1;
         *(short*)(&dest_pgt3_ptr->u2) = temp2;
+
         /*
         *(short*)(&dest_pgt3_ptr->u0) = *(short*)(&pgt3_ptr->u0);
         *(short*)(&dest_pgt3_ptr->u1) = *(short*)(&pgt3_ptr->u1);
