@@ -50,6 +50,7 @@ typedef struct Camera {
   SVECTOR target_offset;
   int state;
   short fov;
+  short fov_s;
 	short rotation_h;
 	short rotation_v;
 	short rotation_h_s;

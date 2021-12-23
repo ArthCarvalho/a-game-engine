@@ -22,6 +22,7 @@ void ObjTsuboActorSetup() {
 
 void ObjTsuboActorInitialize(struct Actor * a, void * descriptor, void * scene) {
   ObjTsuboActor * actor = (ObjTsuboActor *)a;
+  Actor_Descriptor * desc = (Actor_Descriptor *)descriptor;
   actor->base.Initialize = (PTRFUNC_3ARG) ObjTsuboActorInitialize;
   actor->base.Destroy = (PTRFUNC_2ARG) ObjTsuboActorDestroy;
   actor->base.Update = (PTRFUNC_2ARG) ObjTsuboActorUpdate;
@@ -30,10 +31,15 @@ void ObjTsuboActorInitialize(struct Actor * a, void * descriptor, void * scene) 
   actor->model_far = obj_tsubo_far_model;
   actor->base.visible = 1;
   actor->base.flags = ACTOR_INTERACTABLE | ACTOR_ACCURATEDIST;
+  actor->base.collisionData.radius = 115;
+  actor->base.collisionData.height = 230;
 
-  actor->matrix.t[0] = actor->base.pos.vx;
-  actor->matrix.t[1] = actor->base.pos.vy;
-  actor->matrix.t[2] = actor->base.pos.vz;
+  actor->matrix.t[0] = actor->base.pos.vx = desc->x;
+  actor->matrix.t[1] = actor->base.pos.vy = desc->y;
+  actor->matrix.t[2] = actor->base.pos.vz = desc->z;
+  actor->base.rot.vx = desc->rot_x;
+  actor->base.rot.vy = desc->rot_y;
+  actor->base.rot.vz = desc->rot_z;
   SVECTOR rot = actor->base.rot;
   RotMatrix_gte(&rot, &actor->matrix);
 }
@@ -61,10 +67,40 @@ void ObjTsuboActorUpdate(struct Actor * a, void * scene) {
 	  tdist.vz = (tdist.vz + mask) ^ mask;
   }
   if(tdist.vx < draw_dist && tdist.vz < draw_dist) {
-    u_int dist = get_distanceXZ(&tdist);
+    /*u_int dist = get_distanceXZ(&tdist);
     //FntPrint("D:%d\n",dist);
     actor->dist = dist;
     //actor->base.visible = 1;
+    // !!! TEST COLLISION CODE !!!
+    // Player Cyl: 180, Obj Cyl: 220, Cyl half: 90/110
+    short cyl_sum_radius = player->collisionData.radius + actor->base.collisionData.radius;
+    short cyl_overlap = 0;
+    if(dist < cyl_sum_radius) { // Test - Collision Code
+      cyl_overlap = cyl_sum_radius - dist;
+      if(dist != 0) { // If both are at the exact same position, ignore.
+        u_long dispfactor = ((u_long)cyl_overlap<<12) / dist;
+        short disp_x = ((player->pos.vx - actor->base.pos.vx) * dispfactor) >> 12;
+        short disp_z = ((player->pos.vz - actor->base.pos.vz) * dispfactor) >> 12;
+        player->collisionData.displacement_x += disp_x;
+        player->collisionData.displacement_z += disp_z;
+
+      }
+    }*/
+    CollisionCylinder col_player;
+    CollisionCylinder col_obj;
+    short dist, intersect, deltax, deltaz;
+
+    col_player.origin = player->pos;
+    col_player.radius = player->collisionData.radius;
+    col_player.height = player->collisionData.height;
+    col_obj.origin = actor->base.pos;
+    col_obj.radius = actor->base.collisionData.radius;
+    col_obj.height = actor->base.collisionData.height; // 230;
+    
+
+    if(ActorCollision_CheckCylinders(&col_obj, &col_player, &dist, &intersect, &deltax, &deltaz) == 1) {
+      ActorCollision_DisplaceActor(player, dist, intersect, deltax, deltaz);
+    }
 
     actor->matrix.t[0] = actor->base.pos.vx;
     actor->matrix.t[1] = actor->base.pos.vy;

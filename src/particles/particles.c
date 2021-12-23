@@ -53,9 +53,15 @@ void Particle3D_Create(struct ParticleEmitter * emitter) {
     particle[i].rx = rand() >> 3;
     particle[i].size = emitter->size + ((rand() >> 9) - 31);
     particle[i].lifetime = (emitter->starting_lifetime * (2048 + (rand() >> 4))) >> 12;
-    particle[i].r0 = emitter->r0;
-    particle[i].g0 = emitter->g0;
-    particle[i].b0 = emitter->b0;
+    if(emitter->flags & PARTICLE_RENDER_AMBIENT) {
+      gte_ldrgb((CVECTOR*)&emitter->r0);
+      gte_cc();
+      gte_strgb((CVECTOR*)&particle[i].r0);
+    } else {
+      particle[i].r0 = emitter->r0;
+      particle[i].g0 = emitter->g0;
+      particle[i].b0 = emitter->b0;
+    }
     particle[i].a0 = 0xFF;
     // Set particle initial speed - Explosion type (Spread from center)
     // TODO - Improve initial speed generation

@@ -45,4 +45,9 @@ struct CollisionRayResult {
   short last_collide_z;
 };
 
+typedef struct {
+  short vx;
+  short vy;
+} ShortVector2D;
+
 #endif

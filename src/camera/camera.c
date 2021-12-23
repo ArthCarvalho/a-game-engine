@@ -43,7 +43,7 @@ short camera_to_back_curr = 0;
 short camera_to_back_step = 0;
 short camera_to_back_counter = 0;
 short camera_to_back_hstep = 0;
-short camera_fov_mod = 4096;
+//short camera_fov_mod = 4096;
 short camera_target_offs_before;
 #define CAMERA_TARG_OFFS 300
 
@@ -75,7 +75,7 @@ void Camera_Create(struct Camera * cam, void * col){
 	cam->rotation_v = -128;
 	col_context = (Col2 *)col;
 	camera_to_back_state = 0;
-	camera_fov_mod = cam->fov = 4096;
+	cam->fov_s = cam->fov = 4096;
 	cam->target_mode = 0;
 	cam->state = 0;
 }
@@ -176,8 +176,8 @@ void Camera_LookAt(struct Camera * cam) {
 	VECTOR aspect_mod = {cam->aspect.vx, cam->aspect.vy, cam->aspect.vz, 0};
 
 	//FntPrint("FOVMOD %d\n", camera_fov_mod);
-	aspect_mod.vx = asm_fpmul64(aspect_mod.vx, camera_fov_mod);
-	aspect_mod.vy = asm_fpmul64(aspect_mod.vy, camera_fov_mod);
+	aspect_mod.vx = asm_fpmul64(aspect_mod.vx, cam->fov_s);
+	aspect_mod.vy = asm_fpmul64(aspect_mod.vy, cam->fov_s);
   ScaleMatrixL(&cam->matrix, &aspect_mod);
   ApplyMatrixLV(&cam->matrix, &pos, &vec);
 	TransMatrix(&cam->matrix, &vec);
@@ -297,7 +297,7 @@ void Camera_Update(struct Camera * cam){
 					{
 						short temp;
 						temp = Smoothing(cam->rotation_v, cam->rotation_v_s, 4096 * 0.0333333333333333);
-						cam->rotation_v_s = Smoothing(cam->rotation_v_s, temp, 4096 * 0.0625);
+						cam->rotation_v_s = Smoothing(cam->rotation_v_s, temp, 4096 * 0.0075);
 					}
 				}
 				cam->rotation_h_s = cam->rotation_h;
@@ -322,7 +322,7 @@ void Camera_Update(struct Camera * cam){
 					cam->target_offset_s.vy += (cam->target_offset.vy - cam->target_offset_s.vy) >> 2;
 					cam->target_offset_s.vz += (cam->target_offset.vz - cam->target_offset_s.vz) >> 2;
 
-					camera_fov_mod += (cam->fov - camera_fov_mod) >> 3;
+					cam->fov_s += (cam->fov - cam->fov_s) >> 3;
 
 					cam->position.vx = (cam->target_pos_s.vx) + camera_pos.vx + cam->target_offset_s.vx;
 					cam->position.vy = (cam->target_pos_s.vy) + camera_pos.vy + cam->target_offset_s.vy;
@@ -397,7 +397,7 @@ void Camera_Update(struct Camera * cam){
 					cam->target_offset_s.vy += (cam->target_offset.vy - cam->target_offset_s.vy) >> 2;
 					cam->target_offset_s.vz += (cam->target_offset.vz - cam->target_offset_s.vz) >> 2;
 
-					camera_fov_mod += (cam->fov - camera_fov_mod) >> 3;
+					cam->fov_s += (cam->fov - cam->fov_s) >> 3;
 
 					cam->position.vx = (cam->target_pos_s.vx) + camera_pos.vx + cam->target_offset_s.vx;
 					cam->position.vy = (cam->target_pos_s.vy) + camera_pos.vy + cam->target_offset_s.vy;
@@ -474,7 +474,7 @@ void Camera_Update(struct Camera * cam){
 					cam->target_offset_s.vy += (cam->target_offset.vy - cam->target_offset_s.vy) >> 2;
 					cam->target_offset_s.vz += (cam->target_offset.vz - cam->target_offset_s.vz) >> 2;
 
-					camera_fov_mod += (cam->fov - camera_fov_mod) >> 5;
+					cam->fov_s += (cam->fov - cam->fov_s) >> 5;
 
 					cam->position.vx = (cam->target_pos_s.vx) + camera_pos.vx + cam->target_offset_s.vx;
 					cam->position.vy = (cam->target_pos_s.vy) + camera_pos.vy + cam->target_offset_s.vy;

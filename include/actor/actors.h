@@ -37,12 +37,23 @@ typedef struct Actor_Descriptor {
   unsigned int init_variables[9]; // 36 bytes for initialization
 } Actor_Descriptor;
 
+typedef struct {
+  short displacement_x;
+  short displacement_y;
+  short displacement_z;
+  short radius;
+  short height;
+  u_char mass;
+  u_char flags;
+} Actor_CollisionData;
+
 typedef struct Actor {
   long id; // Actor id
   u_char type; // Actor type
   u_char room; // Room it belongs to, 0xFF = Persistent/No Room
   SVECTOR pos;
   SVECTOR rot;
+  SVECTOR scale;
   //short x,y,z; // Map Position
   //short rx,ry,rz; // Map Rotation
   u_short xzDistance;
@@ -55,6 +66,7 @@ typedef struct Actor {
   unsigned int visible;
   unsigned int size; // Actor's structure byte size
   struct BoundingBox3D bbox;
+  Actor_CollisionData collisionData;
   void (*Initialize)(void*,void*,void*); // Actor's instance initialization function.
   void (*Destroy)(void*,void*); // Actor's destroy instance function.
   void (*Update)(void*,void*); // Actor's main loop function.

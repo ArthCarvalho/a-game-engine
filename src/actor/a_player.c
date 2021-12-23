@@ -48,12 +48,22 @@
 #define PLAYER_MAX_ROTINT 1536
 #define PLAYER_ROT_SPD_AIR 10
 
-#define PLAYER_MOVE_SPEED FIXED(35.5)
+/*#define PLAYER_MOVE_SPEED FIXED(35.5)
 #define PLAYER_ROLL_SPEED_LOW FIXED(19.36)
 //#define PLAYER_ROLL_SPEED FIXED(53.25)
 #define PLAYER_ROLL_SPEED FIXED(60.25)
 #define PLAYER_MOVE_FALLING FIXED(0.3227272727272728)
-#define PLAYER_MOVE_FALLING_DEACCEL FIXED(0.6454545454545455)
+#define PLAYER_MOVE_FALLING_DEACCEL FIXED(0.6454545454545455)*/
+
+//#define SPEED_MULT 0.5
+#define SPEED_MULT 1.0
+
+#define PLAYER_MOVE_SPEED FIXED(35.5*SPEED_MULT)
+#define PLAYER_ROLL_SPEED_LOW FIXED(19.36*SPEED_MULT)
+//#define PLAYER_ROLL_SPEED FIXED(53.25)
+#define PLAYER_ROLL_SPEED FIXED(60.25*SPEED_MULT)
+#define PLAYER_MOVE_FALLING FIXED(0.3227272727272728*SPEED_MULT)
+#define PLAYER_MOVE_FALLING_DEACCEL FIXED(0.6454545454545455*SPEED_MULT)
 
 // Prepare Data (Load Assets)
 int PlayerDataLoaded = 0;
@@ -148,6 +158,9 @@ void PlayerCreateInstance(Actor * a, void * col_ctx) {
   actor->x_position = actor->base.pos.vx << 12;
   actor->y_position = actor->base.pos.vz << 12;
   actor->z_position = actor->base.pos.vz << 12;
+
+  actor->base.collisionData.radius = 90;
+  actor->base.collisionData.height = 333;
 
   actor->void_out = 0;
 
@@ -371,9 +384,9 @@ void PlayerUpdate(Actor * a, void * scene) {
       }
     }
 
-    actor->x_position += actor->move.vx;
-    actor->y_position += actor->move.vy;
-    actor->z_position += actor->move.vz;
+    actor->x_position += actor->move.vx + (actor->base.collisionData.displacement_x << 12);
+    actor->y_position += actor->move.vy + (actor->base.collisionData.displacement_y << 12);
+    actor->z_position += actor->move.vz + (actor->base.collisionData.displacement_z << 12);
 
     if(!(actor->state & PLAYER_STATE_ONAIR)) {
       actor->last_floor_pos_x = actor->base.pos.vx;
@@ -388,6 +401,10 @@ void PlayerUpdate(Actor * a, void * scene) {
     actor->base.pos.vz = FROM_FIXED(actor->z_position);
 
     actor->base.rot.vy = actor->y_rotation;
+
+    actor->base.collisionData.displacement_x = 0;
+    actor->base.collisionData.displacement_y = 0;
+    actor->base.collisionData.displacement_z = 0;
 
     
   }
@@ -589,9 +606,14 @@ void Player_Normal(Actor * a) {
   PlayerActor * actor = (PlayerActor *)a;
   //FntPrint("Player: Normal\n");
 
-    actor->current_anim = ANM_IdleFree;
-    anim_spd = 2048;
-    actor->anim_no_loop = 0;
+  actor->current_anim = ANM_IdleFree;
+  anim_spd = 2048;
+  actor->anim_no_loop = 0;
+
+  if(last_state & PLAYER_STATE_ONAIR) {
+    // From Falling => Stand
+    actor->xzspeed = 0;
+  }
 
   switch(actor->state & 0x0000000F){
       default:
@@ -711,11 +733,6 @@ void Player_Normal(Actor * a) {
       break;
     }
     actor->y_rotation = actor->y_move_dir;
-
-      if(last_state & PLAYER_STATE_ONAIR) {
-        // From Falling => Stand
-        actor->xzspeed = 0;
-      }
 
 
 };

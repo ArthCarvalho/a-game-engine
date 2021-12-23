@@ -40,6 +40,7 @@ typedef struct ObjSyokudaiActor {
   struct Actor base;
   u_char flame_color; // select flame color
   u_char flame_rand; // Randomize flame animation per object
+  u_char flicker_frame;
   short flame_timer; // -1 <= Always on, 0 = off, 1 >= countdown
   struct SGM2 * body; // syokudai model
   struct SGM2 * flame; // flame model

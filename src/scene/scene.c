@@ -22,6 +22,219 @@
 // Fix Arena_Free() coalesce crash
 // Make make ambient color calculation faster (GTE)
 
+/*
+    OBJ_PLAYER,
+    OBJ_TSUBO,
+    OBJ_SYOKUDAI,
+    OBJ_GRASS,
+    OBJ_GRASS_CUT,
+    OBJ_MAX
+*/
+void * ActorInitFuncs[] = {
+  PlayerInitialize,
+  ObjTsuboActorInitialize,
+  ObjSyokudaiActorInitialize,
+  ObjGrassActorInitialize,
+  ObjGrassCutActorInitialize
+};
+
+u_long ActorDataSizes[] = {
+  sizeof(PlayerActor),
+  sizeof(ObjTsuboActor),
+  sizeof(ObjSyokudaiActor),
+  sizeof(ObjGrassActor),
+  sizeof(ObjGrassCutActor)
+};
+
+Actor_Descriptor room0_actors[] = {
+  {
+    8832, -4096, 0,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_TSUBO,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    8832, -4096, 256,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_GRASS_CUT,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    8832, -4096, -256,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_SYOKUDAI,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    8832+256, -4096, 0,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_GRASS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+};
+
+//
+Actor_Descriptor room1_actors[] = {
+  {
+    7424, -4096, -768,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_SYOKUDAI,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    7424, -4096, 768,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_SYOKUDAI,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    2816, -4096-256, 384,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_SYOKUDAI,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    2816, -4096-256, -384,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_SYOKUDAI,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+};
+
+
+Room_Data room_data[5] = {
+  { // Room 0
+    0, ROOM_TYPE_DUNGEON, // Id, Room Type
+    {
+      { 128, 128, 128, 0 }, // Ambient Color
+      { 128, 128, 128, 0 }, // Fog Color
+      {
+        128, 128, 128, 0, // Light Color 1
+        128, 128, 128, 0, // Light Color 2
+        128, 128, 128, 0  // Light Color 3
+      },
+      0, 0,                 // Fog Start, End
+      0                     // Skybox Type
+    },
+    room0_actors,           // List of actor initialization parameters
+    4,                      // Number of actors in initialization list
+    NULL,                   // Pointer to list of models in this room's background
+    0,                      // Number of background models
+  },
+  { // Room 1
+    1, ROOM_TYPE_DUNGEON, // Id, Room Type
+    {
+      { 128, 128, 128, 0 }, // Ambient Color
+      { 128, 128, 128, 0 }, // Fog Color
+      {
+        128, 128, 128, 0, // Light Color 1
+        128, 128, 128, 0, // Light Color 2
+        128, 128, 128, 0  // Light Color 3
+      },
+      0, 0,                 // Fog Start, End
+      0                     // Skybox Type
+    },
+    room1_actors,           // List of actor initialization parameters
+    4,                      // Number of actors in initialization list
+    NULL,                   // Pointer to list of models in this room's background
+    0,                      // Number of background models
+  },
+  { // Room 2
+    2, ROOM_TYPE_DUNGEON, // Id, Room Type
+    {
+      { 128, 128, 128, 0 }, // Ambient Color
+      { 128, 128, 128, 0 }, // Fog Color
+      {
+        128, 128, 128, 0, // Light Color 1
+        128, 128, 128, 0, // Light Color 2
+        128, 128, 128, 0  // Light Color 3
+      },
+      0, 0,                 // Fog Start, End
+      0                     // Skybox Type
+    },
+    room0_actors,           // List of actor initialization parameters
+    0,                      // Number of actors in initialization list
+    NULL,                   // Pointer to list of models in this room's background
+    0,                      // Number of background models
+  },
+  { // Room 3
+    3, ROOM_TYPE_DUNGEON, // Id, Room Type
+    {
+      { 128, 128, 128, 0 }, // Ambient Color
+      { 128, 128, 128, 0 }, // Fog Color
+      {
+        128, 128, 128, 0, // Light Color 1
+        128, 128, 128, 0, // Light Color 2
+        128, 128, 128, 0  // Light Color 3
+      },
+      0, 0,                 // Fog Start, End
+      0                     // Skybox Type
+    },
+    room0_actors,           // List of actor initialization parameters
+    0,                      // Number of actors in initialization list
+    NULL,                   // Pointer to list of models in this room's background
+    0,                      // Number of background models
+  },
+  { // Room 4
+    4, ROOM_TYPE_DUNGEON, // Id, Room Type
+    {
+      { 128, 128, 128, 0 }, // Ambient Color
+      { 128, 128, 128, 0 }, // Fog Color
+      {
+        128, 128, 128, 0, // Light Color 1
+        128, 128, 128, 0, // Light Color 2
+        128, 128, 128, 0  // Light Color 3
+      },
+      0, 0,                 // Fog Start, End
+      0                     // Skybox Type
+    },
+    room0_actors,           // List of actor initialization parameters
+    0,                      // Number of actors in initialization list
+    NULL,                   // Pointer to list of models in this room's background
+    0,                      // Number of background models
+  },
+};
+
 unsigned int __DEBUG_TOGGLE;
 
 u_char daytime_segment = 0;
@@ -792,7 +1005,7 @@ void SceneLoad() {
   Scene_ActorList[ACTORTYPE_PLAYER].start = (Actor*)playerActor;
   Scene_ActorList[ACTORTYPE_PLAYER].end = (Actor*)playerActor;
 
-  
+  ObjSyokudaiActorSetup();
   // Init Actors
   /*for(int i = 0; i < NUM_TEST_OBJ_SYOKUDAI; i++) {
     // Move this to ObjSyokudaiActorInitialize
@@ -824,7 +1037,13 @@ void SceneLoad() {
     actor->base.rot.vz = 0;
     ObjSyokudaiActorInitialize((Actor*)actor, NULL, scene);
   }*/
+
+  // initializer
+  Scene_LoadRoom(&room_data[0], scene);
+
+
   u_long actptr;
+  /*
   for(int i = 0; i < 1; i++) {
     ObjTsuboActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjTsuboActor));
     actor->base.room = 0;
@@ -839,7 +1058,7 @@ void SceneLoad() {
     //playerActor->base.child = (Actor*)actor;
     actptr = (u_long)actor;
     ObjTsuboActorInitialize((Actor*) actor, NULL, scene);
-  }
+  }*/
 
   {
     ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjGrassCutActor));
@@ -907,7 +1126,7 @@ void Scene_RemoveOldActors(int actor_type, Scene_Ctx * scene) {
     if(c->room != scene->previous_room_id) continue;
     Scene_RemoveActor(&Scene_ActorList[actor_type], c);
     c->Destroy(c, scene);
-    printf("removing actor 0x%08X\n", c);
+    //printf("removing actor 0x%08X\n", c);
     Arena_Free(c);
   }
 }
@@ -965,10 +1184,11 @@ void SceneMain() {
   //FntPrint("DRAW DIST: %d\n", scene->draw_dist);
 
   if(scene->current_room_id != scene->previous_room_id) {
+    Scene_LoadRoom(&room_data[scene->current_room_id], scene);
     switch(scene->current_room_id) {
       default:
         break;
-      case 1:
+      /*case 1:
         for(int i = 0; i < 5; i++) {
           // Move this to ObjSyokudaiActorInitialize
           ObjSyokudaiActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjSyokudaiActor));
@@ -984,7 +1204,7 @@ void SceneMain() {
           actor->base.rot.vz = 0;
           ObjSyokudaiActorInitialize((Actor*)actor, NULL, scene);
         }
-        break;
+        break;*/
       case 2:
         for(int i = 0; i < 64; i++) {
           ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjGrassCutActor));
@@ -1229,7 +1449,7 @@ void SceneDraw() {
 
   local_identity_far = local_identity = m_identity;
 
-  daytime_seg_interp += 16;
+  daytime_seg_interp += 1;
   if(daytime_seg_interp > 4096) {
     daytime_seg_interp = 0;
     daytime_segment++;
@@ -1663,4 +1883,18 @@ u_char * Scene_ParticleUpdate(Scene_Ctx * scene, MATRIX * view, u_char * buff) {
     }
   }
   return buf_ptr;
+}
+
+void Scene_LoadRoom(Room_Data * room, Scene_Ctx * scene) {
+  // Initialize Actors
+  for(long i = 0; i < room->actor_count; i++) {
+    Actor_Descriptor * actdesc = &room->actor_init[i];
+    Scene_CreateActor(actdesc, scene);
+  }
+}
+
+void Scene_CreateActor(Actor_Descriptor * actdesc, Scene_Ctx * scene) {
+    Actor * actor =  Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, ActorDataSizes[actdesc->actor_type]);
+    actor->Initialize = ActorInitFuncs[actdesc->actor_type];
+    actor->Initialize(actor, actdesc, scene);
 }

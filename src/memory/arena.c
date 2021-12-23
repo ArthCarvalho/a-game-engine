@@ -18,16 +18,31 @@ unsigned long * _arena_end_ptr; // end address of the linear heap
 #define ARENA_SIZE_MASK -2
 
 void Arena_Init(void * start, unsigned long size) {
-  _arena_start_ptr = (unsigned long * )(((unsigned long)start >> 2) + 1 << 2);
-  _arena_end_ptr = (unsigned long * )((unsigned long)_arena_start_ptr + ((size >> 2) + 1 << 2));
-  *_arena_start_ptr = (size-4) & ARENA_SIZE_MASK;
+  unsigned long size4 = (((size >> 2) + 1) << 2);
+  _arena_start_ptr = (unsigned long *)(((((unsigned long)start) >> 2) + 1) << 2);
+  _arena_end_ptr = (unsigned long *)((((unsigned long)_arena_start_ptr) + size4));
+  for(long * itr = _arena_start_ptr; itr < _arena_end_ptr; itr++) {
+    *itr = 0x0;
+  }
+  *_arena_start_ptr = *_arena_end_ptr = size4-4;
+  printf("Arena Start: 0x%08X Arena End:0x%08X\n", _arena_start_ptr, _arena_end_ptr);
+}
+
+
+/*void Arena_Init(void * start, unsigned long size) {
+  _arena_start_ptr = (unsigned long *)(((unsigned long)start >> 2) + 1 << 2);
+  _arena_end_ptr = (unsigned long *)((unsigned long)_arena_start_ptr + ((size >> 2) + 1 << 2));
+  *_arena_start_ptr = ((size)-4) & ARENA_SIZE_MASK;
   *_arena_end_ptr = *_arena_start_ptr;
+  for(long * itr = _arena_start_ptr; itr <= _arena_end_ptr; itr++) {
+    *itr = 0x0;
+  }
 }
 
 void Arena_Release() {
   _arena_start_ptr = 0;
   _arena_end_ptr = 0;
-}
+}*/
 
 
 void * Arena_Malloc(unsigned long size) {
@@ -55,7 +70,13 @@ void * Arena_Malloc(unsigned long size) {
   itr = (itr+sz+1);
   *itr = *result;
   if(old_sz > (sz4+8)){ // if old size is greater than current
-    *(itr+1) = ((old_sz - (sz4+8)) & ARENA_SIZE_MASK);
+    unsigned long splitsize = ((old_sz - (sz4+8)) & ARENA_SIZE_MASK);
+    itr++;
+    //*(itr+1) = ((old_sz - (sz4+8)) & ARENA_SIZE_MASK);
+    *itr = splitsize;
+    itr += (*itr >> 2) + 1;
+    *itr = splitsize;
+
   }
   return result+1;
 }
@@ -77,6 +98,7 @@ void Arena_Free(void * ptr) {
   *itr = *itr & ARENA_SIZE_MASK;
   //printf("Now itr(0x%08X) = %08X\n", itr, *itr);
   end_ptr = itr;
+  // Look ahead
   /*itr++;
   printf("Neighbor block itr(0x%08X) = %08X Alloc? %d\n", itr, *itr,  *itr & ARENA_ALLOCATED_BIT);
   if((itr < _arena_end_ptr) && (!(*itr & ARENA_ALLOCATED_BIT))) {

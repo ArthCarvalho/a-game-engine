@@ -191,6 +191,42 @@ typedef struct RoomEntry {
 //    unsigned long temp;
 //};
 
+enum {
+    ROOM_TYPE_EXTERIOR,
+    ROOM_TYPE_NORMAL,
+    ROOM_TYPE_DUNGEON,
+    ROOM_TYPE_BOSS,
+    ROOM_TYPE_MAX
+};
+
+enum {
+    OBJ_PLAYER,
+    OBJ_TSUBO,
+    OBJ_SYOKUDAI,
+    OBJ_GRASS,
+    OBJ_GRASS_CUT,
+    OBJ_MAX
+};
+
+typedef struct {
+    CVECTOR ambient_color;  // Ambient light color
+    CVECTOR fog_color;      // Fog color
+    CVECTOR light_color[3]; // Parallel Light Color
+    short fog_start;        // Fog Start Distance
+    short fog_end;          // Fog End Distance
+    u_char skybox_type;     // Skybox type, 0 - disabled, 1 - Standard, 2+ - Other
+} Room_Kankyou;
+// New Room Format
+typedef struct Room_Data {
+    u_char id;                          // This Room's ID/Index
+    u_char room_type;                   // Room Type
+    Room_Kankyou kankyou_data;          // Environment variables
+    Actor_Descriptor * actor_init;      // List of actor initialization parameters
+    u_short actor_count;                // Number of actors in initialization list
+    void * bg_models;                   // Pointer to list of models in this room's background
+    u_char bg_count;                    // Number of background models
+} Room_Data;
+
 typedef struct Scene {                        // Note: Struct is ordered to avoid padding
     unsigned char ambient[3];                 // Default ambient color
     unsigned char skybox_type;                // 0 - Disabled, 1 - Standard, 2 + Special
@@ -290,5 +326,9 @@ void Scene_RemoveActorRoom(ActorList * list, u_char room, Scene_Ctx * scene);
 struct ParticleEmitter * Scene_ParticleCreate(struct ParticleEmitter * emitter, Scene_Ctx * scene);
 
 u_char * Scene_ParticleUpdate(Scene_Ctx * scene, MATRIX * view, u_char * buff);
+
+void Scene_LoadRoom(Room_Data * room, Scene_Ctx * scene);
+
+void Scene_CreateActor(Actor_Descriptor * actdesc, Scene_Ctx * scene);
 
 #endif

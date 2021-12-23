@@ -24,10 +24,15 @@ void ObjGrassCutActorSetup() {
 
 void ObjGrassCutActorInitialize(struct Actor * a, void * descriptor, void * scene) {
   ObjGrassCutActor * actor = (ObjGrassCutActor *)a;
+  if(descriptor) {
+    Actor_PopulateBase(&actor->base, descriptor);
+  }
   actor->base.Initialize = (PTRFUNC_3ARG) ObjGrassCutActorInitialize;
   actor->base.Destroy = (PTRFUNC_2ARG) ObjGrassCutActorDestroy;
   actor->base.Update = (PTRFUNC_2ARG) ObjGrassCutActorUpdate;
   actor->base.Draw = (PTRFUNC_4ARGCHAR) ObjGrassCutActorDraw;
+  actor->base.collisionData.radius = 115;
+  actor->base.collisionData.height = 128;
   actor->model_full = actor->model = obj_grass_cut_full_model;
   actor->model_cut = obj_grass_cut_half_model;
   actor->base.visible = 1;
@@ -52,7 +57,40 @@ void ObjGrassCutActorUpdate(struct Actor * a, void * scene) {
   struct Scene_Ctx * scene_ctx = (struct Scene_Ctx*)scene;
   Actor * player = scene_ctx->player;
 
+  
+  // COLLISION CODE - TEMPORARY
+  if(actor->cut_timer == 0) { 
+    /*short distXDelta = (player->pos.vx - actor->base.pos.vx);
+    short distZDelta = (player->pos.vz - actor->base.pos.vz);
+    short cyl_sum_radius = player->collisionData.radius + actor->base.collisionData.radius;
+    //u_int dist = get_distanceXZ({distXDelta, 0, distZDelta, 0});
+    u_int dist =  SquareRoot0(distXDelta * distXDelta + distZDelta * distZDelta);
+    if(dist < cyl_sum_radius) { // Test - Collision Code
+      short cyl_overlap = cyl_sum_radius - dist;
+      if(dist != 0) { // If both are at the exact same position, ignore.
+        u_long dispfactor = ((u_long)cyl_overlap<<12) / dist;
+        short disp_x = (distXDelta * dispfactor) >> 12;
+        short disp_z = (distZDelta * dispfactor) >> 12;
+        player->collisionData.displacement_x += disp_x;
+        player->collisionData.displacement_z += disp_z;
+      }
+    }*/
 
+    CollisionCylinder col_player;
+    CollisionCylinder col_obj;
+    short dist, intersect, deltax, deltaz;
+
+    col_player.origin = player->pos;
+    col_player.radius = player->collisionData.radius;
+    col_player.height = player->collisionData.height;
+    col_obj.origin = actor->base.pos;
+    col_obj.radius = actor->base.collisionData.radius;
+    col_obj.height = actor->base.collisionData.height; // = 128;
+
+    if(ActorCollision_CheckCylinders(&col_obj, &col_player, &dist, &intersect, &deltax, &deltaz) == 1) {
+      ActorCollision_DisplaceActor(player, dist, intersect, deltax, deltaz);
+    }
+  }
 
   if(actor->cut_timer > 3) {
     actor->cut_timer--;
@@ -91,7 +129,7 @@ void ObjGrassCutActorUpdate(struct Actor * a, void * scene) {
     RotMatrix_gte(&rot, &actor->matrix);
     ScaleMatrixL(&actor->matrix, &scale);
   } else {
-    if(actor->base.xzDistance < 288) {
+    if(actor->base.xzDistance < 288 && ((PlayerActor*)player)->state & PLAYER_STATE_ROLL) {
       actor->cut_timer = 240;
       actor->model = actor->model_cut;
 
@@ -130,6 +168,8 @@ void ObjGrassCutActorUpdate(struct Actor * a, void * scene) {
       
       pemitter.u0 = (36*4) & 0xFF;
       pemitter.v0 = (416) & 0xFF;
+
+      pemitter.flags = PARTICLE_RENDER_AMBIENT;
 
       Scene_ParticleCreate(&pemitter,NULL);
 

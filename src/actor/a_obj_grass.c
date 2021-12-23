@@ -23,6 +23,9 @@ void ObjGrassActorSetup() {
 
 void ObjGrassActorInitialize(struct Actor * a, void * descriptor, void * scene) {
   ObjGrassActor * actor = (ObjGrassActor *)a;
+  if(descriptor) {
+    Actor_PopulateBase(&actor->base, descriptor);
+  }
   actor->base.Initialize = (PTRFUNC_3ARG) ObjGrassActorInitialize;
   actor->base.Destroy = (PTRFUNC_2ARG) ObjGrassActorDestroy;
   actor->base.Update = (PTRFUNC_2ARG) ObjGrassActorUpdate;
@@ -32,6 +35,8 @@ void ObjGrassActorInitialize(struct Actor * a, void * descriptor, void * scene) 
   actor->model_far2 = obj_grass_far2_model;
   actor->base.visible = 1;
   actor->base.flags = ACTOR_INTERACTABLE | ACTOR_ACCURATEDIST;
+  actor->base.collisionData.radius = 115;
+  actor->base.collisionData.height = 128;
 
   actor->matrix.t[0] = actor->base.pos.vx;
   actor->matrix.t[1] = actor->base.pos.vy;
@@ -46,10 +51,28 @@ void ObjGrassActorDestroy(struct Actor * a, void * scene) {
 
 void ObjGrassActorUpdate(struct Actor * a, void * scene) {
   ObjGrassActor * actor = (ObjGrassActor *)a;
-  //struct Scene_Ctx * scene_ctx = (struct Scene_Ctx*)scene;
-  //Actor * player = scene_ctx->player;
+  struct Scene_Ctx * scene_ctx = (struct Scene_Ctx*)scene;
+  Actor * player = scene_ctx->player;
 
-  if(actor->base.xzDistance < 288) {
+  if(actor->base.xzDistance < 512) {
+    CollisionCylinder col_player;
+    CollisionCylinder col_obj;
+    short dist, intersect, deltax, deltaz;
+
+    col_player.origin = player->pos;
+    col_player.radius = player->collisionData.radius;
+    col_player.height = player->collisionData.height;
+    col_obj.origin = actor->base.pos;
+    col_obj.radius = actor->base.collisionData.radius;
+    col_obj.height = actor->base.collisionData.height; // = 128;
+    if(ActorCollision_CheckCylinders(&col_obj, &col_player, &dist, &intersect, &deltax, &deltaz) == 1) {
+      ActorCollision_DisplaceActor(player, dist, intersect, deltax, deltaz);
+    }
+  }
+
+  
+
+  if(actor->base.xzDistance < 288 && ((PlayerActor*)player)->state & PLAYER_STATE_ROLL) {
     actor->base.Update = NULL;
     // Generate particles?
       ParticleEmitter pemitter;

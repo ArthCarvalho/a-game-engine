@@ -491,3 +491,59 @@ void SGM2_OffsetTexCoords(SGM2_File * model, short x, short y) {
     pgt3_ptr->v2 += y;
   }
 }
+/*
+void SGM2_SubdivideGT3_Sub1() {
+  // Calculate vertex subdivision
+  // A -> B * 0.5
+  short ab_half_x = (pgt3_ptr->x1 - pgt3_ptr->x0) >> 1;
+  short ab_half_y = (pgt3_ptr->y1 - pgt3_ptr->y0) >> 1;
+  short ab_half_z = (pgt3_ptr->z1 - pgt3_ptr->z0) >> 1;
+  // B -> C * 0.5
+  short bc_half_x = (pgt3_ptr->x2 - pgt3_ptr->x1) >> 1;
+  short bc_half_y = (pgt3_ptr->y2 - pgt3_ptr->y1) >> 1;
+  short bc_half_z = (pgt3_ptr->z2 - pgt3_ptr->z1) >> 1;
+  // C -> A * 0.5
+  short ca_half_x = (pgt3_ptr->x0 - pgt3_ptr->x2) >> 1;
+  short ca_half_y = (pgt3_ptr->y0 - pgt3_ptr->y2) >> 1;
+  short ca_half_z = (pgt3_ptr->z0 - pgt3_ptr->z2) >> 1;
+  // Add offset
+  ab_half_x += pgt3_ptr->x0;
+  ab_half_y += pgt3_ptr->y0;
+  ab_half_z += pgt3_ptr->z0;
+  bc_half_x += pgt3_ptr->x1;
+  bc_half_y += pgt3_ptr->y1;
+  bc_half_z += pgt3_ptr->z1;
+  ca_half_x += pgt3_ptr->x2;
+  ca_half_y += pgt3_ptr->y2;
+  ca_half_z += pgt3_ptr->z2;
+  // Calculate UV subdivision
+  // A -> B * 0.5
+  short ab_half_u = (pgt3_ptr->u1 - pgt3_ptr->u0) >> 1;
+  short ab_half_v = (pgt3_ptr->v1 - pgt3_ptr->v0) >> 1;
+  // B -> C * 0.5
+  short bc_half_u = (pgt3_ptr->u2 - pgt3_ptr->u1) >> 1;
+  short bc_half_v = (pgt3_ptr->v2 - pgt3_ptr->v1) >> 1;
+  // C -> A * 0.5
+  short ca_half_u = (pgt3_ptr->u0 - pgt3_ptr->u2) >> 1;
+  short ca_half_v = (pgt3_ptr->v0 - pgt3_ptr->v2) >> 1;
+  // Add offset
+  ab_half_u += pgt3_ptr->u0;
+  ab_half_v += pgt3_ptr->v0;
+  bc_half_u += pgt3_ptr->u1;
+  bc_half_v += pgt3_ptr->v1;
+  ca_half_u += pgt3_ptr->u2;
+  ca_half_v += pgt3_ptr->v2;
+  // Calculate color subdivision
+  // A -> B
+  u_char ab_r = (pgt3_ptr->r0 + pgt3_ptr->r1) >> 1;
+  u_char ab_g = (pgt3_ptr->g0 + pgt3_ptr->g1) >> 1;
+  u_char ab_b = (pgt3_ptr->b0 + pgt3_ptr->b1) >> 1;
+  // B -> C
+  u_char bc_r = (pgt3_ptr->r1 + pgt3_ptr->r2) >> 1;
+  u_char bc_g = (pgt3_ptr->g1 + pgt3_ptr->g2) >> 1;
+  u_char bc_b = (pgt3_ptr->b1 + pgt3_ptr->b2) >> 1;
+  // C -> A
+  u_char ca_r = (pgt3_ptr->r2 + pgt3_ptr->r0) >> 1;
+  u_char ca_g = (pgt3_ptr->g2 + pgt3_ptr->g0) >> 1;
+  u_char ca_b = (pgt3_ptr->b2 + pgt3_ptr->b0) >> 1;
+}*/

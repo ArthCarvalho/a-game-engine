@@ -19,6 +19,9 @@
 
 #include "global.h"
 
+#define PARTICLE_RENDER_AMBIENT 0x00000001
+//SGM2_RENDER_AMBIENT
+
 typedef struct ParticleEmitter {
   SVECTOR position;         // Particle source
   SVECTOR rotation;         // Particle rotation speed

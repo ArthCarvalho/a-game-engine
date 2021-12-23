@@ -13,7 +13,23 @@
 
 #include "global.h"
 
+typedef struct {
+  SVECTOR origin;
+  short radius;
+  short height;
+} CollisionCylinder;
+
 // Actor ID, position, etc. must be filled before calling this function
 void ActorCreate(struct Actor * actor);
+
+// Populate basic actor data (Position, Rotation, Scale)
+void Actor_PopulateBase(Actor * actor, Actor_Descriptor * desc);
+
+// Actor vs Actor Collision Functions
+
+// Cylinder vs Cylinder check
+long ActorCollision_CheckCylinders(CollisionCylinder * a, CollisionCylinder * b, short * dist, short * intersect, short * deltax, short * deltaz);
+
+void ActorCollision_DisplaceActor(Actor * actor, short dist, short intersect, short deltax, short deltaz);
 
 #endif
