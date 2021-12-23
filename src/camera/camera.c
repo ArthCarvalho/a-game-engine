@@ -49,6 +49,12 @@ short camera_target_offs_before;
 
 Col2 * col_context;
 
+void Camera_AddQuake(struct Camera * cam, short str) {
+	cam->quake_str = str;
+	cam->quake_state = 1;
+	cam->quake_timer = 0;
+}
+
 void Camera_Create(struct Camera * cam, void * col){
   cam->target_pos.vx = 0;
   cam->target_pos.vy = 0;
@@ -78,6 +84,14 @@ void Camera_Create(struct Camera * cam, void * col){
 	cam->fov_s = cam->fov = 4096;
 	cam->target_mode = 0;
 	cam->state = 0;
+
+	// Quake things
+	cam->quake_state = 0;
+  cam->quake_timer = 0;
+  cam->quake_str = 0;
+	cam->quake_mod = 0;
+	cam->quake_decay = 1;
+	cam->quake_speed = 1300;
 }
 
 unsigned long iabs(long value) {
@@ -120,10 +134,22 @@ void Camera_LookAt(struct Camera * cam) {
 	VECTOR pos;
 	VECTOR vec;
   int temp0;
+
+	// Quake
+	if(cam->quake_state != 0 && cam->quake_str > 0) {
+		cam->quake_mod = (isin(cam->quake_timer+=cam->quake_speed) * cam->quake_str) >> 12;
+		cam->quake_str -= cam->quake_decay;
+		if(cam->quake_str <= 0) {
+			cam->quake_state = 0;
+			cam->quake_mod = 0;
+		}
+	} else {
+		cam->quake_mod = 0;
+	}
   
   setVector(&taxis,
     (cam->target_pos_s.vx)+cam->target_offset_s.vx-(cam->position.vx),
-    (cam->target_pos_s.vy)+cam->target_offset_s.vy-(cam->position.vy),
+    ((cam->target_pos_s.vy)+cam->target_offset_s.vy-(cam->position.vy))+cam->quake_mod,
     (cam->target_pos_s.vz)+cam->target_offset_s.vz-(cam->position.vz)
   );
 	VectorNormalS(&taxis, &zaxis);
@@ -170,7 +196,7 @@ void Camera_LookAt(struct Camera * cam) {
 	((PlayerActor*)cam->target)->zaxis = cam->zaxis;
 
   pos.vx = -cam->position.vx;
-	pos.vy = -cam->position.vy;
+	pos.vy = -(cam->position.vy + cam->quake_mod);
 	pos.vz = -cam->position.vz;
   
 	VECTOR aspect_mod = {cam->aspect.vx, cam->aspect.vy, cam->aspect.vz, 0};

@@ -21,6 +21,7 @@
 #include "actor/a_obj_tsubo.h"
 #include "actor/a_obj_grass.h"
 #include "actor/a_obj_grass_cut.h"
+#include "actor/a_obj_door_shutter.h"
 
 // Animated Flame Texture Source Location
 #define FLAME_TEX_X_SRC 496
@@ -205,6 +206,7 @@ enum {
     OBJ_SYOKUDAI,
     OBJ_GRASS,
     OBJ_GRASS_CUT,
+    OBJ_DOOR_SHUTTER,
     OBJ_MAX
 };
 

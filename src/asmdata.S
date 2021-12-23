@@ -48,6 +48,7 @@
   .global test_image2_tim
   .global test_image3_tim
   .global test_image4_tim
+  .global obj_dangeon_door_tim
   .global screen_lifebar_tim
   .global texture_data_start
   .global texture_data_end
@@ -203,6 +204,10 @@ test_image3_tim:
 
 test_image4_tim:
   .incbin "../AGAME_PCDATA/item_icons/bow-multi-pal.tim"
+  .balign 16
+
+obj_dangeon_door_tim:
+  .incbin "../AGAME_PCDATA/obj_dangeon_door.tim"
   .balign 16
 
 screen_lifebar_tim:

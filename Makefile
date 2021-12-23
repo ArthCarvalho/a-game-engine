@@ -32,6 +32,7 @@ $(SRC_DIR)/actor/a_obj_syokudai.c \
 $(SRC_DIR)/actor/a_obj_tsubo.c    \
 $(SRC_DIR)/actor/a_obj_grass.c    \
 $(SRC_DIR)/actor/a_obj_grass_cut.c\
+$(SRC_DIR)/actor/a_obj_door_shutter.c\
 $(SRC_DIR)/particles/particles.c  \
 $(SRC_DIR)/fpmath.S							  \
 $(SRC_DIR)/lz77.S                 \

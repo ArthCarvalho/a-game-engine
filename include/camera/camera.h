@@ -68,7 +68,16 @@ typedef struct Camera {
 	SVECTOR target_offset_s; // Smoothed Target Offset
   // Etc
   u_char target_mode;
+  // Quake Mode
+  u_char quake_state;
+  u_short quake_timer;
+  short quake_str;
+  short quake_mod;
+  short quake_decay;
+  short quake_speed;
 } CAMERA;
+
+void Camera_AddQuake(struct Camera * cam, short str);
 
 void Camera_Create(struct Camera * cam, void * col);
 

@@ -28,6 +28,7 @@
     OBJ_SYOKUDAI,
     OBJ_GRASS,
     OBJ_GRASS_CUT,
+    OBJ_DOOR_SHUTTER,
     OBJ_MAX
 */
 void * ActorInitFuncs[] = {
@@ -35,7 +36,8 @@ void * ActorInitFuncs[] = {
   ObjTsuboActorInitialize,
   ObjSyokudaiActorInitialize,
   ObjGrassActorInitialize,
-  ObjGrassCutActorInitialize
+  ObjGrassCutActorInitialize,
+  ObjDoorShutterActorInitialize
 };
 
 u_long ActorDataSizes[] = {
@@ -43,7 +45,8 @@ u_long ActorDataSizes[] = {
   sizeof(ObjTsuboActor),
   sizeof(ObjSyokudaiActor),
   sizeof(ObjGrassActor),
-  sizeof(ObjGrassCutActor)
+  sizeof(ObjGrassCutActor),
+  sizeof(ObjDoorShutterActor)
 };
 
 Actor_Descriptor room0_actors[] = {
@@ -87,6 +90,17 @@ Actor_Descriptor room0_actors[] = {
     0,                // unsigned char room;
     NULL,             // unsigned char pad;
     OBJ_GRASS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    7833, -4096, 0,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DOOR_SHUTTER,        // unsigned int actor_type; Actor ID
     {                 // unsigned int init_variables[9];
       0, 0, 0, 0, 0, 0, 0, 0, 0
     }
@@ -157,7 +171,7 @@ Room_Data room_data[5] = {
       0                     // Skybox Type
     },
     room0_actors,           // List of actor initialization parameters
-    4,                      // Number of actors in initialization list
+    5,                      // Number of actors in initialization list
     NULL,                   // Pointer to list of models in this room's background
     0,                      // Number of background models
   },
@@ -940,6 +954,8 @@ void SceneLoad() {
   load_texture_pos((unsigned long)test_image2_tim, 64+(13*1), 256, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+9);
   load_texture_pos((unsigned long)test_image3_tim, 64+(13*2), 256, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+10);
   load_texture_pos((unsigned long)test_image4_tim, 64+(13*3), 256, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+13);
+  // Door Textures
+  load_texture_pos((unsigned long)obj_dangeon_door_tim, 192, 0, 784, 500);
 
   load_texture_pos((unsigned long)screen_lifebar_tim, LIFEMETER_TEX_X, LIFEMETER_TEX_Y, LIFEMETER_CLUT_X, LIFEMETER_CLUT_Y);
 
