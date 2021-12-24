@@ -92,6 +92,8 @@ void Camera_Create(struct Camera * cam, void * col){
 	cam->quake_mod = 0;
 	cam->quake_decay = 1;
 	cam->quake_speed = 1300;
+
+	cam->state_fix = 0;
 }
 
 unsigned long iabs(long value) {
@@ -134,6 +136,8 @@ void Camera_LookAt(struct Camera * cam) {
 	VECTOR pos;
 	VECTOR vec;
   int temp0;
+
+	//FntPrint("Cam x %d y %d z %d\n", cam->position.vx, cam->position.vy, cam->position.vz);
 
 	// Quake
 	if(cam->quake_state != 0 && cam->quake_str > 0) {
@@ -212,12 +216,13 @@ void Camera_LookAt(struct Camera * cam) {
 short camera_rot_smooth = 0;
 short camera_rot_smooth_targ = 0;
 
-void Camera_Update(struct Camera * cam){
+void Camera_Update(struct Camera * cam, void * scene){
 	VECTOR last_targ_pos;
 	VECTOR targ_pos_diff;
+	Scene_Ctx * scene_ctx = (Scene_Ctx *)scene;
 
 	u_int playerstate = ((PlayerActor*)cam->target)->state;
-	if(cam->state != 3) {
+	if(cam->state != 3 && !cam->state_fix) {
 		cam->state = 0;
 		if(playerstate & PLAYER_STATE_ONAIR) cam->state = 1;
 		if(((PlayerActor*)cam->target)->void_out) cam->state = 2;
@@ -443,6 +448,7 @@ void Camera_Update(struct Camera * cam){
 			case 3: // Targetting
 				if(camera_to_back_state == 1) {
 					cam->target_mode = 1;
+					scene_ctx->cinema_mode = 1;
 					camera_target_offs_before = cam->target_offset.vy;
 					cam->target_offset.vy = CAMERA_TARG_OFFS;
 					short target_rot_h = ((PlayerActor*)cam->target)->base.rot.vy & 0xFFF;
@@ -477,6 +483,7 @@ void Camera_Update(struct Camera * cam){
 						camera_to_back_state = 0;
 						cam->state = 0;
 						cam->target_mode = 0;
+						scene_ctx->cinema_mode = 0;
 					}
 				}
 

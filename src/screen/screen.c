@@ -14,7 +14,7 @@ void Screen_LifeMeterInit() {
 
 }
 
-char * Screen_LifeMeterDraw(char * buff) {
+char * Screen_LifeMeterDraw(char * buff, char level) {
   short max_hearts = life_max >> 4;
   short pos_x = LIFEMETER_POS_X;
   short pos_y = LIFEMETER_POS_Y;
@@ -35,13 +35,13 @@ char * Screen_LifeMeterDraw(char * buff) {
     // 6~10   - 2/4
     // 1~5    - 1/4
     // 0      - full
-    buff = Screen_RenderHeart(buff, pos_x, pos_y, (in < life_current) + ((in >= (life_current-0x10)) && in < life_current),life_percent);
+    buff = Screen_RenderHeart(buff, pos_x, pos_y, (in < life_current) + ((in >= (life_current-0x10)) && in < life_current),life_percent, level);
     pos_x += 16;
   }
   pos_x = LIFEMETER_POS_X;
   pos_y += 11;
 
-  buff = Screen_MagicBarDraw(buff, pos_x, pos_y, 86, 4096);
+  buff = Screen_MagicBarDraw(buff, pos_x, pos_y, 86, 4096, level);
 
   //setDrawTPage((DR_TPAGE*)buff, 1, 0, getTPage(0, 0, LIFEMETER_TEX_X, LIFEMETER_TEX_Y));
   //addPrim(G.pOt, buff);
@@ -50,9 +50,9 @@ char * Screen_LifeMeterDraw(char * buff) {
   return buff;
 }
 
-char * Screen_RenderHeart(char * buff, short x, short y, char state, u_char pct) {
+char * Screen_RenderHeart(char * buff, short x, short y, char state, u_char pct, char alpha) {
   SPRT * piece = (SPRT*)buff;
-  u_short cl = clut[screen_transparent];
+  u_short cl = clut[alpha];
   if(state == 2){
     if(pct == 0) { // Full, Active
       setXY0(piece, x, y-1);
@@ -125,9 +125,9 @@ char * Screen_RenderHeart(char * buff, short x, short y, char state, u_char pct)
   return (char *)piece;
 }
 
-char * Screen_MagicBarDraw(char * buff, short x, short y, short w, short magic) {
+char * Screen_MagicBarDraw(char * buff, short x, short y, short w, short magic, char alpha) {
   SPRT * sprite = (SPRT*) buff;
-  u_short cl = clut[screen_transparent];
+  u_short cl = clut[alpha];
 
   short barw = ((w-10) * magic) >> 12;
 

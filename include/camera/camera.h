@@ -75,6 +75,7 @@ typedef struct Camera {
   short quake_mod;
   short quake_decay;
   short quake_speed;
+  u_char state_fix; // Must fix this
 } CAMERA;
 
 void Camera_AddQuake(struct Camera * cam, short str);
@@ -83,7 +84,7 @@ void Camera_Create(struct Camera * cam, void * col);
 
 void Camera_LookAt(struct Camera * cam);
 
-void Camera_Update(struct Camera * cam);
+void Camera_Update(struct Camera * cam, void * scene);
 
 void Camera_SetStartValues(struct Camera * cam);
 

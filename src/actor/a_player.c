@@ -237,7 +237,7 @@ void PlayerUpdate(Actor * a, void * scene) {
     // Analog Stick Bypass (DPAD)
     if(demo_counter > 0){
       if(demo_counter > 10){
-        mov_vec_x = -4096;
+        //mov_vec_x = -4096;
         analog_l_mag = 128;
         mov_vec_z = 0;
         actor->xzspeed = PLAYER_MOVE_SPEED;
@@ -628,7 +628,7 @@ void Player_Normal(Actor * a) {
           actor->state &= ~PLAYER_STATE_MOVE; // reset movement state
         }
         
-        if(analog_l_mag > ANALOG_MIN){
+        if(analog_l_mag > ANALOG_MIN && !demo_counter){
           // Converts the analog input
           // Convert Vector to Angle
           new_y_direction = (fix12_atan2(mov_vec_x, mov_vec_z) << 7 ) / 0x0324;
@@ -790,4 +790,11 @@ void Player_Falling(Actor * a) {
 
   //if(actor->xzspeed < 0) actor->xzspeed = 0;
 
+}
+
+void Player_ForceIdle(Actor * player) {
+  PlayerActor * p = (PlayerActor *)player;
+  p->xzspeed = 0;
+  p->state = (p->state & PLAYER_STATE_MASK) | PLAYER_STATE_WAIT;
+  p->current_anim = ANM_IdleFree;
 }

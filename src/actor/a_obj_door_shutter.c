@@ -94,6 +94,7 @@ void ObjDoorShutterActorInitialize(struct Actor * a, void * descriptor, void * s
 
   actor->anim_timer = 0;
   actor->sub_timer = 0;
+  actor->flip_model = 0;
 
   if(descriptor) {
     Actor_PopulateBase(&actor->base, descriptor);
@@ -105,12 +106,14 @@ void ObjDoorShutterActorInitialize(struct Actor * a, void * descriptor, void * s
 
   actor->base.rot.vy = 1024;
 
+  actor->front_room = desc->init_variables[0];
+  actor->back_room = desc->init_variables[1];
+
   SVECTOR rot = actor->base.rot;
   RotMatrix_gte(&rot, &actor->matrix);
 }
 
 void ObjDoorShutterActorDestroy(struct Actor * a, void * scene) {
-
 }
 
 void ObjDoorShutterActorUpdate(struct Actor * a, void * scene) {
@@ -118,6 +121,20 @@ void ObjDoorShutterActorUpdate(struct Actor * a, void * scene) {
   struct Scene_Ctx * scene_ctx = (struct Scene_Ctx*)scene;
   struct Camera * cam = (struct Camera *)((Scene_Ctx*)scene)->camera;
   Actor * player = scene_ctx->player;
+  PlayerActor * pl = (PlayerActor *)player;
+
+  // Set model facing directon
+  VECTOR ppos = {player->pos.vx - actor->matrix.t[0], 0, player->pos.vz - actor->matrix.t[2]};
+  short plen = SquareRoot0(ppos.vx * ppos.vx + ppos.vz * ppos.vz);
+  ppos.vx = (ppos.vx<<12)/plen;
+  ppos.vz = (ppos.vz<<12)/plen;
+  SVECTOR z_dir = {actor->matrix.m[2][0], 0, actor->matrix.m[2][2], 0};
+  long dot = dotProductXZ(&ppos, &z_dir);
+  if(dot >= 0) {
+    actor->flip_model = 2048;
+  } else {
+    actor->flip_model = 0;
+  }
 
   SVECTOR tdist = player->pos;
   tdist.vx -= actor->base.pos.vx;
@@ -130,8 +147,22 @@ void ObjDoorShutterActorUpdate(struct Actor * a, void * scene) {
 	  tdist.vz = (tdist.vz + mask) ^ mask;
   }
   if(tdist.vx < 400 && tdist.vz < 400) {
-    if(actor->sub_timer == 0) {
+    if(actor->sub_timer == 0 && (g_pad_press & PAD_CROSS) && !(pl->state & PLAYER_CUTSCENE_MODE)) {
       actor->sub_timer = 1;
+      scene_ctx->cinema_mode = 1;
+      scene_ctx->interface_fade = 1;
+      Player_ForceIdle(pl);
+      pl->state |= PLAYER_CUTSCENE_MODE;
+      scene_ctx->room_swap = 1;
+      if(!actor->flip_model) {
+        pl->y_move_dir = (actor->base.rot.vy + 2048) % 4096;
+        scene_ctx->current_room_id = actor->back_room;
+        scene_ctx->previous_room_id = actor->front_room;
+      } else {
+        pl->y_move_dir = actor->base.rot.vy;
+        scene_ctx->current_room_id = actor->front_room;
+        scene_ctx->previous_room_id = actor->back_room;
+      }
     }
 
   } else {
@@ -141,12 +172,28 @@ void ObjDoorShutterActorUpdate(struct Actor * a, void * scene) {
     //actor->base.visible = 0;
   }
 
+  if(actor->sub_timer != 0) {
+    cam->state = 2;
+    cam->state_fix = 1;
+  }
+
+
   if(actor->sub_timer == 1) {
     actor->anim_timer++;
+    if(actor->anim_timer == 11) demo_counter = 32;
   }
   if(actor->anim_timer > 16) {
     actor->anim_timer = 16;
     actor->sub_timer = 2;
+    // Swap Camera Sides
+    SVECTOR cam_pos = {608, 845, -1248, 0};
+    if(actor->flip_model) cam_pos.vz = -cam_pos.vz;
+    VECTOR f_cam_pos;
+    gte_SetRotMatrix(&actor->matrix);
+    ApplyRotMatrix(&cam_pos, &f_cam_pos);
+    cam->position.vx = f_cam_pos.vx + actor->matrix.t[0];
+    cam->position.vy = f_cam_pos.vy + actor->matrix.t[1];
+    cam->position.vz = f_cam_pos.vz + actor->matrix.t[2];
   }
   if(actor->sub_timer == 3) {
     actor->anim_timer-=2;
@@ -155,20 +202,28 @@ void ObjDoorShutterActorUpdate(struct Actor * a, void * scene) {
     actor->anim_timer = 0;
     actor->sub_timer = 0;
     Camera_AddQuake(cam, 8);
+    cam->state = 0;
+    cam->state_fix = 0;
+    scene_ctx->cinema_mode = 0;
+    scene_ctx->interface_fade = 0;
+    scene_ctx->previous_room_m = NULL;
+    scene_ctx->actor_cleanup = 1;
+    pl->state &= ~PLAYER_CUTSCENE_MODE;
   }
-
-  FntPrint("anim_timer %d\n", actor->anim_timer);
-
-  
+  //FntPrint("anim_timer %d\n", actor->anim_timer);
 }
 
 u_char * ObjDoorShutterActorDraw(struct Actor * a, MATRIX * view, u_char * packet_ptr, void * scene) {
   ObjDoorShutterActor * actor = (ObjDoorShutterActor *)a;
   MATRIX local_identity;
-  //MATRIX anim_identity = actor->matrix;
-  //anim_identity.t[1] = anim_identity.t[1] + door_shutter_open_anim[actor->anim_timer];
-  CompMatrixLV(view, &actor->matrix, &local_identity);
-  //CompMatrixLV(view, &anim_identity, &local_identity);
+  MATRIX anim_identity = actor->matrix;
+  if(actor->flip_model) {
+    anim_identity.m[0][0] = -actor->matrix.m[0][0];
+    anim_identity.m[0][2] = -actor->matrix.m[0][2];
+    anim_identity.m[2][0] = -actor->matrix.m[2][0];
+    anim_identity.m[2][2] = -actor->matrix.m[2][2];
+  }
+  CompMatrixLV(view, &anim_identity, &local_identity);
   gte_SetRotMatrix(&local_identity);
   gte_SetTransMatrix(&local_identity);
 

@@ -28,6 +28,9 @@ typedef struct ObjDoorShutterActor {
   u_int dist;
   u_char anim_timer;
   u_char sub_timer;
+  u_short flip_model;
+  u_char front_room;
+  u_char back_room;
 } ObjDoorShutterActor;
 
 void ObjDoorShutterActorSetup(); // Loads and sets up data, called while loading new scenes, does not create instances

@@ -102,7 +102,7 @@ Actor_Descriptor room0_actors[] = {
     NULL,             // unsigned char pad;
     OBJ_DOOR_SHUTTER,        // unsigned int actor_type; Actor ID
     {                 // unsigned int init_variables[9];
-      0, 0, 0, 0, 0, 0, 0, 0, 0
+      0, 1, 0, 0, 0, 0, 0, 0, 0
     }
   },
 };
@@ -153,6 +153,17 @@ Actor_Descriptor room1_actors[] = {
       0, 0, 0, 0, 0, 0, 0, 0, 0
     }
   },
+  {
+    7833, -4096, 0,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DOOR_SHUTTER,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 1, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
 };
 
 
@@ -189,7 +200,7 @@ Room_Data room_data[5] = {
       0                     // Skybox Type
     },
     room1_actors,           // List of actor initialization parameters
-    4,                      // Number of actors in initialization list
+    5,                      // Number of actors in initialization list
     NULL,                   // Pointer to list of models in this room's background
     0,                      // Number of background models
   },
@@ -412,7 +423,6 @@ RECT anim_tex_flame_src;
 RECT anim_tex_flame_dest;
 
 u_int scene_counter;
-u_char cinema_mode = 0;
 //u_char cinema_mode_anim[3] = {15, 24 ,30};
 // 4 frames
 u_char cinema_mode_anim[4] = {10, 20, 25,30};
@@ -456,7 +466,10 @@ typedef struct Actor_SwapPlane{
   unsigned char display_type;
   unsigned char front_room;
   unsigned char back_room;
-
+  short swap_start;
+  unsigned char swap_state;
+  unsigned char swap_state_prev;
+  unsigned char swap_active;
 } Actor_SwapPlane;
 
 void Actor_SwapPlane_Init(Actor * address, Actor_Descriptor * descriptor, Scene_Ctx * scene);
@@ -495,6 +508,10 @@ void Actor_SwapPlane_Init(Actor * address, Actor_Descriptor * descriptor, Scene_
   myself->back_room = initial_values->back;
 
   myself->display_type = 0; // No Display
+
+  myself->swap_start = 0;
+  myself->swap_state = 0;
+  myself->swap_active = 0;
 };
 
 void Actor_SwapPlane_Destroy(Actor * address, Scene_Ctx * scene) {
@@ -511,22 +528,33 @@ void Actor_SwapPlane_Update(Actor * actor, Scene_Ctx * scene) {
   //myself->base.bbox.min_x, myself->base.bbox.max_x,
   //myself->base.bbox.min_y, myself->base.bbox.max_y,
   //myself->base.bbox.min_z, myself->base.bbox.max_z);
+  myself->swap_state_prev = myself->swap_state;
   if(player->pos.vy > myself->base.bbox.min_y && player->pos.vy < myself->base.bbox.max_y){
     if(player->pos.vx > myself->base.bbox.min_x && player->pos.vx < myself->base.bbox.max_x){
       if(player->pos.vz > myself->base.bbox.min_z && player->pos.vz < myself->base.bbox.max_z){
+          
           // Get Dist
           d_x = player->pos.vx - myself->base.pos.vx;
           d_y = player->pos.vy - myself->base.pos.vy;
           d_z = player->pos.vz - myself->base.pos.vz;
           dist = d_x * d_x + d_y * d_y + d_z * d_z;
           //FntPrint("Swap Dist: %d [0x%0x]\n", dist, dist);
-          // Swap rooms
-          if(d_x > 0) {
-            scene->current_room_id = myself->front_room;
-          } else {
-            scene->current_room_id = myself->back_room;
+          if(d_x < 180 && d_x > -180) {
+            if(d_x > 0 && myself->swap_start < 0 || d_x < 0 && myself->swap_start > 0){
+              if(d_x > 0) {
+                scene->current_room_id = myself->front_room;
+                scene->previous_room_id = myself->back_room;
+              } else {
+                scene->current_room_id = myself->back_room;
+                scene->previous_room_id = myself->front_room;
+              }
+              scene->room_swap = 1;
+              scene->actor_cleanup = 1;
+              scene->previous_room_m = NULL;
+            }
           }
-          scene->previous_room_m = NULL;
+
+          myself->swap_start = d_x;
       }
     }
   }
@@ -639,6 +667,11 @@ void SceneLoad() {
 
   scene = LStack_Alloc(sizeof(Scene_Ctx)); // Allocate scene structure
 
+  scene->cinema_mode = 0;
+  scene->cinema_mode_counter = 0;
+  scene->interface_fade = 0;
+  scene->interface_fade_counter = 0;
+
   // Setup scene data
   scene->num_rooms = 4;
   #define TRANSITION_ACTORS_N 4
@@ -654,6 +687,8 @@ void SceneLoad() {
   for(int i = 0; i < MAX_PARTICLE_EMITTERS; i++) {
     particle_list[i].flags = 0;
   }
+
+  scene->room_swap = 0;
   
 
   //scene->transition_actors_descriptor = LStack_Alloc(sizeof(Actor_Descriptor)*TRANSITION_ACTORS_N);
@@ -664,7 +699,8 @@ void SceneLoad() {
     Actor_Descriptor newactor;
     Actor_SwapPlane_Initializer * plane_init;
     newactor.x = 7818;
-    newactor.y = -4096;
+    //newactor.y = -4096;
+    newactor.y = -4096+4096;
     newactor.z = 0;
     newactor.rot_x = 0;
     newactor.rot_y = 0;
@@ -674,10 +710,10 @@ void SceneLoad() {
     plane_init = (Actor_SwapPlane_Initializer*)newactor.init_variables;
 
     plane_init->max_x = 8296;
-    plane_init->max_y = -3215;
+    plane_init->max_y = -3215+4096;
     plane_init->max_z = 512;
     plane_init->min_x = 7272;
-    plane_init->min_y = -4238;
+    plane_init->min_y = -4238+4096;
     plane_init->min_z = -512;
     plane_init->front = 0;
     plane_init->back = 1;
@@ -866,7 +902,7 @@ void SceneLoad() {
   camera->target_offset.vy = 256;
   Camera_SetTarget(camera, (Actor*)playerActor);
   Camera_SetStartValues(camera);
-  Camera_Update(camera);
+  Camera_Update(camera, scene);
   scene->camera = camera;
 
   G.clear.r = 98;
@@ -1139,7 +1175,7 @@ void SceneLoad() {
 /* __attribute__((optimize("Os"))) */
 void Scene_RemoveOldActors(int actor_type, Scene_Ctx * scene) {
   for(Actor * c = Scene_ActorList[actor_type].start; c; c = c->next) {
-    if(c->room != scene->previous_room_id) continue;
+    if(c->room == scene->current_room_id) continue;
     Scene_RemoveActor(&Scene_ActorList[actor_type], c);
     c->Destroy(c, scene);
     //printf("removing actor 0x%08X\n", c);
@@ -1199,7 +1235,14 @@ void SceneMain() {
 
   //FntPrint("DRAW DIST: %d\n", scene->draw_dist);
 
-  if(scene->current_room_id != scene->previous_room_id) {
+  if((scene->current_room_id != scene->previous_room_id) && scene->room_swap) {
+    scene->current_room_m = map_model[scene->current_room_id];
+    scene->previous_room_m = map_model[scene->previous_room_id];
+  }
+
+
+  if(scene->room_swap) {
+    scene->room_swap = 0;
     Scene_LoadRoom(&room_data[scene->current_room_id], scene);
     switch(scene->current_room_id) {
       default:
@@ -1270,7 +1313,6 @@ void SceneMain() {
         }*/
         break;
     }
-    Scene_RemoveOldActors(ACTORTYPE_BG, scene);
     /*Actor *c;
 
     printf("room change %d<->%d\n", scene->previous_room_id, scene->current_room_id);
@@ -1298,13 +1340,14 @@ void SceneMain() {
     }*/
     //printf("%d/%d objects removed\n", test_removed, test_total);
   }
+  if(scene->actor_cleanup) {
+    Scene_RemoveOldActors(ACTORTYPE_BG, scene);
+    scene->actor_cleanup = 0;
+  }
+
+  //FntPrint("OLD ROOM: 0x%08X\n", scene->previous_room_m);
 
   //FntPrint("ACTORTYPE_BG %d\n", Scene_ActorList[ACTORTYPE_BG].length);
-
-  if(scene->current_room_id != scene->previous_room_id) {
-    scene->previous_room_id = scene->current_room_id;
-    scene->current_room_m = map_model[scene->current_room_id];
-  }
 
   PlayerUpdate(scene->player, scene);
 
@@ -1313,7 +1356,7 @@ void SceneMain() {
   //if(g_pad & PAD_R2) playerActor->y_position = -4096 << 12;
   //if(g_pad & PAD_L2) playerActor->y_position = -6158 << 12;
 
-  Camera_Update(camera);
+  Camera_Update(camera, scene);
 
   if(playerActor->base.pos.vy < void_out && fade_counter == 0 && !void_out_active) {
     fade_timer = 20;
@@ -1360,7 +1403,7 @@ void SceneMain() {
       camera->target_offset.vy = 256;
       Camera_SetTarget(camera, (Actor*)playerActor);
       Camera_SetStartValues(camera);
-      Camera_Update(camera);
+      Camera_Update(camera, scene);
       fade_direction = 0;
       fade_timer = 30;
     }
@@ -1429,7 +1472,7 @@ void SceneMain() {
     if(Scene_ActorList[i].length == 0) continue;
     while(current) {
       Actor * next = current->next;
-      if((current->room == 0xFF || current->room == scene->current_room_id) && current->Update) {
+      if(current->Update) {
         SetSpadStack(SPAD_STACK_ADDR);
         SVECTOR tdist = playerActor->base.pos;
         tdist.vx -= current->pos.vx;
@@ -1612,7 +1655,7 @@ void SceneDraw() {
   //packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_CLUTFOG, scene);
   packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_AMBIENT, scene);
   ResetSpadStack();
-  if(scene->previous_room_m != NULL && scene->previous_room_m != scene->current_room_m){
+  if(scene->previous_room_m){
     SetSpadStack(SPAD_STACK_ADDR);
       packet_b_ptr = SGM2_UpdateModel(scene->previous_room_m, packet_b_ptr, (u_long*)G.pOt, 20, 0, scene);
     ResetSpadStack();
@@ -1632,9 +1675,7 @@ void SceneDraw() {
     if(Scene_ActorList[i].length == 0) continue;
     while(current) {
       if(current->visible){
-        if(current->room == 0xFF || current->room == scene->current_room_id) {
-          packet_b_ptr = current->Draw(current, &camera->matrix, packet_b_ptr,scene);
-        }
+        packet_b_ptr = current->Draw(current, &camera->matrix, packet_b_ptr,scene);
       }
       current = current->next;
     }
@@ -1668,41 +1709,53 @@ void SceneDraw() {
   // Draw particles
   packet_b_ptr = Scene_ParticleUpdate(scene, &camera->matrix, packet_b_ptr);
 
-  // Draw sprite (for testing)
-  draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52, 16, 52, 32, 0, 0, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+8);
-  packet_b_ptr += sizeof(SPRT);
-/*
-  draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52, 16, 52, 32, 52, 0, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+9);
-  packet_b_ptr += sizeof(SPRT);
-
-  draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52-52, 16, 52, 32, 52*2, 0, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+10+2);
-  packet_b_ptr += sizeof(SPRT);
-
-  draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52-52-52, 16, 52, 32, 52*3, 0, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+13);
-  packet_b_ptr += sizeof(SPRT);
-
-  draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52-52-52-52, 16, 52, 32, 52*3, 0, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+13+1);
-  packet_b_ptr += sizeof(SPRT);
-*/
-  //draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52-52-52-52-52, 16, 52, 32, 52*3, 0, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+13+2);
-  draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52, 16, 52, 32, 52*3, 0, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+13+2);
-  packet_b_ptr += sizeof(SPRT);
-
-  setDrawTPage((DR_TPAGE*)packet_b_ptr, 1, 0, getTPage(0, 0, 64, 256));
-  addPrim(G.pOt, packet_b_ptr);
-  packet_b_ptr += sizeof(DR_TPAGE);
-
-  packet_b_ptr = Screen_LifeMeterDraw(packet_b_ptr);
-
-  if(scene->camera->target_mode) {
-    cinema_mode++;
-    if(cinema_mode > 4) cinema_mode = 4;
+  if(scene->interface_fade) {
+    scene->interface_fade_counter++;
+    if(scene->interface_fade_counter > 2) scene->interface_fade_counter = 2;
   } else {
-    if(cinema_mode != 0) cinema_mode--;
+    if(scene->interface_fade_counter > 0) scene->interface_fade_counter--;
   }
 
-  if(cinema_mode) {
-    u_char targ_height = cinema_mode_anim[cinema_mode-1];
+  if(scene->interface_fade_counter <= 1) {
+    // Draw sprite (for testing)
+    draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52, 16, 52, 32, 0, 0, FLAME_TEX_CLUT_X, (FLAME_TEX_CLUT_Y+8)+scene->interface_fade_counter);
+    packet_b_ptr += sizeof(SPRT);
+  /*
+    draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52, 16, 52, 32, 52, 0, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+9);
+    packet_b_ptr += sizeof(SPRT);
+
+    draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52-52, 16, 52, 32, 52*2, 0, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+10+2);
+    packet_b_ptr += sizeof(SPRT);
+
+    draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52-52-52, 16, 52, 32, 52*3, 0, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+13);
+    packet_b_ptr += sizeof(SPRT);
+
+    draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52-52-52-52, 16, 52, 32, 52*3, 0, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+13+1);
+    packet_b_ptr += sizeof(SPRT);
+  */
+    //draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52-52-52-52-52, 16, 52, 32, 52*3, 0, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+13+2);
+    draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52, 16, 52, 32, 52*3, 0, FLAME_TEX_CLUT_X, (FLAME_TEX_CLUT_Y+13+2)+scene->interface_fade_counter);
+    packet_b_ptr += sizeof(SPRT);
+
+    setDrawTPage((DR_TPAGE*)packet_b_ptr, 1, 0, getTPage(0, 0, 64, 256));
+    addPrim(G.pOt, packet_b_ptr);
+    packet_b_ptr += sizeof(DR_TPAGE);
+
+  }
+
+  if(scene->interface_fade_counter <= 1) {
+    packet_b_ptr = Screen_LifeMeterDraw(packet_b_ptr, scene->interface_fade_counter);
+  }
+
+  if(scene->cinema_mode) {
+    scene->cinema_mode_counter++;
+    if(scene->cinema_mode_counter > 4) scene->cinema_mode_counter = 4;
+  } else {
+    if(scene->cinema_mode_counter > 0) scene->cinema_mode_counter--;
+  }
+
+  if(scene->cinema_mode_counter > 0) {
+    u_char targ_height = cinema_mode_anim[scene->cinema_mode_counter-1];
     draw_SimpleTile((TILE*)packet_b_ptr, G.pOt, 0, 0, 512, targ_height);
     packet_b_ptr += sizeof(TILE);
     draw_SimpleTile((TILE*)packet_b_ptr, G.pOt, 0, 240-targ_height, 512, targ_height);

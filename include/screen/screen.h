@@ -32,10 +32,10 @@
 // Life Meter
 void Screen_LifeMeterInit();
 
-char * Screen_LifeMeterDraw(char * buff);
+char * Screen_LifeMeterDraw(char * buff, char level);
 
-char * Screen_RenderHeart(char * buff, short x, short y, char state, u_char pct);
+char * Screen_RenderHeart(char * buff, short x, short y, char state, u_char pct, char alpha);
 
-char * Screen_MagicBarDraw(char * buff, short x, short y, short w, short magic);
+char * Screen_MagicBarDraw(char * buff, short x, short y, short w, short magic, char alpha);
 
 #endif // SCREEN_H

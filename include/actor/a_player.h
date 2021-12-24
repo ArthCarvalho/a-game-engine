@@ -37,6 +37,7 @@
 #define PLAYER_STATE_FIRSTPERSON  0x00000009
 #define PLAYER_STATE_AIMING       0x0000000A
 #define PLAYER_STATE_ONAIR        0x00000010
+#define PLAYER_CUTSCENE_MODE      0x08000000
 
 /*
 typedef struct NewPlayerActor {
@@ -131,6 +132,10 @@ void Player_Normal(Actor * player);
 void Player_Move(Actor * player);
 void Player_Jump(Actor * player);
 void Player_Falling(Actor * player);
+
+void Player_ForceIdle(Actor * player);
+
+extern u_long demo_counter;
 
 
 

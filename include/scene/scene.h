@@ -278,6 +278,12 @@ typedef struct Scene_Ctx {
   struct Camera * camera;
   short draw_dist; // TEMP - Remove later
   CVECTOR ambient;
+  u_char room_swap;
+  u_char actor_cleanup;
+  char cinema_mode;
+  char cinema_mode_counter;
+  char interface_fade;
+  char interface_fade_counter;
 } Scene_Ctx;
 
 // Calculating the texture block and where to upload:
