@@ -29,6 +29,7 @@ typedef struct ObjDoorShutterActor {
   u_char anim_timer;
   u_char sub_timer;
   u_short flip_model;
+  u_char camera_side;
   u_char front_room;
   u_char back_room;
 } ObjDoorShutterActor;

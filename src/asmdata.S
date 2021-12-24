@@ -207,7 +207,7 @@ test_image4_tim:
   .balign 16
 
 obj_dangeon_door_tim:
-  .incbin "../AGAME_PCDATA/obj_dangeon_door.tim"
+  .incbin "../AGAME_PCDATA/obj_dangeon_door_shika.tim"
   .balign 16
 
 screen_lifebar_tim:

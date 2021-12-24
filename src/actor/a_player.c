@@ -117,6 +117,7 @@ void PlayerLoadData() {
 
 
 u_long demo_counter = 50;
+short demo_dir = 4096;
 
 void PlayerUnloadData() {
 }

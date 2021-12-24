@@ -130,6 +130,7 @@ void ObjDoorShutterActorUpdate(struct Actor * a, void * scene) {
   ppos.vz = (ppos.vz<<12)/plen;
   SVECTOR z_dir = {actor->matrix.m[2][0], 0, actor->matrix.m[2][2], 0};
   long dot = dotProductXZ(&ppos, &z_dir);
+  
   if(dot >= 0) {
     actor->flip_model = 2048;
   } else {
@@ -158,10 +159,12 @@ void ObjDoorShutterActorUpdate(struct Actor * a, void * scene) {
         pl->y_move_dir = (actor->base.rot.vy + 2048) % 4096;
         scene_ctx->current_room_id = actor->back_room;
         scene_ctx->previous_room_id = actor->front_room;
+        actor->camera_side = 0;
       } else {
         pl->y_move_dir = actor->base.rot.vy;
         scene_ctx->current_room_id = actor->front_room;
         scene_ctx->previous_room_id = actor->back_room;
+        actor->camera_side = 1;
       }
     }
 
@@ -180,14 +183,14 @@ void ObjDoorShutterActorUpdate(struct Actor * a, void * scene) {
 
   if(actor->sub_timer == 1) {
     actor->anim_timer++;
-    if(actor->anim_timer == 11) demo_counter = 32;
+    if(actor->anim_timer == 3) demo_counter = 31;
   }
   if(actor->anim_timer > 16) {
     actor->anim_timer = 16;
     actor->sub_timer = 2;
     // Swap Camera Sides
-    SVECTOR cam_pos = {608, 845, -1248, 0};
-    if(actor->flip_model) cam_pos.vz = -cam_pos.vz;
+    SVECTOR cam_pos = {608, 945, -1348, 0};
+    if(actor->camera_side) cam_pos.vz = -cam_pos.vz;
     VECTOR f_cam_pos;
     gte_SetRotMatrix(&actor->matrix);
     ApplyRotMatrix(&cam_pos, &f_cam_pos);
@@ -212,6 +215,8 @@ void ObjDoorShutterActorUpdate(struct Actor * a, void * scene) {
   }
   //FntPrint("anim_timer %d\n", actor->anim_timer);
 }
+
+#define DOOR_SHUTTER_DEPTH_MOD 10
 
 u_char * ObjDoorShutterActorDraw(struct Actor * a, MATRIX * view, u_char * packet_ptr, void * scene) {
   ObjDoorShutterActor * actor = (ObjDoorShutterActor *)a;
@@ -272,13 +277,17 @@ u_char * ObjDoorShutterActorDraw(struct Actor * a, MATRIX * view, u_char * packe
   gte_rtpt();
   gte_avsz3();
   gte_stotz(&otz);
-  otz = (otz >> OTSUBDIV)+5;
+  otz = (otz >> OTSUBDIV) + DOOR_SHUTTER_DEPTH_MOD;
   if (otz > OTMIN && otz < OTSIZE) {
+    long otz2;
     CVECTOR color = { 0x80, 0x80, 0x80, 0x00 };
     gte_stsxy3((long *)&poly->x0,(long *)&poly->x1,(long *)&poly->x2);
 
     gte_ldv3(&door_verts_tmp[3], &door_verts_tmp[4], &door_verts_tmp[5]);
     gte_rtpt();
+    gte_avsz3();
+    gte_stotz(&otz2);
+    otz2 = (otz2 >> OTSUBDIV) + DOOR_SHUTTER_DEPTH_MOD;
     long temp0, temp1;
     gte_stsxy3((long *)&poly->x3,&temp0, &temp1);
 
@@ -317,7 +326,7 @@ u_char * ObjDoorShutterActorDraw(struct Actor * a, MATRIX * view, u_char * packe
     poly->clut = getClut(784,500);
 
     setPolyFT4(poly);
-    addPrim(G.pOt+otz, poly);
+    addPrim(G.pOt+otz2, poly);
     poly++;
   }
 

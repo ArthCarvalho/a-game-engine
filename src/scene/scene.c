@@ -37,7 +37,8 @@ void * ActorInitFuncs[] = {
   ObjSyokudaiActorInitialize,
   ObjGrassActorInitialize,
   ObjGrassCutActorInitialize,
-  ObjDoorShutterActorInitialize
+  ObjDoorShutterActorInitialize,
+  ObjSwapPlaneActorInitialize
 };
 
 u_long ActorDataSizes[] = {
@@ -46,7 +47,118 @@ u_long ActorDataSizes[] = {
   sizeof(ObjSyokudaiActor),
   sizeof(ObjGrassActor),
   sizeof(ObjGrassCutActor),
-  sizeof(ObjDoorShutterActor)
+  sizeof(ObjDoorShutterActor),
+  sizeof(ObjSwapPlaneActor)
+};
+
+/*
+  printf("Actor_SwapPlane_Init 2\n");
+  {
+    Actor_Descriptor newactor;
+    Actor_SwapPlane_Initializer * plane_init;
+    newactor.x = -2379;
+    newactor.y = -4014;
+    newactor.z = 0;
+    newactor.rot_x = 0;
+    newactor.rot_y = 0;
+    newactor.rot_z = 0;
+    newactor.actor_type = ACTOR_TYPE_SWAP_PLANE;
+
+    plane_init = (Actor_SwapPlane_Initializer*)newactor.init_variables;
+
+    plane_init->max_x = -1867;
+    plane_init->max_y = 593-4096;
+    plane_init->max_z = 512;
+    plane_init->min_x = -2891;
+    plane_init->min_y = (-430)-4096;
+    plane_init->min_z = -512;
+    plane_init->front = 2;
+    plane_init->back = 3;
+
+
+    // Allocate
+    scene->transition_actors[2] = LStack_Alloc(sizeof(Actor_SwapPlane));
+    //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
+    // Create each transition actor
+    Scene_AddActor(&Scene_ActorList[ACTOR_GROUP_DOOR], scene->transition_actors[2]);
+    Actor_SwapPlane_Init(scene->transition_actors[2], &newactor, scene);
+  }
+  printf("Actor_SwapPlane_Init 3 Begin\n");
+  {
+    Actor_Descriptor newactor;
+    Actor_SwapPlane_Initializer * plane_init;
+    newactor.x = 5332;
+    newactor.y = (624)-4096;
+    newactor.z = -3170;
+    newactor.rot_x = 0;
+    newactor.rot_y = 0;
+    newactor.rot_z = 0;
+    newactor.actor_type = ACTOR_TYPE_SWAP_PLANE;
+
+    plane_init = (Actor_SwapPlane_Initializer*)newactor.init_variables;
+
+    plane_init->max_x = 5844;
+    plane_init->max_y = (1392)-4096;
+    plane_init->max_z = -2658;
+    plane_init->min_x = 4820;
+    plane_init->min_y = (-255)-4096;
+    plane_init->min_z = -3682;
+    plane_init->front = 1;
+    plane_init->back = 4;
+
+    // Allocate
+    scene->transition_actors[3] = LStack_Alloc(sizeof(Actor_SwapPlane));
+    //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
+    // Create each transition actor
+    Scene_AddActor(&Scene_ActorList[ACTOR_GROUP_DOOR], scene->transition_actors[3]);
+    Actor_SwapPlane_Init(scene->transition_actors[3], &newactor, scene);
+  }*/
+
+Actor_Descriptor transition_actors[] = {
+  { // Door Rooms 0 - 1
+    7833, -4096, 0,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DOOR_SHUTTER,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 1, 0, 0, 0, 0, 0, 0, 0 // [0]Front, [1]Back Rooms
+    }
+  },
+  { // Swap Plane Rooms 1 - 2
+    2374, -4330, 0,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DOOR_SHUTTER,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      1, 2, 2864, -3502, 512, 1840, -4526, -512, 0 // [0]Front, [1]Back Rooms
+    }
+  },
+  { // Swap Plane Rooms 2 - 3
+    -2383, -4330, 0,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DOOR_SHUTTER,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      2, 3, 2864, -3502, 512, 1840, -4526, -512, 0 // [0]Front, [1]Back Rooms
+    }
+  },
+  { // Swap Plane Rooms 1 - 4
+    5332, (624)-4096, -3170,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_SWAP_PLANE,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      1, 4, 5844, (1392)-4096, -2658, 4820, (-255)-4096, -3682, 0 // [0]Front, [1]Back Rooms
+    }
+  },
 };
 
 Actor_Descriptor room0_actors[] = {
@@ -94,7 +206,7 @@ Actor_Descriptor room0_actors[] = {
       0, 0, 0, 0, 0, 0, 0, 0, 0
     }
   },
-  {
+  /*{
     7833, -4096, 0,          // short x, y, z;
     0, 0, 0,          // short rot_x, rot_y, rot_z;
     4096, 4096, 4096, // short scale_x, scale_y, scale_z;
@@ -104,7 +216,7 @@ Actor_Descriptor room0_actors[] = {
     {                 // unsigned int init_variables[9];
       0, 1, 0, 0, 0, 0, 0, 0, 0
     }
-  },
+  },*/
 };
 
 //
@@ -153,7 +265,7 @@ Actor_Descriptor room1_actors[] = {
       0, 0, 0, 0, 0, 0, 0, 0, 0
     }
   },
-  {
+  /*{
     7833, -4096, 0,          // short x, y, z;
     0, 0, 0,          // short rot_x, rot_y, rot_z;
     4096, 4096, 4096, // short scale_x, scale_y, scale_z;
@@ -163,7 +275,7 @@ Actor_Descriptor room1_actors[] = {
     {                 // unsigned int init_variables[9];
       0, 1, 0, 0, 0, 0, 0, 0, 0
     }
-  },
+  },*/
 };
 
 
@@ -182,7 +294,7 @@ Room_Data room_data[5] = {
       0                     // Skybox Type
     },
     room0_actors,           // List of actor initialization parameters
-    5,                      // Number of actors in initialization list
+    4,                      // Number of actors in initialization list
     NULL,                   // Pointer to list of models in this room's background
     0,                      // Number of background models
   },
@@ -200,7 +312,7 @@ Room_Data room_data[5] = {
       0                     // Skybox Type
     },
     room1_actors,           // List of actor initialization parameters
-    5,                      // Number of actors in initialization list
+    4,                      // Number of actors in initialization list
     NULL,                   // Pointer to list of models in this room's background
     0,                      // Number of background models
   },
@@ -438,7 +550,7 @@ unsigned long * test_pointer;
 //ObjSyokudaiActor test_obj_syokudai[NUM_TEST_OBJ_SYOKUDAI];
 //ObjTsuboActor test_obj_tsubo;
 
-ActorList Scene_ActorList[ACTOR_LIST_NUM];
+ActorList Scene_ActorList[ACTOR_GROUP_MAX];
 
 enum Actor_Type {
   ACTOR_TYPE_SWAP_PLANE,
@@ -460,120 +572,6 @@ typedef struct Actor_SwapPlane_Initializer {
 } Actor_SwapPlane_Initializer;
 
 Scene_Ctx * scene;
-
-typedef struct Actor_SwapPlane{ 
-  Actor base;
-  unsigned char display_type;
-  unsigned char front_room;
-  unsigned char back_room;
-  short swap_start;
-  unsigned char swap_state;
-  unsigned char swap_state_prev;
-  unsigned char swap_active;
-} Actor_SwapPlane;
-
-void Actor_SwapPlane_Init(Actor * address, Actor_Descriptor * descriptor, Scene_Ctx * scene);
-void Actor_SwapPlane_Destroy(Actor * address, Scene_Ctx * scene);
-void Actor_SwapPlane_Update(Actor * address, Scene_Ctx * scene);
-u_char * Actor_SwapPlane_Draw(Actor * address, void * view, unsigned char * buffer, void * scene);
-/* Swap Plane Class */
-void Actor_SwapPlane_Init(Actor * address, Actor_Descriptor * descriptor, Scene_Ctx * scene) {
-  Actor_SwapPlane * myself = (Actor_SwapPlane*)address;
-  Actor_SwapPlane_Initializer * initial_values;
-  myself->base.Initialize = (PTRFUNC_3ARG) Actor_SwapPlane_Init;
-  myself->base.Destroy = (PTRFUNC_2ARG) Actor_SwapPlane_Destroy;
-  myself->base.Update = (PTRFUNC_2ARG) Actor_SwapPlane_Update;
-  myself->base.Draw = (PTRFUNC_4ARGCHAR) Actor_SwapPlane_Draw;
-  myself->base.room = 0xFF; // Process independent of current room location
-
-  myself->base.pos.vx = descriptor->x;
-  myself->base.pos.vy = descriptor->y;
-  myself->base.pos.vz = descriptor->z;
-  myself->base.rot.vx = descriptor->rot_x;
-  myself->base.rot.vy = descriptor->rot_y;
-  myself->base.rot.vz = descriptor->rot_z;
-  myself->base.visible = 0;
-
-  initial_values = (Actor_SwapPlane_Initializer *)descriptor->init_variables;
-
-  myself->base.bbox.min_x = initial_values->min_x;
-  myself->base.bbox.min_y = initial_values->min_y;
-  myself->base.bbox.min_z = initial_values->min_z;
-
-  myself->base.bbox.max_x = initial_values->max_x;
-  myself->base.bbox.max_y = initial_values->max_y;
-  myself->base.bbox.max_z = initial_values->max_z;
-
-  myself->front_room = initial_values->front;
-  myself->back_room = initial_values->back;
-
-  myself->display_type = 0; // No Display
-
-  myself->swap_start = 0;
-  myself->swap_state = 0;
-  myself->swap_active = 0;
-};
-
-void Actor_SwapPlane_Destroy(Actor * address, Scene_Ctx * scene) {
-
-};
-
-void Actor_SwapPlane_Update(Actor * actor, Scene_Ctx * scene) {
-  int d_x, d_y, d_z, dist;
-  Actor_SwapPlane * myself = (Actor_SwapPlane *)actor;
-  //PlayerActor * player = (PlayerActor *)scene->player;
-  Actor * player = scene->player; 
-  // Bounding check
-  //FntPrint("S:X[%d][%d]Y[%d][%d]Z[%d][%d]\n",
-  //myself->base.bbox.min_x, myself->base.bbox.max_x,
-  //myself->base.bbox.min_y, myself->base.bbox.max_y,
-  //myself->base.bbox.min_z, myself->base.bbox.max_z);
-  myself->swap_state_prev = myself->swap_state;
-  if(player->pos.vy > myself->base.bbox.min_y && player->pos.vy < myself->base.bbox.max_y){
-    if(player->pos.vx > myself->base.bbox.min_x && player->pos.vx < myself->base.bbox.max_x){
-      if(player->pos.vz > myself->base.bbox.min_z && player->pos.vz < myself->base.bbox.max_z){
-          
-          // Get Dist
-          d_x = player->pos.vx - myself->base.pos.vx;
-          d_y = player->pos.vy - myself->base.pos.vy;
-          d_z = player->pos.vz - myself->base.pos.vz;
-          dist = d_x * d_x + d_y * d_y + d_z * d_z;
-          //FntPrint("Swap Dist: %d [0x%0x]\n", dist, dist);
-          if(d_x < 180 && d_x > -180) {
-            if(d_x > 0 && myself->swap_start < 0 || d_x < 0 && myself->swap_start > 0){
-              if(d_x > 0) {
-                scene->current_room_id = myself->front_room;
-                scene->previous_room_id = myself->back_room;
-              } else {
-                scene->current_room_id = myself->back_room;
-                scene->previous_room_id = myself->front_room;
-              }
-              scene->room_swap = 1;
-              scene->actor_cleanup = 1;
-              scene->previous_room_m = NULL;
-            }
-          }
-
-          myself->swap_start = d_x;
-      }
-    }
-  }
-
-};
-
-u_char * Actor_SwapPlane_Draw(Actor * address, void * view, unsigned char * buffer, void * scene) {
-  return buffer;
-};
-
-unsigned long Scene_ActorFactory(unsigned int type) {
-  switch(type) {
-    case ACTOR_TYPE_SWAP_PLANE:
-      return sizeof(Actor_SwapPlane);
-    default:
-      return 0;
-  }
-};
-
 
 void SceneInitialize() {
   void * dataptr;
@@ -678,7 +676,7 @@ void SceneLoad() {
   scene->transition_actors_num = TRANSITION_ACTORS_N;
 
   // Init Actor List
-  for(int i = 0; i < ACTOR_LIST_NUM; i++) {
+  for(int i = 0; i < ACTOR_GROUP_MAX; i++) {
     Scene_ActorList[i].length = 0;
     Scene_ActorList[i].start = NULL;
     Scene_ActorList[i].end = NULL;
@@ -689,13 +687,13 @@ void SceneLoad() {
   }
 
   scene->room_swap = 0;
-  
+
 
   //scene->transition_actors_descriptor = LStack_Alloc(sizeof(Actor_Descriptor)*TRANSITION_ACTORS_N);
 
-  scene->transition_actors = LStack_Alloc(sizeof(Actor*)*TRANSITION_ACTORS_N);
+  //scene->transition_actors = LStack_Alloc(sizeof(Actor*)*TRANSITION_ACTORS_N);
 
-  {
+  /*{
     Actor_Descriptor newactor;
     Actor_SwapPlane_Initializer * plane_init;
     newactor.x = 7818;
@@ -721,7 +719,7 @@ void SceneLoad() {
 
     // Allocate
     scene->transition_actors[0] = LStack_Alloc(sizeof(Actor_SwapPlane));
-    Scene_AddActor(&Scene_ActorList[ACTORTYPE_DOOR], scene->transition_actors[0]);
+    Scene_AddActor(&Scene_ActorList[ACTOR_GROUP_DOOR], scene->transition_actors[0]);
     //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
     // Create each transition actor
     Actor_SwapPlane_Init(scene->transition_actors[0], &newactor, scene);
@@ -753,7 +751,7 @@ void SceneLoad() {
     scene->transition_actors[1] = LStack_Alloc(sizeof(Actor_SwapPlane));
     //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
     // Create each transition actor
-    Scene_AddActor(&Scene_ActorList[ACTORTYPE_DOOR], scene->transition_actors[1]);
+    Scene_AddActor(&Scene_ActorList[ACTOR_GROUP_DOOR], scene->transition_actors[1]);
     Actor_SwapPlane_Init(scene->transition_actors[1], &newactor, scene);
   }
   printf("Actor_SwapPlane_Init 2\n");
@@ -784,7 +782,7 @@ void SceneLoad() {
     scene->transition_actors[2] = LStack_Alloc(sizeof(Actor_SwapPlane));
     //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
     // Create each transition actor
-    Scene_AddActor(&Scene_ActorList[ACTORTYPE_DOOR], scene->transition_actors[2]);
+    Scene_AddActor(&Scene_ActorList[ACTOR_GROUP_DOOR], scene->transition_actors[2]);
     Actor_SwapPlane_Init(scene->transition_actors[2], &newactor, scene);
   }
   printf("Actor_SwapPlane_Init 3 Begin\n");
@@ -814,9 +812,9 @@ void SceneLoad() {
     scene->transition_actors[3] = LStack_Alloc(sizeof(Actor_SwapPlane));
     //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
     // Create each transition actor
-    Scene_AddActor(&Scene_ActorList[ACTORTYPE_DOOR], scene->transition_actors[3]);
+    Scene_AddActor(&Scene_ActorList[ACTOR_GROUP_DOOR], scene->transition_actors[3]);
     Actor_SwapPlane_Init(scene->transition_actors[3], &newactor, scene);
-  }
+  }*/
 
   // Load scene data
   //dataptr = LStack_GetTail();
@@ -941,6 +939,10 @@ void SceneLoad() {
     //printf("malloc(1): %x (content: %x)\n", testptr, *testptr);
   }
 
+  for(int i = 0; i < TRANSITION_ACTORS_N; i++) {
+    Actor_Descriptor * actdesc = &transition_actors[i];
+    Scene_CreateActor(actdesc, ACTOR_GROUP_DOOR, scene);
+  }
   // Load map (global) textures
   //file_load_temp_noalloc("\\DATA\\TEST.TIM;1", dataptr);
   //SetFarColor(255,255,255);
@@ -1053,9 +1055,9 @@ void SceneLoad() {
   SGM2_OffsetTexCoords(obj_grass_cut_half_model, (36*4) & 0xFF, (416) & 0xFF);
 
 
-  Scene_ActorList[ACTORTYPE_PLAYER].length = 1;
-  Scene_ActorList[ACTORTYPE_PLAYER].start = (Actor*)playerActor;
-  Scene_ActorList[ACTORTYPE_PLAYER].end = (Actor*)playerActor;
+  Scene_ActorList[ACTOR_GROUP_PLAYER].length = 1;
+  Scene_ActorList[ACTOR_GROUP_PLAYER].start = (Actor*)playerActor;
+  Scene_ActorList[ACTOR_GROUP_PLAYER].end = (Actor*)playerActor;
 
   ObjSyokudaiActorSetup();
   // Init Actors
@@ -1076,7 +1078,7 @@ void SceneLoad() {
   // NUM_TEST_OBJ_SYOKUDAI
   /*for(int i = 0; i < 100; i++) {
     // Move this to ObjSyokudaiActorInitialize
-    ObjSyokudaiActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjSyokudaiActor));
+    ObjSyokudaiActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjSyokudaiActor));
     actor->base.room = 1;
     actor->flame_color = 1;//1+ (rand() % 5);
     actor->flame_rand = rand() >> 9;
@@ -1097,7 +1099,7 @@ void SceneLoad() {
   u_long actptr;
   /*
   for(int i = 0; i < 1; i++) {
-    ObjTsuboActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjTsuboActor));
+    ObjTsuboActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjTsuboActor));
     actor->base.room = 0;
     //actor->model = obj_tsubo_model;
     actor->base.pos.vx = 8832;
@@ -1113,7 +1115,7 @@ void SceneLoad() {
   }*/
 
   {
-    ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjGrassCutActor));
+    ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjGrassCutActor));
       actor->base.room = 0;
       actor->base.pos.vx = 2013;
       actor->base.pos.vy = -3763;
@@ -1125,7 +1127,7 @@ void SceneLoad() {
   }
 
   {
-    ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjGrassCutActor));
+    ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjGrassCutActor));
       actor->base.room = 0;
       actor->base.pos.vx = 1862;
       actor->base.pos.vy = -3763;
@@ -1137,7 +1139,7 @@ void SceneLoad() {
   }
 
   {
-    ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjGrassCutActor));
+    ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjGrassCutActor));
       actor->base.room = 0;
       actor->base.pos.vx = 6570;
       actor->base.pos.vy = -3763;
@@ -1149,7 +1151,7 @@ void SceneLoad() {
   }
 
   {
-    ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjGrassCutActor));
+    ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjGrassCutActor));
       actor->base.room = 0;
       actor->base.pos.vx = 6782;
       actor->base.pos.vy = -3763;
@@ -1173,21 +1175,21 @@ void SceneLoad() {
     //printf("a actor: 0x%08X <<prev [0x%08X] next>> 0x%08X\n", current->prev, current, current->next);
 /* __attribute__((optimize("O0"))) */
 /* __attribute__((optimize("Os"))) */
-void Scene_RemoveOldActors(int actor_type, Scene_Ctx * scene) {
-  for(Actor * c = Scene_ActorList[actor_type].start; c; c = c->next) {
+void Scene_RemoveOldActors(int actor_group, Scene_Ctx * scene) {
+  for(Actor * c = Scene_ActorList[actor_group].start; c; c = c->next) {
     if(c->room == scene->current_room_id) continue;
-    Scene_RemoveActor(&Scene_ActorList[actor_type], c);
+    Scene_RemoveActor(&Scene_ActorList[actor_group], c);
     c->Destroy(c, scene);
     //printf("removing actor 0x%08X\n", c);
     Arena_Free(c);
   }
 }
-  /*for(Actor * c = Scene_ActorList[actor_type].start; c; c = c->next) {
+  /*for(Actor * c = Scene_ActorList[actor_group].start; c; c = c->next) {
     test_total++;
     if(c->room != scene->previous_room_id)
       continue;
 
-    Scene_RemoveActor(&Scene_ActorList[actor_type], c);
+    Scene_RemoveActor(&Scene_ActorList[actor_group], c);
     c->Destroy(c, scene);
     Arena_Free(c);
     test_removed++;
@@ -1222,7 +1224,7 @@ void SceneMain() {
 
 
   if(g_pad_press & PAD_R2) {
-    Actor * current = Scene_ActorList[ACTORTYPE_BG].start;
+    Actor * current = Scene_ActorList[ACTOR_GROUP_BG].start;
     int idx = 0;
     while(current != NULL) {
       printf("list[%d] actor->prev = 0x%0X actor->next = 0x%0X\n", idx++, current->prev, current->next);
@@ -1250,7 +1252,7 @@ void SceneMain() {
       /*case 1:
         for(int i = 0; i < 5; i++) {
           // Move this to ObjSyokudaiActorInitialize
-          ObjSyokudaiActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjSyokudaiActor));
+          ObjSyokudaiActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjSyokudaiActor));
           actor->base.room = scene->current_room_id;
           actor->flame_color = 1;//1+ (rand() % 5);
           actor->flame_rand = rand() >> 9;
@@ -1266,7 +1268,7 @@ void SceneMain() {
         break;*/
       case 2:
         for(int i = 0; i < 64; i++) {
-          ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjGrassCutActor));
+          ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjGrassCutActor));
           actor->base.room = scene->current_room_id;
           actor->base.pos.vx = (3514/2)-(rand() * 3514 / RAND_MAX);
           actor->base.pos.vy = -4096-256;//(rand() >> 8)-4096-200;
@@ -1279,7 +1281,7 @@ void SceneMain() {
         break;
       case 4:
         /*for(int i = 0; i < 256; i++) {
-          ObjTsuboActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjTsuboActor));
+          ObjTsuboActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjTsuboActor));
           actor->base.room = scene->current_room_id;
           actor->base.pos.vx = (rand() >> 2)-4096+(4221);
           actor->base.pos.vy = -6157;
@@ -1290,7 +1292,7 @@ void SceneMain() {
           ObjTsuboActorInitialize((Actor*)actor, NULL, scene);
         }*/
         for(int i = 0; i < 512; i++) {
-          ObjGrassActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjGrassActor));
+          ObjGrassActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjGrassActor));
           actor->base.room = scene->current_room_id;
           actor->base.pos.vx = (rand() >> 2)-4096+(4221);
           actor->base.pos.vy = -6157;
@@ -1301,7 +1303,7 @@ void SceneMain() {
           ObjGrassActorInitialize((Actor*)actor, NULL, scene);
         }
         /*for(int i = 0; i < 1024; i++) {
-          ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, sizeof(ObjGrassCutActor));
+          ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjGrassCutActor));
           actor->base.room = scene->current_room_id;
           actor->base.pos.vx = (rand() >> 2)-4096+(4221);
           actor->base.pos.vy = -6157;
@@ -1317,7 +1319,7 @@ void SceneMain() {
 
     printf("room change %d<->%d\n", scene->previous_room_id, scene->current_room_id);
 
-    for(c = Scene_ActorList[ACTORTYPE_BG].start; c; c = c->next)
+    for(c = Scene_ActorList[ACTOR_GROUP_BG].start; c; c = c->next)
     {
         Actor *t = c;
 
@@ -1332,7 +1334,7 @@ void SceneMain() {
 
         c = c->next;
 
-        Scene_RemoveActor(&Scene_ActorList[ACTORTYPE_BG], t);
+        Scene_RemoveActor(&Scene_ActorList[ACTOR_GROUP_BG], t);
         t->Destroy(t, scene);
         Arena_Free(t);
         printf("removing\n");
@@ -1341,13 +1343,13 @@ void SceneMain() {
     //printf("%d/%d objects removed\n", test_removed, test_total);
   }
   if(scene->actor_cleanup) {
-    Scene_RemoveOldActors(ACTORTYPE_BG, scene);
+    Scene_RemoveOldActors(ACTOR_GROUP_BG, scene);
     scene->actor_cleanup = 0;
   }
 
   //FntPrint("OLD ROOM: 0x%08X\n", scene->previous_room_m);
 
-  //FntPrint("ACTORTYPE_BG %d\n", Scene_ActorList[ACTORTYPE_BG].length);
+  //FntPrint("ACTOR_GROUP_BG %d\n", Scene_ActorList[ACTOR_GROUP_BG].length);
 
   PlayerUpdate(scene->player, scene);
 
@@ -1467,7 +1469,7 @@ void SceneMain() {
     actor->base.Update(actor, scene);
   }*/
 
-  for(int i = ACTORTYPE_BG; i < ACTOR_LIST_NUM; i++) {
+  for(int i = ACTOR_GROUP_BG; i < ACTOR_GROUP_MAX; i++) {
     Actor * current = Scene_ActorList[i].start;
     if(Scene_ActorList[i].length == 0) continue;
     while(current) {
@@ -1657,7 +1659,7 @@ void SceneDraw() {
   ResetSpadStack();
   if(scene->previous_room_m){
     SetSpadStack(SPAD_STACK_ADDR);
-      packet_b_ptr = SGM2_UpdateModel(scene->previous_room_m, packet_b_ptr, (u_long*)G.pOt, 20, 0, scene);
+      packet_b_ptr = SGM2_UpdateModel(scene->previous_room_m, packet_b_ptr, (u_long*)G.pOt, 20, SGM2_RENDER_AMBIENT | SGM2_RENDER_SUBDIV, scene);
     ResetSpadStack();
   }
 
@@ -1670,7 +1672,7 @@ void SceneDraw() {
     packet_b_ptr = actor->base.Draw((Actor*)actor, &camera->matrix, packet_b_ptr);
   }*/
 
-  for(int i = ACTORTYPE_BG; i < ACTOR_LIST_NUM; i++) {
+  for(int i = ACTOR_GROUP_BG; i < ACTOR_GROUP_MAX; i++) {
     Actor * current = Scene_ActorList[i].start;
     if(Scene_ActorList[i].length == 0) continue;
     while(current) {
@@ -1958,12 +1960,12 @@ void Scene_LoadRoom(Room_Data * room, Scene_Ctx * scene) {
   // Initialize Actors
   for(long i = 0; i < room->actor_count; i++) {
     Actor_Descriptor * actdesc = &room->actor_init[i];
-    Scene_CreateActor(actdesc, scene);
+    Scene_CreateActor(actdesc, ACTOR_GROUP_BG, scene);
   }
 }
 
-void Scene_CreateActor(Actor_Descriptor * actdesc, Scene_Ctx * scene) {
-    Actor * actor =  Scene_AllocActor(&Scene_ActorList[ACTORTYPE_BG], ACTORTYPE_BG, ActorDataSizes[actdesc->actor_type]);
-    actor->Initialize = ActorInitFuncs[actdesc->actor_type];
-    actor->Initialize(actor, actdesc, scene);
+void Scene_CreateActor(Actor_Descriptor * actdesc, u_short group, Scene_Ctx * scene) {
+  Actor * actor =  Scene_AllocActor(&Scene_ActorList[group], group, ActorDataSizes[actdesc->actor_type]);
+  actor->Initialize = ActorInitFuncs[actdesc->actor_type];
+  actor->Initialize(actor, actdesc, scene);
 }

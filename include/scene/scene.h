@@ -22,6 +22,7 @@
 #include "actor/a_obj_grass.h"
 #include "actor/a_obj_grass_cut.h"
 #include "actor/a_obj_door_shutter.h"
+#include "actor/a_obj_swap_plane.h"
 
 // Animated Flame Texture Source Location
 #define FLAME_TEX_X_SRC 496
@@ -207,6 +208,7 @@ enum {
     OBJ_GRASS,
     OBJ_GRASS_CUT,
     OBJ_DOOR_SHUTTER,
+    OBJ_SWAP_PLANE,
     OBJ_MAX
 };
 
@@ -337,6 +339,6 @@ u_char * Scene_ParticleUpdate(Scene_Ctx * scene, MATRIX * view, u_char * buff);
 
 void Scene_LoadRoom(Room_Data * room, Scene_Ctx * scene);
 
-void Scene_CreateActor(Actor_Descriptor * actdesc, Scene_Ctx * scene);
+void Scene_CreateActor(Actor_Descriptor * actdesc, u_short group, Scene_Ctx * scene);
 
 #endif

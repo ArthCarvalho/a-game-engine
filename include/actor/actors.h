@@ -13,18 +13,19 @@
 
 #define ACTOR_PLAYER 0x01
 
-#define ACTOR_LIST_NUM 8
+//#define ACTOR_GROUP_MAX 8
 
 typedef enum {
-    ACTORTYPE_PLAYER,
-    ACTORTYPE_BG,
-    ACTORTYPE_NPC,
-    ACTORTYPE_ENEMY,
-    ACTORTYPE_SWITCH,
-    ACTORTYPE_DOOR,
-    ACTORTYPE_CHEST,
-    ACTORTYPE_OTHER
-} ActorType;
+    ACTOR_GROUP_PLAYER,
+    ACTOR_GROUP_BG,
+    ACTOR_GROUP_NPC,
+    ACTOR_GROUP_ENEMY,
+    ACTOR_GROUP_SWITCH,
+    ACTOR_GROUP_DOOR,
+    ACTOR_GROUP_CHEST,
+    ACTOR_GROUP_OTHER,
+    ACTOR_GROUP_MAX
+} ActorGroup;
 
 // Common Actor Descriptor
 typedef struct Actor_Descriptor {
@@ -34,7 +35,7 @@ typedef struct Actor_Descriptor {
   unsigned char room;
   unsigned char pad;
   unsigned int actor_type;
-  unsigned int init_variables[9]; // 36 bytes for initialization
+  int init_variables[9]; // 36 bytes for initialization
 } Actor_Descriptor;
 
 typedef struct {
