@@ -93,6 +93,11 @@ typedef struct PlayerActor{
   struct ColResult * floor;
 
   void (*process)(Actor *);
+
+  char action;
+  char sub_action;
+  char action_prev;
+  char sub_action_prev;
 } PlayerActor;
 
 // Player Data Load Status

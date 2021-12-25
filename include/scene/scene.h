@@ -34,6 +34,81 @@
 #define FLAME_TEX_H 64
 #define FLAME_TEX_CLUT_X 768
 #define FLAME_TEX_CLUT_Y 496
+// Gameplay Screen Buttons
+#define SCR_BUTTON_CIRCLE_X 492
+#define SCR_BUTTON_CIRCLE_Y 0
+#define SCR_BUTTON_CIRCLE_CLUT_X 512
+#define SCR_BUTTON_CIRCLE_CLUT_Y 243
+#define SCR_BUTTON_CROSS_X 500
+#define SCR_BUTTON_CROSS_Y 0
+#define SCR_BUTTON_CROSS_CLUT_X 512
+#define SCR_BUTTON_CROSS_CLUT_Y 245
+#define SCR_BUTTON_SQUARE_X 492
+#define SCR_BUTTON_SQUARE_Y 20
+#define SCR_BUTTON_SQUARE_CLUT_X 512
+#define SCR_BUTTON_SQUARE_CLUT_Y 247
+#define SCR_BUTTON_TRIANGLE_X 500
+#define SCR_BUTTON_TRIANGLE_Y 20
+#define SCR_BUTTON_TRIANGLE_CLUT_X 512
+#define SCR_BUTTON_TRIANGLE_CLUT_Y 250
+// Screen Positions
+// Triangle Button: 427,14
+#define SCR_POS_BUTTON_TRIANGLE_X 427+6
+#define SCR_POS_BUTTON_TRIANGLE_Y 14
+// Square Button: 399,30
+#define SCR_POS_BUTTON_SQUARE_X 399+6
+#define SCR_POS_BUTTON_SQUARE_Y 30
+// Cricle Button: 455,30
+#define SCR_POS_BUTTON_CIRCLE_X 455+6
+#define SCR_POS_BUTTON_CIRCLE_Y 30
+// Cross Button: 427,46
+#define SCR_POS_BUTTON_CROSS_X 427+6
+#define SCR_POS_BUTTON_CROSS_Y 46
+
+// Modern Ui Button Back
+#define SCR_BUTTON_BACK_X 483
+#define SCR_BUTTON_BACK_Y 0
+#define SCR_BUTTON_BACK_CLUT_X 512
+#define SCR_BUTTON_BACK_CLUT_Y 251
+// Modern Ui Button Labels
+#define SCR_BUTTON_LABELS_X 494
+#define SCR_BUTTON_LABELS_Y 40
+#define SCR_BUTTON_LABELS_CLUT_X 512
+#define SCR_BUTTON_LABELS_CLUT_Y 253
+// Modern Ui Button Positions
+#define SCR_BUTTON_MODERN_TRIANGLE_X 400
+#define SCR_BUTTON_MODERN_TRIANGLE_Y 15
+#define SCR_BUTTON_MODERN_SQUARE_X 372
+#define SCR_BUTTON_MODERN_SQUARE_Y 32
+#define SCR_BUTTON_MODERN_CIRCLE_X 428
+#define SCR_BUTTON_MODERN_CIRCLE_Y 32
+#define SCR_BUTTON_MODERN_CROSS_X 400
+#define SCR_BUTTON_MODERN_CROSS_Y 49
+// Circle Action Label
+#define SCR_BUTTON_MODERN_CIRCLE_LABEL_X 423+6
+#define SCR_BUTTON_MODERN_CIRCLE_LABEL_Y 38
+// Cross Action Label
+#define SCR_BUTTON_MODERN_CROSS_LABEL_X 395+6
+#define SCR_BUTTON_MODERN_CROSS_LABEL_Y 55
+// Action Labels
+#define SCR_ACTION_LABELS_X 482
+#define SCR_ACTION_LABELS_Y 49
+#define SCR_ACTION_LABELS_CLUT_X 528
+#define SCR_ACTION_LABELS_CLUT_Y 241
+// Circle Action Label
+#define SCR_ACTION_LABEL_CIRCLE_X 423
+#define SCR_ACTION_LABEL_CIRCLE_Y 38
+// Cross Action Label
+#define SCR_ACTION_LABEL_CROSS_X 395
+#define SCR_ACTION_LABEL_CROSS_Y 55
+// Action Label Height/Width
+#define SCR_ACTION_LABEL_W 60
+#define SCR_ACTION_LABEL_H 13
+// Action Icons
+#define SCR_ACTION_BOMB_X 473
+#define SCR_ACTION_BOMB_Y 49
+#define SCR_ACTION_HOOKSHOT_X 473
+#define SCR_ACTION_HOOKSHOT_Y 72
 
 #define draw_SimpleSprite(p, ot, x, y, w, h, u, v, cx, cy ) {\
   setSprt(p);\
@@ -219,64 +294,36 @@ typedef struct {
     short fog_start;        // Fog Start Distance
     short fog_end;          // Fog End Distance
     u_char skybox_type;     // Skybox type, 0 - disabled, 1 - Standard, 2+ - Other
-} Room_Kankyou;
+} KankyouData;
 // New Room Format
 typedef struct Room_Data {
     u_char id;                          // This Room's ID/Index
     u_char room_type;                   // Room Type
-    Room_Kankyou kankyou_data;          // Environment variables
+    u_char kankyou_override;            // Enable Enviroment Settings
+    KankyouData kankyou_data;           // Environment variables
     Actor_Descriptor * actor_init;      // List of actor initialization parameters
     u_short actor_count;                // Number of actors in initialization list
     void * bg_models;                   // Pointer to list of models in this room's background
     u_char bg_count;                    // Number of background models
 } Room_Data;
-
-typedef struct Scene {                        // Note: Struct is ordered to avoid padding
-    unsigned char ambient[3];                 // Default ambient color
-    unsigned char skybox_type;                // 0 - Disabled, 1 - Standard, 2 + Special
-    SceneObjects * object_list;               // List of objects metadata to be used by actors in this scene
-    TextureEntry * texture_list;              // List of textures (their sizes and their VRAM locations, plus default clut address)
-    LoadTrigger * load_triggers;              // List of load triggers
-    StartEntry * start_list;                  // List of player starting points
-    ExitEntry * exit_list;                    // List of scene exits
-    Waterbox * waterbox_list;                 // List of scene waterboxes
-    RoomEntry * room_entry;                   // List of rooms, their filenames and status
-    ActorCreator * transition_actors_init;    // Pointer to an array of actor initialization commands
-    ActorEntry * transition_actors;           // Linked list of actors used for room transitions (doors, transition planes, etc.)
-    struct AGM_Model * object_models_data;           // Pointer to data block containing all object models
-    struct ANM_Animation * object_animations_data;   // Pointer to data block containing all object animations
-    struct COL * collision_mesh;                     // Pointer to collision data
-    unsigned short object_list_count;         // Numebr of object entries in object_list
-    unsigned short texture_count;             // Number of textures (size of texture_list array)
-    unsigned short load_triggers_count;       // Number of load trigers
-    unsigned short start_list_count;          // Number of starting points
-    unsigned short exit_list_count;           // Number of exit points
-    unsigned short waterbox_list_count;             // Number of waterboxes
-    unsigned short object_models_count;       // Number of object models
-    unsigned short object_animations_count;   // Number of animation pointers
-    unsigned short transition_actor_count;    // Number of transition actors in this scene
-    unsigned short reserved0;
-    unsigned long object_models_size;         // Total size of object models memory area
-    unsigned long object_animations_size;     // Total size of object animations memory area
-    unsigned long collision_mesh_size;        // Total size of collision mesh data
-    unsigned char room_count;                 // Number of rooms in this scene
-    unsigned char current_room;               // Current active room
-    unsigned short reserved1;
-    unsigned long total_size;                 // Total size of the file excluding texture data
-    unsigned long * scene_heap;               // Pointer to the beginning of the scene heap, this is where room and actors are allocated
-                                              // scene_heap also double as the starting point of texture data inside the Scene data block
-} Scene;
+// New Scene Format
+typedef struct {
+    u_char scene_type;                  // Scene Type - Outdoors, House, Dungeon, etc.
+    KankyouData kankyou_data;           // Global Enviroment Settings
+    Actor_Descriptor * transition_init; // Transition Actor Initialization List
+    u_char transition_count;            // Number of transition actors
+    Room_Data * room_data;              // List of rooms
+    u_char room_count;                  // Number of rooms
+    struct COL2 * collision_mesh;        // Map Collision Mesh
+} Scene_Data;
 
 typedef struct Scene_Ctx {
-  unsigned char num_rooms; // Total rooms in this scene
+  Scene_Data * data;
   unsigned char current_room_id; // Current active room id
   unsigned char previous_room_id; // Id of the room that was active before the current one
-  unsigned char transition_actors_num; // Total of transition actors in this scene
-  Actor_Descriptor * transition_actors_descriptor;
   struct SGM2 * current_room_m; // Pointer to the active geometry
   struct SGM2 * previous_room_m; // Pointer to the geometry of the previous room
   Actor * player; // pointer to player actor
-  Actor ** transition_actors; // Pointer to a list of transition actors in this scene
   struct Camera * camera;
   short draw_dist; // TEMP - Remove later
   CVECTOR ambient;
@@ -286,6 +333,7 @@ typedef struct Scene_Ctx {
   char cinema_mode_counter;
   char interface_fade;
   char interface_fade_counter;
+  char interface_sub_counter;
 } Scene_Ctx;
 
 // Calculating the texture block and where to upload:
@@ -313,7 +361,7 @@ extern MATRIX player_bone_matrix[30];
 
 void SceneInitialize();
 
-void SceneLoad();
+void SceneLoad(Scene_Data * scene_data);
 
 void SceneMain();
 

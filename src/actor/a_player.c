@@ -171,6 +171,9 @@ void PlayerCreateInstance(Actor * a, void * col_ctx) {
   actor->base.child = NULL;
   actor->base.parent = NULL;
 
+  actor->action = -1;
+  actor->sub_action = -1;
+
   // Place player on ground
   {
     SVECTOR pos = {actor->base.pos.vx, actor->base.pos.vy, actor->base.pos.vz, 0};
@@ -219,6 +222,9 @@ void PlayerUpdate(Actor * a, void * scene) {
   mov_vec_x = 0;
   mov_vec_z = 0;
   input_a = 0;
+
+  actor->action_prev = actor->action;
+  actor->sub_action_prev = actor->sub_action;
 
   
   if(actor->state & PLAYER_ENABLE_CONTROL){
@@ -619,6 +625,7 @@ void Player_Normal(Actor * a) {
   switch(actor->state & 0x0000000F){
       default:
       case PLAYER_STATE_WAIT:
+      actor->action = -1;
       case PLAYER_STATE_MOVE:
       {
         long spdconst;
@@ -685,7 +692,8 @@ void Player_Normal(Actor * a) {
           anim_spd = fix12_mul(actor->xzspeed,128);
         }
         //FntPrint("PLAYER SPD: %d\n", actor->xzspeed);
-        if(g_pad_press & PAD_CROSS && (actor->xzspeed > 100000) && (actor->state & ~PLAYER_STATE_MASK) == PLAYER_STATE_MOVE){
+         if(actor->state & PLAYER_STATE_MOVE && actor->xzspeed > 100000) actor->action = 20;
+        if(g_pad_press & PAD_CIRCLE && (actor->xzspeed > 100000) && (actor->state & ~PLAYER_STATE_MASK) == PLAYER_STATE_MOVE){
           actor->state = (actor->state & PLAYER_STATE_MASK) | PLAYER_STATE_ROLL;
           actor->state_sub = 0;
         }

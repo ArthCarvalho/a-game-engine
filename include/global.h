@@ -141,6 +141,11 @@ enum MODULE_TABLE{
   MODULE_GAMEPLAY
 };
 
+typedef struct {
+  u_char u;
+  u_char v;
+} UVCOORD;
+
 /* From LIBGS */
 /*** packet peripheral pointer ***/
 typedef unsigned char PACKET;

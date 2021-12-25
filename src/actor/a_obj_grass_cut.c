@@ -188,7 +188,7 @@ u_char * ObjGrassCutActorDraw(struct Actor * a, MATRIX * view, u_char * packet_p
   struct SGM2 * model = actor->model;
   u_int render_flags = SGM2_RENDER_ABE | SGM2_RENDER_NO_NCLIP;
 
-  if(__DEBUG_TOGGLE) render_flags |= SGM2_RENDER_AMBIENT;
+  if(!__DEBUG_TOGGLE) render_flags |= SGM2_RENDER_AMBIENT;
 
   SVECTOR vec0, vec1;
   long otzv;

@@ -18,6 +18,40 @@
 
 //#include "particles/particles.h"
 
+/* Temporary Static Data Files */
+extern unsigned long player_tim[];
+extern unsigned long player_agm[];
+extern unsigned long player_anm[];
+extern unsigned long sword_sg2[];
+extern unsigned long scene_tim[];
+extern unsigned long iwakabe_tim[];
+extern unsigned long iwakabe_far_tim[];
+extern unsigned long iwayuka_tim[];
+extern unsigned long scene_col[];
+extern unsigned long scene_room00_sg2[];
+extern unsigned long scene_room01_sg2[];
+extern unsigned long scene_room02_sg2[];
+extern unsigned long scene_room03_sg2[];
+extern unsigned long scene_room04_sg2[];
+extern unsigned long scene_room05_sg2[];
+extern unsigned long scene_room05_sg2_ext[];
+extern unsigned long test_image_tim[];
+extern unsigned long test_image2_tim[];
+extern unsigned long test_image3_tim[];
+extern unsigned long test_image4_tim[];
+extern unsigned long screen_lifebar_tim[];
+extern unsigned long main_ps_buttons_circle_tim[];
+extern unsigned long main_ps_buttons_cross_tim[];
+extern unsigned long main_ps_buttons_square_tim[];
+extern unsigned long main_ps_buttons_triangle_tim[];
+extern unsigned long main_button_bg[];
+extern unsigned long main_button_labels[];
+extern unsigned long button_action_labels[];
+extern unsigned long action_icon_bomb[];
+extern unsigned long action_icon_hookshot[];
+extern unsigned long texture_data_start[];
+extern unsigned long texture_data_end[];
+
 // !!!BIG TODO !!!
 // Fix Arena_Free() coalesce crash
 // Make make ambient color calculation faster (GTE)
@@ -158,7 +192,7 @@ Actor_Descriptor transition_actors[] = {
     {                 // unsigned int init_variables[9];
       1, 4, 5844, (1392)-4096, -2658, 4820, (-255)-4096, -3682, 0 // [0]Front, [1]Back Rooms
     }
-  },
+  }
 };
 
 Actor_Descriptor room0_actors[] = {
@@ -205,7 +239,7 @@ Actor_Descriptor room0_actors[] = {
     {                 // unsigned int init_variables[9];
       0, 0, 0, 0, 0, 0, 0, 0, 0
     }
-  },
+  }
   /*{
     7833, -4096, 0,          // short x, y, z;
     0, 0, 0,          // short rot_x, rot_y, rot_z;
@@ -264,7 +298,7 @@ Actor_Descriptor room1_actors[] = {
     {                 // unsigned int init_variables[9];
       0, 0, 0, 0, 0, 0, 0, 0, 0
     }
-  },
+  }
   /*{
     7833, -4096, 0,          // short x, y, z;
     0, 0, 0,          // short rot_x, rot_y, rot_z;
@@ -279,9 +313,10 @@ Actor_Descriptor room1_actors[] = {
 };
 
 
-Room_Data room_data[5] = {
+Room_Data room_data[] = {
   { // Room 0
     0, ROOM_TYPE_DUNGEON, // Id, Room Type
+    0,                      // Enviroment Override
     {
       { 128, 128, 128, 0 }, // Ambient Color
       { 128, 128, 128, 0 }, // Fog Color
@@ -300,6 +335,7 @@ Room_Data room_data[5] = {
   },
   { // Room 1
     1, ROOM_TYPE_DUNGEON, // Id, Room Type
+    0,                      // Enviroment Override
     {
       { 128, 128, 128, 0 }, // Ambient Color
       { 128, 128, 128, 0 }, // Fog Color
@@ -318,6 +354,7 @@ Room_Data room_data[5] = {
   },
   { // Room 2
     2, ROOM_TYPE_DUNGEON, // Id, Room Type
+    0,                      // Enviroment Override
     {
       { 128, 128, 128, 0 }, // Ambient Color
       { 128, 128, 128, 0 }, // Fog Color
@@ -336,6 +373,7 @@ Room_Data room_data[5] = {
   },
   { // Room 3
     3, ROOM_TYPE_DUNGEON, // Id, Room Type
+    0,                      // Enviroment Override
     {
       { 128, 128, 128, 0 }, // Ambient Color
       { 128, 128, 128, 0 }, // Fog Color
@@ -354,6 +392,7 @@ Room_Data room_data[5] = {
   },
   { // Room 4
     4, ROOM_TYPE_DUNGEON, // Id, Room Type
+    0,                      // Enviroment Override
     {
       { 128, 128, 128, 0 }, // Ambient Color
       { 128, 128, 128, 0 }, // Fog Color
@@ -369,8 +408,31 @@ Room_Data room_data[5] = {
     0,                      // Number of actors in initialization list
     NULL,                   // Pointer to list of models in this room's background
     0,                      // Number of background models
+  }
+};
+
+Scene_Data scene_data[] = {
+  {                           // Scene Settings
+    0,                        // Scene Type - Outdoors, House, Dungeon, etc.
+    {                         // Global Enviroment Settings
+      { 128, 128, 128, 0 },   // Ambient Color
+      { 128, 128, 128, 0 },   // Fog Color
+      {
+        128, 128, 128, 0,     // Light Color 1
+        128, 128, 128, 0,     // Light Color 2
+        128, 128, 128, 0      // Light Color 3
+      },
+      0, 0,                   // Fog Start, End
+      0                       // Skybox Type
+    },
+    transition_actors,        // Transition Actor Initialization List
+    4,                        // Number of transition actors
+    room_data,                // List of rooms
+    5,                        // Number of rooms
+    scene_col                 // Map Collision Mesh
   },
 };
+
 
 unsigned int __DEBUG_TOGGLE;
 
@@ -448,7 +510,7 @@ ANM_ANIMATION * player_anime;
 SGM2_File * player_prop_sword;
 
 // Map Data
-Col2 * map_col;
+//Col2 * map_col;
 SGM2_File * map_model[7];
 
 // Camera
@@ -470,6 +532,12 @@ u_short fade_timer;
 u_short fade_direction;
 u_short fade_step;
 
+// Promt Buttons Animation
+u_char action_anim_swap = 0;
+u_char action_anim_counter = 0;
+u_char sub_action_anim_swap = 0;
+u_char sub_action_anim_counter = 0;
+
 // Void Out Y
 short void_out = -16383;
 u_short void_out_active = 0;
@@ -481,30 +549,7 @@ u_char active_particle_count = 0;
 
 
 //char active_room = 0;
-/* Temporary Static Data Files */
-extern unsigned long player_tim[];
-extern unsigned long player_agm[];
-extern unsigned long player_anm[];
-extern unsigned long sword_sg2[];
-extern unsigned long scene_tim[];
-extern unsigned long iwakabe_tim[];
-extern unsigned long iwakabe_far_tim[];
-extern unsigned long iwayuka_tim[];
-extern unsigned long scene_col[];
-extern unsigned long scene_room00_sg2[];
-extern unsigned long scene_room01_sg2[];
-extern unsigned long scene_room02_sg2[];
-extern unsigned long scene_room03_sg2[];
-extern unsigned long scene_room04_sg2[];
-extern unsigned long scene_room05_sg2[];
-extern unsigned long scene_room05_sg2_ext[];
-extern unsigned long test_image_tim[];
-extern unsigned long test_image2_tim[];
-extern unsigned long test_image3_tim[];
-extern unsigned long test_image4_tim[];
-extern unsigned long screen_lifebar_tim[];
-extern unsigned long texture_data_start[];
-extern unsigned long texture_data_end[];
+
 
 /*SGM2_File * current_room = NULL; //
 SGM2_File * previous_room = NULL; /* Previous room rendering, if null, skip rendering
@@ -655,15 +700,17 @@ void SceneInitialize() {
   LStack_SaveCurrentPosition();
   printf("Total free memory: %dKB (load start)\n",LStack_GetFree() >> 10);
   // Load initial scene data
-  SceneLoad();
+  SceneLoad(scene_data);
 }
 
 // Sets up and loads a new scene/map area
-void SceneLoad() {
+void SceneLoad(Scene_Data * scene_data) {
   void * dataptr;
   unsigned long datasize;
 
   scene = LStack_Alloc(sizeof(Scene_Ctx)); // Allocate scene structure
+
+  scene->data = scene_data;
 
   scene->cinema_mode = 0;
   scene->cinema_mode_counter = 0;
@@ -671,10 +718,6 @@ void SceneLoad() {
   scene->interface_fade_counter = 0;
 
   // Setup scene data
-  scene->num_rooms = 4;
-  #define TRANSITION_ACTORS_N 4
-  scene->transition_actors_num = TRANSITION_ACTORS_N;
-
   // Init Actor List
   for(int i = 0; i < ACTOR_GROUP_MAX; i++) {
     Scene_ActorList[i].length = 0;
@@ -688,142 +731,12 @@ void SceneLoad() {
 
   scene->room_swap = 0;
 
-
-  //scene->transition_actors_descriptor = LStack_Alloc(sizeof(Actor_Descriptor)*TRANSITION_ACTORS_N);
-
-  //scene->transition_actors = LStack_Alloc(sizeof(Actor*)*TRANSITION_ACTORS_N);
-
-  /*{
-    Actor_Descriptor newactor;
-    Actor_SwapPlane_Initializer * plane_init;
-    newactor.x = 7818;
-    //newactor.y = -4096;
-    newactor.y = -4096+4096;
-    newactor.z = 0;
-    newactor.rot_x = 0;
-    newactor.rot_y = 0;
-    newactor.rot_z = 0;
-    newactor.actor_type = ACTOR_TYPE_SWAP_PLANE;
-
-    plane_init = (Actor_SwapPlane_Initializer*)newactor.init_variables;
-
-    plane_init->max_x = 8296;
-    plane_init->max_y = -3215+4096;
-    plane_init->max_z = 512;
-    plane_init->min_x = 7272;
-    plane_init->min_y = -4238+4096;
-    plane_init->min_z = -512;
-    plane_init->front = 0;
-    plane_init->back = 1;
-
-
-    // Allocate
-    scene->transition_actors[0] = LStack_Alloc(sizeof(Actor_SwapPlane));
-    Scene_AddActor(&Scene_ActorList[ACTOR_GROUP_DOOR], scene->transition_actors[0]);
-    //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
-    // Create each transition actor
-    Actor_SwapPlane_Init(scene->transition_actors[0], &newactor, scene);
-  }
-
-  {
-    Actor_Descriptor newactor;
-    Actor_SwapPlane_Initializer * plane_init;
-    newactor.x = 2352;
-    newactor.y = -4014;
-    newactor.z = 0;
-    newactor.rot_x = 0;
-    newactor.rot_y = 0;
-    newactor.rot_z = 0;
-    newactor.actor_type = ACTOR_TYPE_SWAP_PLANE;
-
-    plane_init = (Actor_SwapPlane_Initializer*)newactor.init_variables;
-
-    plane_init->max_x = 2864;
-    plane_init->max_y = -3502;
-    plane_init->max_z = 512;
-    plane_init->min_x = 1840;
-    plane_init->min_y = -4526;
-    plane_init->min_z = -512;
-    plane_init->front = 1;
-    plane_init->back = 2;
-
-    // Allocate
-    scene->transition_actors[1] = LStack_Alloc(sizeof(Actor_SwapPlane));
-    //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
-    // Create each transition actor
-    Scene_AddActor(&Scene_ActorList[ACTOR_GROUP_DOOR], scene->transition_actors[1]);
-    Actor_SwapPlane_Init(scene->transition_actors[1], &newactor, scene);
-  }
-  printf("Actor_SwapPlane_Init 2\n");
-  {
-    Actor_Descriptor newactor;
-    Actor_SwapPlane_Initializer * plane_init;
-    newactor.x = -2379;
-    newactor.y = -4014;
-    newactor.z = 0;
-    newactor.rot_x = 0;
-    newactor.rot_y = 0;
-    newactor.rot_z = 0;
-    newactor.actor_type = ACTOR_TYPE_SWAP_PLANE;
-
-    plane_init = (Actor_SwapPlane_Initializer*)newactor.init_variables;
-
-    plane_init->max_x = -1867;
-    plane_init->max_y = 593-4096;
-    plane_init->max_z = 512;
-    plane_init->min_x = -2891;
-    plane_init->min_y = (-430)-4096;
-    plane_init->min_z = -512;
-    plane_init->front = 2;
-    plane_init->back = 3;
-
-
-    // Allocate
-    scene->transition_actors[2] = LStack_Alloc(sizeof(Actor_SwapPlane));
-    //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
-    // Create each transition actor
-    Scene_AddActor(&Scene_ActorList[ACTOR_GROUP_DOOR], scene->transition_actors[2]);
-    Actor_SwapPlane_Init(scene->transition_actors[2], &newactor, scene);
-  }
-  printf("Actor_SwapPlane_Init 3 Begin\n");
-  {
-    Actor_Descriptor newactor;
-    Actor_SwapPlane_Initializer * plane_init;
-    newactor.x = 5332;
-    newactor.y = (624)-4096;
-    newactor.z = -3170;
-    newactor.rot_x = 0;
-    newactor.rot_y = 0;
-    newactor.rot_z = 0;
-    newactor.actor_type = ACTOR_TYPE_SWAP_PLANE;
-
-    plane_init = (Actor_SwapPlane_Initializer*)newactor.init_variables;
-
-    plane_init->max_x = 5844;
-    plane_init->max_y = (1392)-4096;
-    plane_init->max_z = -2658;
-    plane_init->min_x = 4820;
-    plane_init->min_y = (-255)-4096;
-    plane_init->min_z = -3682;
-    plane_init->front = 1;
-    plane_init->back = 4;
-
-    // Allocate
-    scene->transition_actors[3] = LStack_Alloc(sizeof(Actor_SwapPlane));
-    //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
-    // Create each transition actor
-    Scene_AddActor(&Scene_ActorList[ACTOR_GROUP_DOOR], scene->transition_actors[3]);
-    Actor_SwapPlane_Init(scene->transition_actors[3], &newactor, scene);
-  }*/
-
   // Load scene data
   //dataptr = LStack_GetTail();
 
-  printf("map_col = (Col2*)scene_col;\n");
-
   //datasize = file_load_temp_noalloc("\\DATA\\scene.cOL;1", dataptr);
   //map_col = LStack_Alloc(datasize);
-  map_col = (Col2*)scene_col;
+  //map_col = (Col2*)scene_col;
 
   // Load starting room model
   //dataptr = LStack_GetTail();
@@ -841,10 +754,12 @@ void SceneLoad() {
 
 
   // Initialize collision
-  map_col = Col_LoadFile((u_long*)map_col);
+  //map_col = Col_LoadFile((u_long*)map_col);
 
-  printf("collision addr: %x vertices: %x faces: %x planes: %x\n",map_col,map_col->vertices,map_col->faces,map_col->planes);
-  printf("vert num: %d face num: %d plane num: %d\n",map_col->vertex_num, map_col->face_num, map_col->plane_num);
+  scene_data->collision_mesh = Col_LoadFile((u_long*)scene_data->collision_mesh);
+
+  printf("collision addr: %x vertices: %x faces: %x planes: %x\n",scene_data->collision_mesh,scene_data->collision_mesh->vertices,scene_data->collision_mesh->faces,scene_data->collision_mesh->planes);
+  printf("vert num: %d face num: %d plane num: %d\n",scene_data->collision_mesh->vertex_num, scene_data->collision_mesh->face_num, scene_data->collision_mesh->plane_num);
 
   printf("map: vert num %d (%d bytes)\n",map_model[4]->vertex_count, map_model[4]->vertex_count * sizeof(SVECTOR));
   // Initialize Transform Buffer
@@ -887,16 +802,17 @@ void SceneLoad() {
 
   printf("Material 0: clut 0x%04X tpage 0x%04X\n", map_model[6]->material[0].clut, map_model[6]->material[0].tpage);
   printf("Material 0: clut 0x%04X tpage 0x%04X\n", map_model[6]->material[1].clut, map_model[6]->material[1].tpage);
+  // map_col
 
   // Initialize player object
   playerActor = LStack_Alloc(sizeof(struct PlayerActor));
-  PlayerCreateInstance((Actor*)playerActor, map_col);
+  PlayerCreateInstance((Actor*)playerActor, scene_data->collision_mesh);
 
   scene->player = (Actor*)playerActor;
 
   // Initialize camera
   camera = LStack_Alloc(sizeof(struct Camera));
-  Camera_Create(camera, map_col);
+  Camera_Create(camera, scene_data->collision_mesh);
   camera->target_offset.vy = 256;
   Camera_SetTarget(camera, (Actor*)playerActor);
   Camera_SetStartValues(camera);
@@ -939,8 +855,8 @@ void SceneLoad() {
     //printf("malloc(1): %x (content: %x)\n", testptr, *testptr);
   }
 
-  for(int i = 0; i < TRANSITION_ACTORS_N; i++) {
-    Actor_Descriptor * actdesc = &transition_actors[i];
+  for(int i = 0; i < scene_data->transition_count; i++) {
+    Actor_Descriptor * actdesc = &scene_data->transition_init[i];
     Scene_CreateActor(actdesc, ACTOR_GROUP_DOOR, scene);
   }
   // Load map (global) textures
@@ -996,6 +912,16 @@ void SceneLoad() {
   load_texture_pos((unsigned long)obj_dangeon_door_tim, 192, 0, 784, 500);
 
   load_texture_pos((unsigned long)screen_lifebar_tim, LIFEMETER_TEX_X, LIFEMETER_TEX_Y, LIFEMETER_CLUT_X, LIFEMETER_CLUT_Y);
+
+  load_texture_pos((unsigned long)main_ps_buttons_circle_tim, SCR_BUTTON_CIRCLE_X, SCR_BUTTON_CIRCLE_Y, SCR_BUTTON_CIRCLE_CLUT_X, SCR_BUTTON_CIRCLE_CLUT_Y);
+  load_texture_pos((unsigned long)main_ps_buttons_cross_tim, SCR_BUTTON_CROSS_X, SCR_BUTTON_CROSS_Y, SCR_BUTTON_CROSS_CLUT_X, SCR_BUTTON_CROSS_CLUT_Y);
+  load_texture_pos((unsigned long)main_ps_buttons_square_tim, SCR_BUTTON_SQUARE_X, SCR_BUTTON_SQUARE_Y, SCR_BUTTON_SQUARE_CLUT_X, SCR_BUTTON_SQUARE_CLUT_Y);
+  load_texture_pos((unsigned long)main_ps_buttons_triangle_tim, SCR_BUTTON_TRIANGLE_X, SCR_BUTTON_TRIANGLE_Y, SCR_BUTTON_TRIANGLE_CLUT_X, SCR_BUTTON_TRIANGLE_CLUT_Y);
+  load_texture_pos((unsigned long)main_button_bg, SCR_BUTTON_BACK_X, SCR_BUTTON_BACK_Y, SCR_BUTTON_BACK_CLUT_X, SCR_BUTTON_BACK_CLUT_Y);
+  load_texture_pos((unsigned long)main_button_labels, SCR_BUTTON_LABELS_X, SCR_BUTTON_LABELS_Y, SCR_BUTTON_LABELS_CLUT_X, SCR_BUTTON_LABELS_CLUT_Y);
+  load_texture_pos((unsigned long)button_action_labels, SCR_ACTION_LABELS_X, SCR_ACTION_LABELS_Y, SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y);
+  load_texture_pos((unsigned long)action_icon_bomb, SCR_ACTION_BOMB_X, SCR_ACTION_BOMB_Y, SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2);
+  load_texture_pos((unsigned long)action_icon_hookshot, SCR_ACTION_HOOKSHOT_X, SCR_ACTION_HOOKSHOT_Y, SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+4);
 
   anim_tex_flame_src = (RECT) {FLAME_TEX_X_SRC, FLAME_TEX_Y_SRC, FLAME_TEX_W, FLAME_TEX_H};
   anim_tex_flame_dest = (RECT) {FLAME_TEX_X, FLAME_TEX_Y, FLAME_TEX_W, FLAME_TEX_H*2};
@@ -1391,7 +1317,7 @@ void SceneMain() {
   if(void_out_active){
     if(fade_counter == 0) {
       //scene->current_room_id = 0;
-      PlayerCreateInstance((Actor*)playerActor, map_col);
+      PlayerCreateInstance((Actor*)playerActor, scene_data->collision_mesh);
       playerActor->base.pos.vx = playerActor->x_position = playerActor->last_floor_pos_x;
       playerActor->base.pos.vy = playerActor->y_position = playerActor->last_floor_pos_y;
       playerActor->base.pos.vz = playerActor->z_position = playerActor->last_floor_pos_z;
@@ -1399,7 +1325,7 @@ void SceneMain() {
       playerActor->y_position <<= 12;
       playerActor->z_position <<= 12;
       playerActor->y_move_dir = playerActor->base.rot.vy = playerActor->y_rotation = playerActor->last_floor_dir;
-      Camera_Create(camera, map_col);
+      Camera_Create(camera, scene_data->collision_mesh);
       void_out_active = 0;
       fade_counter = fade_timer;
       camera->target_offset.vy = 256;
@@ -1501,6 +1427,13 @@ void SceneMain() {
   //test_obj_tsubo.base.Update(&test_obj_tsubo,scene);
 
   scene_counter++; // Global/General Purpose Counter
+}
+
+UVCOORD Screen_GetActionLabel(char action) {
+  UVCOORD result = {(SCR_ACTION_LABELS_X * 4) % 256, SCR_ACTION_LABELS_Y % 256};
+  if(action > 10) result.u += SCR_ACTION_LABEL_W;
+  result.v += SCR_ACTION_LABEL_H * (action % 11);
+  return result;
 }
 
 void SceneDraw() {
@@ -1648,18 +1581,18 @@ void SceneDraw() {
   //FntPrint("X: %d Y:%d Z:%d\n", playerActor->base.pos.vx, playerActor->base.pos.vy, playerActor->base.pos.vz);
 
   SetSpadStack(SPAD_STACK_ADDR);
-  if(__DEBUG_TOGGLE){ 
+  if(!__DEBUG_TOGGLE){  // SGM2_RENDER_SUBDIV | 
     packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 20, SGM2_RENDER_SUBDIV | SGM2_RENDER_AMBIENT, scene);
   } else {
     packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 20, SGM2_RENDER_SUBDIV, scene);
   }
   
   //packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_CLUTFOG, scene);
-  packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_AMBIENT, scene);
+  packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_AMBIENT, scene); // SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | 
   ResetSpadStack();
   if(scene->previous_room_m){
     SetSpadStack(SPAD_STACK_ADDR);
-      packet_b_ptr = SGM2_UpdateModel(scene->previous_room_m, packet_b_ptr, (u_long*)G.pOt, 20, SGM2_RENDER_AMBIENT | SGM2_RENDER_SUBDIV, scene);
+      packet_b_ptr = SGM2_UpdateModel(scene->previous_room_m, packet_b_ptr, (u_long*)G.pOt, 20, SGM2_RENDER_SUBDIV | SGM2_RENDER_AMBIENT, scene); // SGM2_RENDER_SUBDIV
     ResetSpadStack();
   }
 
@@ -1710,18 +1643,31 @@ void SceneDraw() {
 
   // Draw particles
   packet_b_ptr = Scene_ParticleUpdate(scene, &camera->matrix, packet_b_ptr);
-
+  #define INTERFACE_FADE_SEMITRANS_FRAMES 2
   if(scene->interface_fade) {
-    scene->interface_fade_counter++;
-    if(scene->interface_fade_counter > 2) scene->interface_fade_counter = 2;
+    if(scene->interface_fade_counter == 0) {
+      scene->interface_fade_counter++;
+    } else {
+      scene->interface_sub_counter++;
+      if(scene->interface_sub_counter == INTERFACE_FADE_SEMITRANS_FRAMES) {
+        scene->interface_sub_counter = 0;
+        scene->interface_fade_counter++;
+      }
+    }
   } else {
-    if(scene->interface_fade_counter > 0) scene->interface_fade_counter--;
+    if(scene->interface_fade_counter != 0) {
+      scene->interface_sub_counter++;
+      if(scene->interface_sub_counter == INTERFACE_FADE_SEMITRANS_FRAMES) {
+        scene->interface_sub_counter = 0;
+        scene->interface_fade_counter = 0;
+      }
+    }
   }
 
   if(scene->interface_fade_counter <= 1) {
     // Draw sprite (for testing)
-    draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52, 16, 52, 32, 0, 0, FLAME_TEX_CLUT_X, (FLAME_TEX_CLUT_Y+8)+scene->interface_fade_counter);
-    packet_b_ptr += sizeof(SPRT);
+    //draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52, 16, 52, 32, 0, 0, FLAME_TEX_CLUT_X, (FLAME_TEX_CLUT_Y+8)+scene->interface_fade_counter);
+    //packet_b_ptr += sizeof(SPRT);
   /*
     draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52, 16, 52, 32, 52, 0, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+9);
     packet_b_ptr += sizeof(SPRT);
@@ -1736,10 +1682,156 @@ void SceneDraw() {
     packet_b_ptr += sizeof(SPRT);
   */
     //draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52-52-52-52-52, 16, 52, 32, 52*3, 0, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+13+2);
-    draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52, 16, 52, 32, 52*3, 0, FLAME_TEX_CLUT_X, (FLAME_TEX_CLUT_Y+13+2)+scene->interface_fade_counter);
+    //draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52, 16, 52, 32, 52*3, 0, FLAME_TEX_CLUT_X, (FLAME_TEX_CLUT_Y+13+2)+scene->interface_fade_counter);
+    //packet_b_ptr += sizeof(SPRT);
+
+    // Draw Triangle Button
+    /*draw_SimpleSpriteSemi(
+      (SPRT*)packet_b_ptr, G.pOt, SCR_POS_BUTTON_TRIANGLE_X, SCR_POS_BUTTON_TRIANGLE_Y,
+      32, 20, (SCR_BUTTON_TRIANGLE_X * 4) % 256, SCR_BUTTON_TRIANGLE_Y % 256,
+      SCR_BUTTON_TRIANGLE_CLUT_X, SCR_BUTTON_TRIANGLE_CLUT_Y+scene->interface_fade_counter
+    );
     packet_b_ptr += sizeof(SPRT);
 
-    setDrawTPage((DR_TPAGE*)packet_b_ptr, 1, 0, getTPage(0, 0, 64, 256));
+    // Draw Square Button
+    draw_SimpleSpriteSemi(
+      (SPRT*)packet_b_ptr, G.pOt, SCR_POS_BUTTON_SQUARE_X, SCR_POS_BUTTON_SQUARE_Y,
+      32, 20, (SCR_BUTTON_SQUARE_X * 4) % 256, SCR_BUTTON_SQUARE_Y % 256,
+      SCR_BUTTON_SQUARE_CLUT_X, SCR_BUTTON_SQUARE_CLUT_Y+scene->interface_fade_counter
+    );
+    packet_b_ptr += sizeof(SPRT);
+
+    // Draw Circle Button
+    draw_SimpleSpriteSemi(
+      (SPRT*)packet_b_ptr, G.pOt, SCR_POS_BUTTON_CIRCLE_X, SCR_POS_BUTTON_CIRCLE_Y,
+      32, 20, (SCR_BUTTON_CIRCLE_X * 4) % 256, SCR_BUTTON_CIRCLE_Y % 256,
+      SCR_BUTTON_CIRCLE_CLUT_X, SCR_BUTTON_CIRCLE_CLUT_Y+scene->interface_fade_counter
+    );
+    packet_b_ptr += sizeof(SPRT);
+
+    // Draw Cross Button
+    draw_SimpleSpriteSemi(
+      (SPRT*)packet_b_ptr, G.pOt, SCR_POS_BUTTON_CROSS_X, SCR_POS_BUTTON_CROSS_Y,
+      32, 20, (SCR_BUTTON_CROSS_X * 4) % 256, SCR_BUTTON_CROSS_Y % 256,
+      SCR_BUTTON_CROSS_CLUT_X, SCR_BUTTON_CROSS_CLUT_Y+scene->interface_fade_counter
+    );
+    packet_b_ptr += sizeof(SPRT);*/
+
+    if(action_anim_swap == 1) {
+      action_anim_counter = 0;
+      action_anim_swap += 1;
+    } else if(action_anim_swap == 2) {
+      action_anim_counter++;
+      if(action_anim_counter > 4) action_anim_swap = 0;
+    }
+
+    if(sub_action_anim_swap == 1) {
+      sub_action_anim_counter = 0;
+      sub_action_anim_swap += 1;
+    } else if(sub_action_anim_swap == 2) {
+      sub_action_anim_counter++;
+      if(sub_action_anim_counter > 4) sub_action_anim_swap = 0;
+    }
+
+    // Modern UI - Action Labels
+    // Circle Button Action Label
+    if(((PlayerActor*)scene->player)->action >= 0) { 
+      UVCOORD actlbl = Screen_GetActionLabel(((PlayerActor*)scene->player)->action);
+      draw_SimpleSpriteSemi(
+        (SPRT*)packet_b_ptr, G.pOt, SCR_ACTION_LABEL_CIRCLE_X, SCR_ACTION_LABEL_CIRCLE_Y,
+        SCR_ACTION_LABEL_W, SCR_ACTION_LABEL_H, actlbl.u, actlbl.v,
+        SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+scene->interface_fade_counter
+      );
+      packet_b_ptr += sizeof(SPRT);
+    }
+    
+    if(((PlayerActor*)scene->player)->sub_action >= 0) { 
+      UVCOORD actlbl = Screen_GetActionLabel(((PlayerActor*)scene->player)->sub_action);
+      draw_SimpleSpriteSemi(
+        (SPRT*)packet_b_ptr, G.pOt, SCR_ACTION_LABEL_CROSS_X, SCR_ACTION_LABEL_CROSS_Y,
+        SCR_ACTION_LABEL_W, SCR_ACTION_LABEL_H, actlbl.u, actlbl.v,
+        SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+scene->interface_fade_counter
+      );
+      packet_b_ptr += sizeof(SPRT);
+    }
+
+
+    // Modern UI - Draw Button Labels
+    draw_SimpleSpriteSemi(
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_TRIANGLE_X, SCR_BUTTON_MODERN_TRIANGLE_Y,
+      13, 9, (SCR_BUTTON_LABELS_X * 4) % 256, SCR_BUTTON_LABELS_Y % 256,
+      SCR_BUTTON_LABELS_CLUT_X, SCR_BUTTON_LABELS_CLUT_Y+scene->interface_fade_counter
+    );
+    packet_b_ptr += sizeof(SPRT);
+/*
+    draw_SimpleSpriteSemi(
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_SQUARE_X, SCR_BUTTON_MODERN_SQUARE_Y,
+      13, 9, (SCR_BUTTON_LABELS_X * 4) + 13 * 1 % 256, SCR_BUTTON_LABELS_Y % 256,
+      SCR_BUTTON_LABELS_CLUT_X, SCR_BUTTON_LABELS_CLUT_Y+scene->interface_fade_counter
+    );
+    packet_b_ptr += sizeof(SPRT);
+*/
+    draw_SimpleSpriteSemi(
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_CIRCLE_X, SCR_BUTTON_MODERN_CIRCLE_Y,
+      14, 9, (SCR_BUTTON_LABELS_X * 4) + 13 * 3 % 256, SCR_BUTTON_LABELS_Y % 256,
+      SCR_BUTTON_LABELS_CLUT_X, SCR_BUTTON_LABELS_CLUT_Y+scene->interface_fade_counter
+    );
+    packet_b_ptr += sizeof(SPRT);
+
+    draw_SimpleSpriteSemi(
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_CROSS_X, SCR_BUTTON_MODERN_CROSS_Y,
+      13, 9, (SCR_BUTTON_LABELS_X * 4) + 13 * 2 % 256, SCR_BUTTON_LABELS_Y % 256,
+      SCR_BUTTON_LABELS_CLUT_X, SCR_BUTTON_LABELS_CLUT_Y+scene->interface_fade_counter
+    );
+    packet_b_ptr += sizeof(SPRT);
+
+    // Modern UI - Draw Action Icons
+    draw_SimpleSpriteSemi(
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_TRIANGLE_X, SCR_BUTTON_MODERN_TRIANGLE_Y,
+      36, 23, (SCR_ACTION_BOMB_X * 4) % 256, SCR_ACTION_BOMB_Y % 256,
+      SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2+scene->interface_fade_counter
+    );
+    packet_b_ptr += sizeof(SPRT);
+
+    draw_SimpleSpriteSemi(
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_SQUARE_X, SCR_BUTTON_MODERN_SQUARE_Y,
+      36, 23, (SCR_ACTION_HOOKSHOT_X * 4) % 256, SCR_ACTION_HOOKSHOT_Y % 256,
+      SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+4+scene->interface_fade_counter
+    );
+    packet_b_ptr += sizeof(SPRT);
+
+
+    // Modern UI - Draw Button Back
+    draw_SimpleSpriteSemi(
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_TRIANGLE_X, SCR_BUTTON_MODERN_TRIANGLE_Y,
+      36, 23, (SCR_BUTTON_BACK_X * 4) % 256, SCR_BUTTON_BACK_Y % 256,
+      SCR_BUTTON_BACK_CLUT_X, SCR_BUTTON_BACK_CLUT_Y+scene->interface_fade_counter
+    );
+    packet_b_ptr += sizeof(SPRT);
+
+    draw_SimpleSpriteSemi(
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_SQUARE_X, SCR_BUTTON_MODERN_SQUARE_Y,
+      36, 23, (SCR_BUTTON_BACK_X * 4) % 256, SCR_BUTTON_BACK_Y % 256,
+      SCR_BUTTON_BACK_CLUT_X, SCR_BUTTON_BACK_CLUT_Y+scene->interface_fade_counter
+    );
+    packet_b_ptr += sizeof(SPRT);
+
+    draw_SimpleSpriteSemi(
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_CIRCLE_X, SCR_BUTTON_MODERN_CIRCLE_Y,
+      36, 23, (SCR_BUTTON_BACK_X * 4) % 256, SCR_BUTTON_BACK_Y % 256,
+      SCR_BUTTON_BACK_CLUT_X, SCR_BUTTON_BACK_CLUT_Y+scene->interface_fade_counter
+    );
+    packet_b_ptr += sizeof(SPRT);
+
+    draw_SimpleSpriteSemi(
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_CROSS_X, SCR_BUTTON_MODERN_CROSS_Y,
+      36, 23, (SCR_BUTTON_BACK_X * 4) % 256, SCR_BUTTON_BACK_Y % 256,
+      SCR_BUTTON_BACK_CLUT_X, SCR_BUTTON_BACK_CLUT_Y+scene->interface_fade_counter
+    );
+    packet_b_ptr += sizeof(SPRT);
+
+
+    setDrawTPage((DR_TPAGE*)packet_b_ptr, 1, 0, getTPage(0, 0, 492, 0));
     addPrim(G.pOt, packet_b_ptr);
     packet_b_ptr += sizeof(DR_TPAGE);
 

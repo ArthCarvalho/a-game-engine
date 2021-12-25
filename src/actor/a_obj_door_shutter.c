@@ -15,11 +15,6 @@
 
 // Door Height: 663
 
-typedef struct {
-  u_char u;
-  u_char v;
-} UVCOORD;
-
 SVECTOR door_shutter_vectors[] = {
   {-192, 663, 30, 0},
   {192, 663, 30, 0},
@@ -148,7 +143,8 @@ void ObjDoorShutterActorUpdate(struct Actor * a, void * scene) {
 	  tdist.vz = (tdist.vz + mask) ^ mask;
   }
   if(tdist.vx < 400 && tdist.vz < 400) {
-    if(actor->sub_timer == 0 && (g_pad_press & PAD_CROSS) && !(pl->state & PLAYER_CUTSCENE_MODE)) {
+    pl->action = 8;
+    if(actor->sub_timer == 0 && (g_pad_press & PAD_CIRCLE) && !(pl->state & PLAYER_CUTSCENE_MODE)) {
       actor->sub_timer = 1;
       scene_ctx->cinema_mode = 1;
       scene_ctx->interface_fade = 1;

@@ -154,11 +154,14 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
     // Store value to otz
     gte_stotz(&otz);
     // Reduce OTZ size
-    otz = (otz >> OTSUBDIV)+depth_offset;
+    otz = (otz >> OTSUBDIV);
+    if(otz < 1) continue;
+    
+    otz += depth_offset;
     //otz = 50;
     //if(otz >= OTSIZE) otz = OTSIZE-1;
 
-    if (otz > 1 && otz < OTSIZE) {
+    if (otz < OTSIZE) {
       if(otz < subdiv_lvl1 && flags & SGM2_RENDER_SUBDIV) {
         u_long uvcode0, uvcode1, uvcode2, uvcode3;
         CVECTOR col0, col1, col2, col3;

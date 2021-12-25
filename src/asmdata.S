@@ -50,6 +50,15 @@
   .global test_image4_tim
   .global obj_dangeon_door_tim
   .global screen_lifebar_tim
+  .global main_ps_buttons_circle_tim
+  .global main_ps_buttons_cross_tim
+  .global main_ps_buttons_square_tim
+  .global main_ps_buttons_triangle_tim
+  .global main_button_bg
+  .global main_button_labels
+  .global button_action_labels
+  .global action_icon_bomb
+  .global action_icon_hookshot
   .global texture_data_start
   .global texture_data_end
 
@@ -207,10 +216,48 @@ test_image4_tim:
   .balign 16
 
 obj_dangeon_door_tim:
-  .incbin "../AGAME_PCDATA/obj_dangeon_door_shika.tim"
+  .incbin "../AGAME_PCDATA/obj_dangeon_door.tim"
   .balign 16
 
 screen_lifebar_tim:
   .incbin "../AGAME_PCDATA/screen_lifebar2.tim"
   .balign 16
+
+main_ps_buttons_circle_tim:
+  .incbin "../AGAME_PCDATA/ui/main_ps_buttons_circle-or8.tim"
+  .balign 16
+
+main_ps_buttons_cross_tim:
+  .incbin "../AGAME_PCDATA/ui/main_ps_buttons_cross-or8.tim"
+  .balign 16
+  
+main_ps_buttons_square_tim:
+  .incbin "../AGAME_PCDATA/ui/main_ps_buttons_square-or8.tim"
+  .balign 16
+
+main_ps_buttons_triangle_tim:
+  .incbin "../AGAME_PCDATA/ui/main_ps_buttons_triangle-or8.tim"
+  .balign 16
+
+main_button_bg:
+  .incbin "../AGAME_PCDATA/ui/modern/button_back-or8.tim"
+  .balign 16
+
+main_button_labels:
+  .incbin "../AGAME_PCDATA/ui/modern/button_labels-or8.tim"
+  .balign 16
+  
+button_action_labels:
+  .incbin "../AGAME_PCDATA/ui/modern/button_action_labels_t-or8.tim"
+  .balign 16
+
+action_icon_bomb:
+  .incbin "../AGAME_PCDATA/ui/modern/action_icon_bomb-or8.tim"
+  .balign 16
+  
+action_icon_hookshot:
+  .incbin "../AGAME_PCDATA/ui/modern/action_icon_hookshot-or8.tim"
+  .balign 16
+
+
 texture_data_end:
