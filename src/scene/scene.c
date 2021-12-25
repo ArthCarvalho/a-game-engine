@@ -532,11 +532,24 @@ u_short fade_timer;
 u_short fade_direction;
 u_short fade_step;
 
-// Promt Buttons Animation
+// Prompt Buttons Animation
 u_char action_anim_swap = 0;
 u_char action_anim_counter = 0;
 u_char sub_action_anim_swap = 0;
 u_char sub_action_anim_counter = 0;
+// Buttons animation
+short button_text_anim_x[] = {
+  4096, 4096*1.1, 4096*1.3, 4096*1.25
+};
+short button_text_anim_y[] = {
+  4096, 4096*0.5, 4096*1.25, 4096*1.2
+};
+short button_anim_x[] = {
+  4096, 4096*0.95, 4096*1.3, 4096*1.0
+};
+short button_anim_y[] = {
+  4096, 4096*0.5, 4096*1.2, 4096*1.0
+};
 
 // Void Out Y
 short void_out = -16383;
@@ -1436,6 +1449,126 @@ UVCOORD Screen_GetActionLabel(char action) {
   return result;
 }
 
+SVECTOR action_label_vtx[] = {
+  -30+5, -7+3, 0, 0,
+  30+5, -7+3, 0, 0,
+  -30+5, 6+3, 0, 0,
+  30+5, 6+3, 0, 0
+};
+
+SVECTOR action_button_icon_vtx[] = {
+  -18, -11, 0, 0,
+  -6, -11, 0, 0,
+  -18, -2, 0, 0,
+  -6, -2, 0, 0
+};
+
+SVECTOR action_button_vtx[] = {
+  -18, -11, 0, 0,
+  18, -11, 0, 0,
+  -18, 12, 0, 0,
+  18, 12, 0, 0
+};
+
+u_char * Screen_DrawActionButton(short x, short y, short scalex0, short scaley0, short scalex1, short scaley1, u_char fade, u_char button, char action, u_char * buffer) {
+  MATRIX matrix = {
+    scalex0, 0, 0,
+    0, scaley0, 0,
+    0, 0, 4096,
+    x-(SCREEN_W/2), y-(SCREEN_H/2), 256
+  };
+
+  POLY_FT4 * poly = (POLY_FT4 *)buffer;
+  u_short tpage = getTPage(0, 0, 492, 0);
+
+  if(action >= 0) {
+    UVCOORD lblcoords = Screen_GetActionLabel(action);
+    gte_SetRotMatrix(&matrix);
+    gte_SetTransMatrix(&matrix);
+
+    gte_ldv3(
+        &action_label_vtx[0],
+        &action_label_vtx[1],
+        &action_label_vtx[2]
+      );
+    gte_rtpt();
+
+    *(long *)&poly->r0 = 0x00808080;
+    poly->tpage = tpage;
+    //setUVWH(poly, 482 * 4 % 256, 49, 60, 13);    
+    setUVWH(poly, lblcoords.u, lblcoords.v, 59, 13);
+    
+    gte_stsxy3((long *)&poly->x0,(long *)&poly->x1,(long *)&poly->x2);
+    gte_ldv0(&action_label_vtx[3]);
+    gte_rtps();
+
+    poly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+fade);
+    setPolyFT4(poly);
+    setSemiTrans(poly, 1);
+
+    gte_stsxy((long *)&poly->x3);
+
+    addPrim(G.pOt, poly);
+    poly++;
+  }
+
+  matrix.m[0][0] = scalex1;
+  matrix.m[1][1] = scaley1;
+
+  gte_SetRotMatrix(&matrix);
+  gte_SetTransMatrix(&matrix);
+
+  gte_ldv3(
+      &action_button_icon_vtx[0],
+      &action_button_icon_vtx[1],
+      &action_button_icon_vtx[2]
+    );
+  gte_rtpt();
+
+  poly->clut = getClut(SCR_BUTTON_LABELS_CLUT_X, SCR_BUTTON_LABELS_CLUT_Y+fade);
+  setUVWH(poly, (SCR_BUTTON_LABELS_X * 4 % 256) + 13 * button, SCR_BUTTON_LABELS_Y, 13, 9);
+
+  gte_stsxy3((long *)&poly->x0,(long *)&poly->x1,(long *)&poly->x2);
+  gte_ldv0(&action_button_icon_vtx[3]);
+  gte_rtps();
+
+  *(long *)&poly->r0 = 0x00808080;
+  poly->tpage = tpage;
+  setPolyFT4(poly);
+  setSemiTrans(poly, 1);
+  
+  gte_stsxy((long *)&poly->x3);
+
+  addPrim(G.pOt, poly);
+  poly++;
+
+  gte_ldv3(
+      &action_button_vtx[0],
+      &action_button_vtx[1],
+      &action_button_vtx[2]
+    );
+  gte_rtpt();
+
+  *(long *)&poly->r0 = 0x00808080;
+  poly->tpage = tpage;
+  setUVWH(poly, SCR_BUTTON_BACK_X * 4 % 256, SCR_BUTTON_BACK_Y, 36, 23);
+
+  gte_stsxy3((long *)&poly->x0,(long *)&poly->x1,(long *)&poly->x2);
+  gte_ldv0(&action_button_vtx[3]);
+  gte_rtps();
+
+  poly->clut = getClut(SCR_BUTTON_BACK_CLUT_X, SCR_BUTTON_BACK_CLUT_Y+fade);
+  setPolyFT4(poly);
+  setSemiTrans(poly, 1);
+
+  gte_stsxy((long *)&poly->x3);
+
+  addPrim(G.pOt, poly);
+  poly++;
+
+  return (u_char*)poly;
+}
+
 void SceneDraw() {
   u_char * packet_b_ptr;
   MATRIX local_identity;
@@ -1717,42 +1850,65 @@ void SceneDraw() {
     );
     packet_b_ptr += sizeof(SPRT);*/
 
+    if(((PlayerActor*)scene->player)->action != ((PlayerActor*)scene->player)->action_prev) action_anim_swap = 1;
+    if(((PlayerActor*)scene->player)->sub_action != ((PlayerActor*)scene->player)->sub_action_prev) sub_action_anim_swap = 1;
+
     if(action_anim_swap == 1) {
       action_anim_counter = 0;
-      action_anim_swap += 1;
+      action_anim_swap ++;
     } else if(action_anim_swap == 2) {
       action_anim_counter++;
-      if(action_anim_counter > 4) action_anim_swap = 0;
+      if(action_anim_counter > 3){
+        action_anim_swap = 0;
+        action_anim_counter = 0;
+      }
     }
+
+    //FntPrint("action_anim_counter %d\n",action_anim_counter);
 
     if(sub_action_anim_swap == 1) {
       sub_action_anim_counter = 0;
-      sub_action_anim_swap += 1;
+      sub_action_anim_swap ++;
     } else if(sub_action_anim_swap == 2) {
       sub_action_anim_counter++;
-      if(sub_action_anim_counter > 4) sub_action_anim_swap = 0;
+      if(sub_action_anim_counter > 3) {
+        sub_action_anim_swap = 0;
+        sub_action_anim_counter = 0;
+      }
     }
 
     // Modern UI - Action Labels
     // Circle Button Action Label
-    if(((PlayerActor*)scene->player)->action >= 0) { 
-      UVCOORD actlbl = Screen_GetActionLabel(((PlayerActor*)scene->player)->action);
+    if(action_anim_counter != 0 || action_anim_swap == 0) { 
+      /*UVCOORD actlbl = Screen_GetActionLabel(((PlayerActor*)scene->player)->action);
       draw_SimpleSpriteSemi(
         (SPRT*)packet_b_ptr, G.pOt, SCR_ACTION_LABEL_CIRCLE_X, SCR_ACTION_LABEL_CIRCLE_Y,
         SCR_ACTION_LABEL_W, SCR_ACTION_LABEL_H, actlbl.u, actlbl.v,
         SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+scene->interface_fade_counter
       );
-      packet_b_ptr += sizeof(SPRT);
+      packet_b_ptr += sizeof(SPRT);*/
+
+      packet_b_ptr = Screen_DrawActionButton(
+        SCR_BUTTON_MODERN_CIRCLE_X+18, SCR_BUTTON_MODERN_CIRCLE_Y+11,
+        button_text_anim_x[action_anim_counter], button_text_anim_y[action_anim_counter],
+        button_anim_x[action_anim_counter], button_anim_y[action_anim_counter],
+        scene->interface_fade_counter, 3, ((PlayerActor*)scene->player)->action, packet_b_ptr
+      );
     }
     
-    if(((PlayerActor*)scene->player)->sub_action >= 0) { 
-      UVCOORD actlbl = Screen_GetActionLabel(((PlayerActor*)scene->player)->sub_action);
+    if(sub_action_anim_counter != 0 || sub_action_anim_swap == 0) { 
+      /*UVCOORD actlbl = Screen_GetActionLabel(((PlayerActor*)scene->player)->sub_action);
       draw_SimpleSpriteSemi(
         (SPRT*)packet_b_ptr, G.pOt, SCR_ACTION_LABEL_CROSS_X, SCR_ACTION_LABEL_CROSS_Y,
         SCR_ACTION_LABEL_W, SCR_ACTION_LABEL_H, actlbl.u, actlbl.v,
         SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+scene->interface_fade_counter
       );
-      packet_b_ptr += sizeof(SPRT);
+      packet_b_ptr += sizeof(SPRT);*/
+      packet_b_ptr = Screen_DrawActionButton(
+        SCR_BUTTON_MODERN_CROSS_X+18, SCR_BUTTON_MODERN_CROSS_Y+11,
+        4096, 4096, 4096, 4096,
+        scene->interface_fade_counter, 2, ((PlayerActor*)scene->player)->sub_action, packet_b_ptr
+      );
     }
 
 
@@ -1763,15 +1919,15 @@ void SceneDraw() {
       SCR_BUTTON_LABELS_CLUT_X, SCR_BUTTON_LABELS_CLUT_Y+scene->interface_fade_counter
     );
     packet_b_ptr += sizeof(SPRT);
-/*
+
     draw_SimpleSpriteSemi(
       (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_SQUARE_X, SCR_BUTTON_MODERN_SQUARE_Y,
       13, 9, (SCR_BUTTON_LABELS_X * 4) + 13 * 1 % 256, SCR_BUTTON_LABELS_Y % 256,
       SCR_BUTTON_LABELS_CLUT_X, SCR_BUTTON_LABELS_CLUT_Y+scene->interface_fade_counter
     );
     packet_b_ptr += sizeof(SPRT);
-*/
-    draw_SimpleSpriteSemi(
+
+    /*draw_SimpleSpriteSemi(
       (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_CIRCLE_X, SCR_BUTTON_MODERN_CIRCLE_Y,
       14, 9, (SCR_BUTTON_LABELS_X * 4) + 13 * 3 % 256, SCR_BUTTON_LABELS_Y % 256,
       SCR_BUTTON_LABELS_CLUT_X, SCR_BUTTON_LABELS_CLUT_Y+scene->interface_fade_counter
@@ -1783,7 +1939,7 @@ void SceneDraw() {
       13, 9, (SCR_BUTTON_LABELS_X * 4) + 13 * 2 % 256, SCR_BUTTON_LABELS_Y % 256,
       SCR_BUTTON_LABELS_CLUT_X, SCR_BUTTON_LABELS_CLUT_Y+scene->interface_fade_counter
     );
-    packet_b_ptr += sizeof(SPRT);
+    packet_b_ptr += sizeof(SPRT);*/
 
     // Modern UI - Draw Action Icons
     draw_SimpleSpriteSemi(
@@ -1816,7 +1972,7 @@ void SceneDraw() {
     );
     packet_b_ptr += sizeof(SPRT);
 
-    draw_SimpleSpriteSemi(
+    /*draw_SimpleSpriteSemi(
       (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_CIRCLE_X, SCR_BUTTON_MODERN_CIRCLE_Y,
       36, 23, (SCR_BUTTON_BACK_X * 4) % 256, SCR_BUTTON_BACK_Y % 256,
       SCR_BUTTON_BACK_CLUT_X, SCR_BUTTON_BACK_CLUT_Y+scene->interface_fade_counter
@@ -1828,7 +1984,7 @@ void SceneDraw() {
       36, 23, (SCR_BUTTON_BACK_X * 4) % 256, SCR_BUTTON_BACK_Y % 256,
       SCR_BUTTON_BACK_CLUT_X, SCR_BUTTON_BACK_CLUT_Y+scene->interface_fade_counter
     );
-    packet_b_ptr += sizeof(SPRT);
+    packet_b_ptr += sizeof(SPRT);*/
 
 
     setDrawTPage((DR_TPAGE*)packet_b_ptr, 1, 0, getTPage(0, 0, 492, 0));
