@@ -35,20 +35,14 @@ extern unsigned long scene_room03_sg2[];
 extern unsigned long scene_room04_sg2[];
 extern unsigned long scene_room05_sg2[];
 extern unsigned long scene_room05_sg2_ext[];
-extern unsigned long test_image_tim[];
-extern unsigned long test_image2_tim[];
-extern unsigned long test_image3_tim[];
-extern unsigned long test_image4_tim[];
 extern unsigned long screen_lifebar_tim[];
-extern unsigned long main_ps_buttons_circle_tim[];
-extern unsigned long main_ps_buttons_cross_tim[];
-extern unsigned long main_ps_buttons_square_tim[];
-extern unsigned long main_ps_buttons_triangle_tim[];
 extern unsigned long main_button_bg[];
 extern unsigned long main_button_labels[];
 extern unsigned long button_action_labels[];
 extern unsigned long action_icon_bomb[];
 extern unsigned long action_icon_hookshot[];
+extern unsigned long icon_256_a_16_tim[];
+extern unsigned long icon_256_b_16_tim[];
 extern unsigned long texture_data_start[];
 extern unsigned long texture_data_end[];
 
@@ -916,25 +910,18 @@ void SceneLoad(Scene_Data * scene_data) {
   load_texture_pos((unsigned long)obj_tsubo_tim, 36, 320, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+7);
   load_texture_pos((unsigned long)obj_grass_tim, 36, 384, FLAME_TEX_CLUT_X+16, FLAME_TEX_CLUT_Y);
   load_texture_pos((unsigned long)obj_grass_cut_tim, 36, 416, FLAME_TEX_CLUT_X+16, FLAME_TEX_CLUT_Y+2);
-  // Test sprite
-  load_texture_pos((unsigned long)test_image_tim, 64, 256, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+8);
-  load_texture_pos((unsigned long)test_image2_tim, 64+(13*1), 256, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+9);
-  load_texture_pos((unsigned long)test_image3_tim, 64+(13*2), 256, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+10);
-  load_texture_pos((unsigned long)test_image4_tim, 64+(13*3), 256, FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+13);
   // Door Textures
   load_texture_pos((unsigned long)obj_dangeon_door_tim, 192, 0, 784, 500);
 
   load_texture_pos((unsigned long)screen_lifebar_tim, LIFEMETER_TEX_X, LIFEMETER_TEX_Y, LIFEMETER_CLUT_X, LIFEMETER_CLUT_Y);
 
-  load_texture_pos((unsigned long)main_ps_buttons_circle_tim, SCR_BUTTON_CIRCLE_X, SCR_BUTTON_CIRCLE_Y, SCR_BUTTON_CIRCLE_CLUT_X, SCR_BUTTON_CIRCLE_CLUT_Y);
-  load_texture_pos((unsigned long)main_ps_buttons_cross_tim, SCR_BUTTON_CROSS_X, SCR_BUTTON_CROSS_Y, SCR_BUTTON_CROSS_CLUT_X, SCR_BUTTON_CROSS_CLUT_Y);
-  load_texture_pos((unsigned long)main_ps_buttons_square_tim, SCR_BUTTON_SQUARE_X, SCR_BUTTON_SQUARE_Y, SCR_BUTTON_SQUARE_CLUT_X, SCR_BUTTON_SQUARE_CLUT_Y);
-  load_texture_pos((unsigned long)main_ps_buttons_triangle_tim, SCR_BUTTON_TRIANGLE_X, SCR_BUTTON_TRIANGLE_Y, SCR_BUTTON_TRIANGLE_CLUT_X, SCR_BUTTON_TRIANGLE_CLUT_Y);
   load_texture_pos((unsigned long)main_button_bg, SCR_BUTTON_BACK_X, SCR_BUTTON_BACK_Y, SCR_BUTTON_BACK_CLUT_X, SCR_BUTTON_BACK_CLUT_Y);
   load_texture_pos((unsigned long)main_button_labels, SCR_BUTTON_LABELS_X, SCR_BUTTON_LABELS_Y, SCR_BUTTON_LABELS_CLUT_X, SCR_BUTTON_LABELS_CLUT_Y);
   load_texture_pos((unsigned long)button_action_labels, SCR_ACTION_LABELS_X, SCR_ACTION_LABELS_Y, SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y);
   load_texture_pos((unsigned long)action_icon_bomb, SCR_ACTION_BOMB_X, SCR_ACTION_BOMB_Y, SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2);
   load_texture_pos((unsigned long)action_icon_hookshot, SCR_ACTION_HOOKSHOT_X, SCR_ACTION_HOOKSHOT_Y, SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+4);
+  load_texture_pos((unsigned long)icon_256_a_16_tim, SCR_ACTION_HOOKSHOT_X, SCR_ACTION_HOOKSHOT_Y+23, SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+6);
+  load_texture_pos((unsigned long)icon_256_b_16_tim, SCR_ACTION_HOOKSHOT_X, SCR_ACTION_HOOKSHOT_Y+23+42, SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+8);
 
   anim_tex_flame_src = (RECT) {FLAME_TEX_X_SRC, FLAME_TEX_Y_SRC, FLAME_TEX_W, FLAME_TEX_H};
   anim_tex_flame_dest = (RECT) {FLAME_TEX_X, FLAME_TEX_Y, FLAME_TEX_W, FLAME_TEX_H*2};
@@ -1123,36 +1110,6 @@ void Scene_RemoveOldActors(int actor_group, Scene_Ctx * scene) {
     Arena_Free(c);
   }
 }
-  /*for(Actor * c = Scene_ActorList[actor_group].start; c; c = c->next) {
-    test_total++;
-    if(c->room != scene->previous_room_id)
-      continue;
-
-    Scene_RemoveActor(&Scene_ActorList[actor_group], c);
-    c->Destroy(c, scene);
-    Arena_Free(c);
-    test_removed++;
-  }
-  printf("%d/%d objects removed\n", test_removed, test_total);
-}*/
-/*void  Scene_RemoveOldActors(int bg_type, Scene_Ctx * scene) {
-  int test_removed = 0;
-  int test_total = 0;
-  for(Actor * c = Scene_ActorList[bg_type].start; c;) {
-    test_total++;
-    if(c->room != scene->previous_room_id) {
-      c = c->next;
-      continue;
-    }
-    Actor * next = c->next;
-    Scene_RemoveActor(&Scene_ActorList[bg_type], c);
-    c->Destroy(c, scene);
-    Arena_Free(c);
-    c = next;
-    test_removed++;
-  }
-  printf("%d/%d objects removed\n", test_removed, test_total);
-}*/
 
 int bone_select = 0;
 
@@ -1171,11 +1128,6 @@ void SceneMain() {
     }
   }
 
-  //if(g_pad & PAD_START) scene->draw_dist++;
-  //if(g_pad & PAD_SELECT) scene->draw_dist--;
-
-  //FntPrint("DRAW DIST: %d\n", scene->draw_dist);
-
   if((scene->current_room_id != scene->previous_room_id) && scene->room_swap) {
     scene->current_room_m = map_model[scene->current_room_id];
     scene->previous_room_m = map_model[scene->previous_room_id];
@@ -1188,23 +1140,6 @@ void SceneMain() {
     switch(scene->current_room_id) {
       default:
         break;
-      /*case 1:
-        for(int i = 0; i < 5; i++) {
-          // Move this to ObjSyokudaiActorInitialize
-          ObjSyokudaiActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjSyokudaiActor));
-          actor->base.room = scene->current_room_id;
-          actor->flame_color = 1;//1+ (rand() % 5);
-          actor->flame_rand = rand() >> 9;
-          actor->flame_timer = -1;
-          actor->base.pos.vx = 3912 + (rand() >> 4);
-          actor->base.pos.vy = -4096-256;//(rand() >> 8)-4096-200;
-          actor->base.pos.vz = (rand() >> 4)-1024;
-          actor->base.rot.vx = 0;
-          actor->base.rot.vy = 0;
-          actor->base.rot.vz = 0;
-          ObjSyokudaiActorInitialize((Actor*)actor, NULL, scene);
-        }
-        break;*/
       case 2:
         for(int i = 0; i < 64; i++) {
           ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjGrassCutActor));
@@ -1219,17 +1154,6 @@ void SceneMain() {
         }
         break;
       case 4:
-        /*for(int i = 0; i < 256; i++) {
-          ObjTsuboActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjTsuboActor));
-          actor->base.room = scene->current_room_id;
-          actor->base.pos.vx = (rand() >> 2)-4096+(4221);
-          actor->base.pos.vy = -6157;
-          actor->base.pos.vz = (rand() >> 2)-4096-(10864);
-          actor->base.rot.vx = 0;
-          actor->base.rot.vy = 0;
-          actor->base.rot.vz = 0;
-          ObjTsuboActorInitialize((Actor*)actor, NULL, scene);
-        }*/
         for(int i = 0; i < 512; i++) {
           ObjGrassActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjGrassActor));
           actor->base.room = scene->current_room_id;
@@ -1241,61 +1165,15 @@ void SceneMain() {
           actor->base.rot.vz = 0;
           ObjGrassActorInitialize((Actor*)actor, NULL, scene);
         }
-        /*for(int i = 0; i < 1024; i++) {
-          ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjGrassCutActor));
-          actor->base.room = scene->current_room_id;
-          actor->base.pos.vx = (rand() >> 2)-4096+(4221);
-          actor->base.pos.vy = -6157;
-          actor->base.pos.vz = (rand() >> 2)-4096-(10864);
-          actor->base.rot.vx = 0;
-          actor->base.rot.vy = rand() >> 4;
-          actor->base.rot.vz = 0;
-          ObjGrassCutActorInitialize((Actor*)actor, NULL, scene);
-        }*/
         break;
     }
-    /*Actor *c;
-
-    printf("room change %d<->%d\n", scene->previous_room_id, scene->current_room_id);
-
-    for(c = Scene_ActorList[ACTOR_GROUP_BG].start; c; c = c->next)
-    {
-        Actor *t = c;
-
-        printf("actor from room %d ", t->room);
-
-        printf("actor: %08X, next: %08X\n", t, t->next);
-
-        test_total++;
-
-        if(t->room != scene->previous_room_id)
-            continue;
-
-        c = c->next;
-
-        Scene_RemoveActor(&Scene_ActorList[ACTOR_GROUP_BG], t);
-        t->Destroy(t, scene);
-        Arena_Free(t);
-        printf("removing\n");
-        test_removed++;
-    }*/
-    //printf("%d/%d objects removed\n", test_removed, test_total);
   }
   if(scene->actor_cleanup) {
     Scene_RemoveOldActors(ACTOR_GROUP_BG, scene);
     scene->actor_cleanup = 0;
   }
 
-  //FntPrint("OLD ROOM: 0x%08X\n", scene->previous_room_m);
-
-  //FntPrint("ACTOR_GROUP_BG %d\n", Scene_ActorList[ACTOR_GROUP_BG].length);
-
   PlayerUpdate(scene->player, scene);
-
-  // TEMP
-  //if(g_pad & PAD_R1) playerActor->y_position = -4332 << 12;
-  //if(g_pad & PAD_R2) playerActor->y_position = -4096 << 12;
-  //if(g_pad & PAD_L2) playerActor->y_position = -6158 << 12;
 
   Camera_Update(camera, scene);
 
@@ -1350,34 +1228,10 @@ void SceneMain() {
     }
   }
 
-  // Process Transition Actors
-  /*{
-    unsigned int i;
-    for(i = 0; i < scene->transition_actors_num; i++){
-      Actor * current = scene->transition_actors[i];
-      current->Update(current, scene);
-    }
-  }*/
-
-  //test_obj_syokudai[0].base.pos.vx = playerActor->base.pos.vx;
-  //test_obj_syokudai[0].base.pos.vy = playerActor->base.pos.vy+256;
-  //test_obj_syokudai[0].base.pos.vz = playerActor->base.pos.vz;
-
   VECTOR test_flame_offset = { 0, 0, 0, 0 };
   VECTOR test_flame_wp;
 
   ApplyMatrixLV(playerActor->L_Hand_matrix, &test_flame_offset, &test_flame_wp);
-
-  /*
-  test_obj_syokudai[0].base.pos.vx = test_flame_wp.vx;
-  test_obj_syokudai[0].base.pos.vy = test_flame_wp.vy;
-  test_obj_syokudai[0].base.pos.vz = test_flame_wp.vz;
-  */
-
-  //test_obj_syokudai[0].base.pos.vx = playerActor->L_Hand_matrix->t[0];
-  //test_obj_syokudai[0].base.pos.vy = playerActor->L_Hand_matrix->t[1];
-  //test_obj_syokudai[0].base.pos.vz = playerActor->L_Hand_matrix->t[2];
-
   
   if(g_pad_press & PAD_TRIANGLE) bone_select++;
   if(g_pad_press & PAD_SQUARE) bone_select--;
@@ -1385,29 +1239,8 @@ void SceneMain() {
   if(bone_select < 0) bone_select = 0;
   
 
-  /*
-  test_obj_syokudai[0].base.pos.vx = player_bone_matrix[bone_select].t[0];
-  test_obj_syokudai[0].base.pos.vy = player_bone_matrix[bone_select].t[1];
-  test_obj_syokudai[0].base.pos.vz = player_bone_matrix[bone_select].t[2];
-  */
-
-  //FntPrint("Bone: %d RAND_MAX %d\n", bone_select, RAND_MAX);
-
-  //test_obj_tsubo.base.pos.vx = player_bone_matrix[2].t[0];
-  //test_obj_tsubo.base.pos.vy = player_bone_matrix[2].t[1]+32;
-  //test_obj_tsubo.base.pos.vz = player_bone_matrix[2].t[2];
-  //test_obj_tsubo.base.rot.vy = playerActor->base.rot.vy;
-
-  
-
   // Process actor list
   // Exclude player type, process all categories
-
-  /*for(int i = 0; i < NUM_TEST_OBJ_SYOKUDAI; i++) {
-    ObjSyokudaiActor * actor = &test_obj_syokudai[i];
-    actor->base.Update(actor, scene);
-  }*/
-
   for(int i = ACTOR_GROUP_BG; i < ACTOR_GROUP_MAX; i++) {
     Actor * current = Scene_ActorList[i].start;
     if(Scene_ActorList[i].length == 0) continue;
@@ -1436,9 +1269,6 @@ void SceneMain() {
     }
   }
 
-
-  //test_obj_tsubo.base.Update(&test_obj_tsubo,scene);
-
   scene_counter++; // Global/General Purpose Counter
 }
 
@@ -1457,17 +1287,17 @@ SVECTOR action_label_vtx[] = {
 };
 
 SVECTOR action_button_icon_vtx[] = {
-  -18, -11, 0, 0,
-  -6, -11, 0, 0,
-  -18, -2, 0, 0,
-  -6, -2, 0, 0
+  -21, -11, 0, 0,
+  -9, -11, 0, 0,
+  -21, -2, 0, 0,
+  -9, -2, 0, 0
 };
 
 SVECTOR action_button_vtx[] = {
-  -18, -11, 0, 0,
-  18, -11, 0, 0,
-  -18, 12, 0, 0,
-  18, 12, 0, 0
+  -21, -11, 0, 0,
+  21, -11, 0, 0,
+  -21, 12, 0, 0,
+  21, 12, 0, 0
 };
 
 u_char * Screen_DrawActionButton(short x, short y, short scalex0, short scaley0, short scalex1, short scaley1, u_char fade, u_char button, char action, u_char * buffer) {
@@ -1551,7 +1381,7 @@ u_char * Screen_DrawActionButton(short x, short y, short scalex0, short scaley0,
 
   *(long *)&poly->r0 = 0x00808080;
   poly->tpage = tpage;
-  setUVWH(poly, SCR_BUTTON_BACK_X * 4 % 256, SCR_BUTTON_BACK_Y, 36, 23);
+  setUVWH(poly, SCR_BUTTON_BACK_X * 4 % 256, SCR_BUTTON_BACK_Y, 42, 23);
 
   gte_stsxy3((long *)&poly->x0,(long *)&poly->x1,(long *)&poly->x2);
   gte_ldv0(&action_button_vtx[3]);
@@ -1568,6 +1398,9 @@ u_char * Screen_DrawActionButton(short x, short y, short scalex0, short scaley0,
 
   return (u_char*)poly;
 }
+
+// Test Temporaries
+u_long temp_counter = 0;
 
 void SceneDraw() {
   u_char * packet_b_ptr;
@@ -1672,15 +1505,9 @@ void SceneDraw() {
 
   BeginDraw();
 
-  //packet_b_ptr = (u_char *)&gpu_packet[G.OTag_id];
   packet_b_ptr = G.pBuffer;
 
   CompMatrixLV(&camera->matrix, &m_identity, &local_identity);
-
-  //VECTOR bgscale = {4096*2,4096*2,4096*2,0};
-  //ScaleMatrixL(&local_identity_far, &bgscale);
-  
-  //CompMatrixLV(&camera->matrix, &local_identity_far, &local_identity_far);
 
   local_identity_far = local_identity;
   local_identity_far.t[0] = local_identity.t[0] >> 3;
@@ -1697,21 +1524,15 @@ void SceneDraw() {
   gte_SetRotMatrix(&local_identity);
   gte_SetTransMatrix(&local_identity);
 
-  //packet_b_ptr = SGM2_UpdateModel(map_model, packet_b_ptr, (u_long*)G.pOt, 10);
-
   prof_current_val = GetRCnt(ROOT_COUNTER);
   prof_update = prof_current_val - prof_last_counter;
   prof_last_counter = prof_current_val;
 
   if(g_pad_press & PAD_TRIANGLE) __DEBUG_TOGGLE = !__DEBUG_TOGGLE;
-  //if(g_pad_press & PAD_START) __DEBUG_TOGGLE++;// = !__DEBUG_TOGGLE;
-  //if(__DEBUG_TOGGLE >= 5) __DEBUG_TOGGLE = 0;
 
   // Update animated textures
   // Flame texture
   Scene_ScrollTexture2x(&anim_tex_flame_src, &anim_tex_flame_dest, 0x3F - ((scene_counter<<1) & 0x3F));
-
-  //FntPrint("X: %d Y:%d Z:%d\n", playerActor->base.pos.vx, playerActor->base.pos.vy, playerActor->base.pos.vz);
 
   SetSpadStack(SPAD_STACK_ADDR);
   if(!__DEBUG_TOGGLE){  // SGM2_RENDER_SUBDIV | 
@@ -1720,23 +1541,13 @@ void SceneDraw() {
     packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 20, SGM2_RENDER_SUBDIV, scene);
   }
   
-  //packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_CLUTFOG, scene);
-  packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_AMBIENT, scene); // SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | 
+  packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_AMBIENT, scene); // SGM2_RENDER_SUBDIV_HIGH
   ResetSpadStack();
   if(scene->previous_room_m){
     SetSpadStack(SPAD_STACK_ADDR);
       packet_b_ptr = SGM2_UpdateModel(scene->previous_room_m, packet_b_ptr, (u_long*)G.pOt, 20, SGM2_RENDER_SUBDIV | SGM2_RENDER_AMBIENT, scene); // SGM2_RENDER_SUBDIV
     ResetSpadStack();
   }
-
-  //SetSpadStack(SPAD_STACK_ADDR);
-  //packet_b_ptr = SGM2_UpdateModel(obj_flame_model, packet_b_ptr, (u_long*)G.pOt, 0, 1);
-  //ResetSpadStack();
-
-  /*for(int i = 0; i < NUM_TEST_OBJ_SYOKUDAI; i++) {
-    ObjSyokudaiActor * actor = &test_obj_syokudai[i];
-    packet_b_ptr = actor->base.Draw((Actor*)actor, &camera->matrix, packet_b_ptr);
-  }*/
 
   for(int i = ACTOR_GROUP_BG; i < ACTOR_GROUP_MAX; i++) {
     Actor * current = Scene_ActorList[i].start;
@@ -1749,9 +1560,6 @@ void SceneDraw() {
     }
   }
 
-  //packet_b_ptr = test_obj_tsubo.base.Draw((Actor*)&test_obj_tsubo, &camera->matrix, packet_b_ptr);
-  
-
   prof_current_val = GetRCnt(ROOT_COUNTER);
   prof_draw_bg = prof_current_val - prof_last_counter;
   prof_last_counter = prof_current_val;
@@ -1761,18 +1569,10 @@ void SceneDraw() {
   CompMatrixLV(&camera->matrix, playerActor->L_Hand_matrix, &local_identity);
   gte_SetRotMatrix(&local_identity);
   gte_SetTransMatrix(&local_identity);
-  /*SetSpadStack(SPAD_STACK_ADDR);
-  packet_b_ptr = SGM2_UpdateModel(player_prop_sword, packet_b_ptr, (u_long*)G.pOt, 0, 0);
-  ResetSpadStack();*/
-
 
   prof_current_val = GetRCnt(ROOT_COUNTER);
   prof_draw_player = prof_current_val - prof_last_counter;
   prof_last_counter = prof_current_val;
-
-  //CompMatrixLV(&camera->matrix, playerActor->L_Hand_matrix, &local_identity);
-  //gte_SetRotMatrix(&local_identity);
-  //gte_SetTransMatrix(&local_identity);
 
   // Draw particles
   packet_b_ptr = Scene_ParticleUpdate(scene, &camera->matrix, packet_b_ptr);
@@ -1818,38 +1618,6 @@ void SceneDraw() {
     //draw_SimpleSpriteSemi((SPRT*)packet_b_ptr, G.pOt, 512-20-52-52, 16, 52, 32, 52*3, 0, FLAME_TEX_CLUT_X, (FLAME_TEX_CLUT_Y+13+2)+scene->interface_fade_counter);
     //packet_b_ptr += sizeof(SPRT);
 
-    // Draw Triangle Button
-    /*draw_SimpleSpriteSemi(
-      (SPRT*)packet_b_ptr, G.pOt, SCR_POS_BUTTON_TRIANGLE_X, SCR_POS_BUTTON_TRIANGLE_Y,
-      32, 20, (SCR_BUTTON_TRIANGLE_X * 4) % 256, SCR_BUTTON_TRIANGLE_Y % 256,
-      SCR_BUTTON_TRIANGLE_CLUT_X, SCR_BUTTON_TRIANGLE_CLUT_Y+scene->interface_fade_counter
-    );
-    packet_b_ptr += sizeof(SPRT);
-
-    // Draw Square Button
-    draw_SimpleSpriteSemi(
-      (SPRT*)packet_b_ptr, G.pOt, SCR_POS_BUTTON_SQUARE_X, SCR_POS_BUTTON_SQUARE_Y,
-      32, 20, (SCR_BUTTON_SQUARE_X * 4) % 256, SCR_BUTTON_SQUARE_Y % 256,
-      SCR_BUTTON_SQUARE_CLUT_X, SCR_BUTTON_SQUARE_CLUT_Y+scene->interface_fade_counter
-    );
-    packet_b_ptr += sizeof(SPRT);
-
-    // Draw Circle Button
-    draw_SimpleSpriteSemi(
-      (SPRT*)packet_b_ptr, G.pOt, SCR_POS_BUTTON_CIRCLE_X, SCR_POS_BUTTON_CIRCLE_Y,
-      32, 20, (SCR_BUTTON_CIRCLE_X * 4) % 256, SCR_BUTTON_CIRCLE_Y % 256,
-      SCR_BUTTON_CIRCLE_CLUT_X, SCR_BUTTON_CIRCLE_CLUT_Y+scene->interface_fade_counter
-    );
-    packet_b_ptr += sizeof(SPRT);
-
-    // Draw Cross Button
-    draw_SimpleSpriteSemi(
-      (SPRT*)packet_b_ptr, G.pOt, SCR_POS_BUTTON_CROSS_X, SCR_POS_BUTTON_CROSS_Y,
-      32, 20, (SCR_BUTTON_CROSS_X * 4) % 256, SCR_BUTTON_CROSS_Y % 256,
-      SCR_BUTTON_CROSS_CLUT_X, SCR_BUTTON_CROSS_CLUT_Y+scene->interface_fade_counter
-    );
-    packet_b_ptr += sizeof(SPRT);*/
-
     if(((PlayerActor*)scene->player)->action != ((PlayerActor*)scene->player)->action_prev) action_anim_swap = 1;
     if(((PlayerActor*)scene->player)->sub_action != ((PlayerActor*)scene->player)->sub_action_prev) sub_action_anim_swap = 1;
 
@@ -1889,7 +1657,7 @@ void SceneDraw() {
       packet_b_ptr += sizeof(SPRT);*/
 
       packet_b_ptr = Screen_DrawActionButton(
-        SCR_BUTTON_MODERN_CIRCLE_X+18, SCR_BUTTON_MODERN_CIRCLE_Y+11,
+        SCR_BUTTON_MODERN_CIRCLE_X+18+14, SCR_BUTTON_MODERN_CIRCLE_Y+11+1,
         button_text_anim_x[action_anim_counter], button_text_anim_y[action_anim_counter],
         button_anim_x[action_anim_counter], button_anim_y[action_anim_counter],
         scene->interface_fade_counter, 3, ((PlayerActor*)scene->player)->action, packet_b_ptr
@@ -1905,7 +1673,7 @@ void SceneDraw() {
       );
       packet_b_ptr += sizeof(SPRT);*/
       packet_b_ptr = Screen_DrawActionButton(
-        SCR_BUTTON_MODERN_CROSS_X+18, SCR_BUTTON_MODERN_CROSS_Y+11,
+        SCR_BUTTON_MODERN_CROSS_X+18+8, SCR_BUTTON_MODERN_CROSS_Y+11+3,
         4096, 4096, 4096, 4096,
         scene->interface_fade_counter, 2, ((PlayerActor*)scene->player)->sub_action, packet_b_ptr
       );
@@ -1914,36 +1682,22 @@ void SceneDraw() {
 
     // Modern UI - Draw Button Labels
     draw_SimpleSpriteSemi(
-      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_TRIANGLE_X, SCR_BUTTON_MODERN_TRIANGLE_Y,
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_TRIANGLE_X+5, SCR_BUTTON_MODERN_TRIANGLE_Y-1,
       13, 9, (SCR_BUTTON_LABELS_X * 4) % 256, SCR_BUTTON_LABELS_Y % 256,
       SCR_BUTTON_LABELS_CLUT_X, SCR_BUTTON_LABELS_CLUT_Y+scene->interface_fade_counter
     );
     packet_b_ptr += sizeof(SPRT);
 
     draw_SimpleSpriteSemi(
-      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_SQUARE_X, SCR_BUTTON_MODERN_SQUARE_Y,
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_SQUARE_X-1, SCR_BUTTON_MODERN_SQUARE_Y+1,
       13, 9, (SCR_BUTTON_LABELS_X * 4) + 13 * 1 % 256, SCR_BUTTON_LABELS_Y % 256,
       SCR_BUTTON_LABELS_CLUT_X, SCR_BUTTON_LABELS_CLUT_Y+scene->interface_fade_counter
     );
     packet_b_ptr += sizeof(SPRT);
 
-    /*draw_SimpleSpriteSemi(
-      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_CIRCLE_X, SCR_BUTTON_MODERN_CIRCLE_Y,
-      14, 9, (SCR_BUTTON_LABELS_X * 4) + 13 * 3 % 256, SCR_BUTTON_LABELS_Y % 256,
-      SCR_BUTTON_LABELS_CLUT_X, SCR_BUTTON_LABELS_CLUT_Y+scene->interface_fade_counter
-    );
-    packet_b_ptr += sizeof(SPRT);
-
-    draw_SimpleSpriteSemi(
-      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_CROSS_X, SCR_BUTTON_MODERN_CROSS_Y,
-      13, 9, (SCR_BUTTON_LABELS_X * 4) + 13 * 2 % 256, SCR_BUTTON_LABELS_Y % 256,
-      SCR_BUTTON_LABELS_CLUT_X, SCR_BUTTON_LABELS_CLUT_Y+scene->interface_fade_counter
-    );
-    packet_b_ptr += sizeof(SPRT);*/
-
     // Modern UI - Draw Action Icons
     draw_SimpleSpriteSemi(
-      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_TRIANGLE_X, SCR_BUTTON_MODERN_TRIANGLE_Y,
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_TRIANGLE_X+7, SCR_BUTTON_MODERN_TRIANGLE_Y-1,
       36, 23, (SCR_ACTION_BOMB_X * 4) % 256, SCR_ACTION_BOMB_Y % 256,
       SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2+scene->interface_fade_counter
     );
@@ -1959,33 +1713,222 @@ void SceneDraw() {
 
     // Modern UI - Draw Button Back
     draw_SimpleSpriteSemi(
-      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_TRIANGLE_X, SCR_BUTTON_MODERN_TRIANGLE_Y,
-      36, 23, (SCR_BUTTON_BACK_X * 4) % 256, SCR_BUTTON_BACK_Y % 256,
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_TRIANGLE_X+5, SCR_BUTTON_MODERN_TRIANGLE_Y-1,
+      42, 23, (SCR_BUTTON_BACK_X * 4) % 256, SCR_BUTTON_BACK_Y % 256,
       SCR_BUTTON_BACK_CLUT_X, SCR_BUTTON_BACK_CLUT_Y+scene->interface_fade_counter
     );
     packet_b_ptr += sizeof(SPRT);
 
     draw_SimpleSpriteSemi(
-      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_SQUARE_X, SCR_BUTTON_MODERN_SQUARE_Y,
-      36, 23, (SCR_BUTTON_BACK_X * 4) % 256, SCR_BUTTON_BACK_Y % 256,
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_SQUARE_X-1, SCR_BUTTON_MODERN_SQUARE_Y+1,
+      42, 23, (SCR_BUTTON_BACK_X * 4) % 256, SCR_BUTTON_BACK_Y % 256,
       SCR_BUTTON_BACK_CLUT_X, SCR_BUTTON_BACK_CLUT_Y+scene->interface_fade_counter
     );
     packet_b_ptr += sizeof(SPRT);
 
+    // Test - Pseudo Linear Interpolated Sprites
     /*draw_SimpleSpriteSemi(
-      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_CIRCLE_X, SCR_BUTTON_MODERN_CIRCLE_Y,
-      36, 23, (SCR_BUTTON_BACK_X * 4) % 256, SCR_BUTTON_BACK_Y % 256,
-      SCR_BUTTON_BACK_CLUT_X, SCR_BUTTON_BACK_CLUT_Y+scene->interface_fade_counter
-    );
-    packet_b_ptr += sizeof(SPRT);
+      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_TRIANGLE_X, SCR_BUTTON_MODERN_TRIANGLE_Y,
+      36, 23, (SCR_ACTION_BOMB_X * 4) % 256, SCR_ACTION_BOMB_Y % 256,
+      SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2+scene->interface_fade_counter
+    );*/
+    /*
+    POLY_FT4 * scalepoly = (POLY_FT4 *)packet_b_ptr;
 
-    draw_SimpleSpriteSemi(
-      (SPRT*)packet_b_ptr, G.pOt, SCR_BUTTON_MODERN_CROSS_X, SCR_BUTTON_MODERN_CROSS_Y,
-      36, 23, (SCR_BUTTON_BACK_X * 4) % 256, SCR_BUTTON_BACK_Y % 256,
-      SCR_BUTTON_BACK_CLUT_X, SCR_BUTTON_BACK_CLUT_Y+scene->interface_fade_counter
-    );
-    packet_b_ptr += sizeof(SPRT);*/
+    setXYWH(scalepoly, 0, 120-21+42, 36*2, 42);
+    setUVWH(scalepoly, (SCR_ACTION_HOOKSHOT_X * 4) % 256, SCR_ACTION_HOOKSHOT_Y+23, 35, 41);
+    *(long*)&scalepoly->r0 = 0x00808080;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+6);
+    scalepoly->tpage = getTPage(0, 0, 492, 0);
+    setPolyFT4(scalepoly);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
 
+    setXYWH(scalepoly, 36*2, 120-21+42, 36*2, 42);
+    setUVWH(scalepoly, (SCR_ACTION_HOOKSHOT_X * 4) % 256, SCR_ACTION_HOOKSHOT_Y+23+42, 35, 41);
+    *(long*)&scalepoly->r0 = 0x00808080;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+8);
+    scalepoly->tpage = getTPage(0, 0, 492, 0);
+    setPolyFT4(scalepoly);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
+
+    setXYWH(scalepoly, 1, 120-21, 36*2, 42);
+    setUVWH(scalepoly, (SCR_ACTION_HOOKSHOT_X * 4) % 256, SCR_ACTION_HOOKSHOT_Y+23, 35, 41);
+    *(long*)&scalepoly->r0 = 0x00808080;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+6+1);
+    scalepoly->tpage = getTPage(0, 0, 492, 0);
+    setPolyFT4(scalepoly);
+    setSemiTrans(scalepoly, 1);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
+
+    setXYWH(scalepoly, 0, 120-21, 36*2, 42);
+    setUVWH(scalepoly, (SCR_ACTION_HOOKSHOT_X * 4) % 256, SCR_ACTION_HOOKSHOT_Y+23, 35, 41);
+    *(long*)&scalepoly->r0 = 0x00808080;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+6);
+    scalepoly->tpage = getTPage(0, 0, 492, 0);
+    setPolyFT4(scalepoly);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
+
+    setXYWH(scalepoly, 36*2+1, 120-21, 36*2, 42);
+    setUVWH(scalepoly, (SCR_ACTION_HOOKSHOT_X * 4) % 256, SCR_ACTION_HOOKSHOT_Y+23+42, 35, 41);
+    *(long*)&scalepoly->r0 = 0x00808080;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+8+1);
+    scalepoly->tpage = getTPage(0, 0, 492, 0);
+    setPolyFT4(scalepoly);
+    setSemiTrans(scalepoly, 1);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
+
+    setXYWH(scalepoly, 36*2, 120-21, 36*2, 42);
+    setUVWH(scalepoly, (SCR_ACTION_HOOKSHOT_X * 4) % 256, SCR_ACTION_HOOKSHOT_Y+23+42, 35, 41);
+    *(long*)&scalepoly->r0 = 0x00808080;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+8);
+    scalepoly->tpage = getTPage(0, 0, 492, 0);
+    setPolyFT4(scalepoly);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
+
+    setXYWH(scalepoly, 256-36-36, 120-22, 36*2, 23*2);
+    setUVWH(scalepoly, (SCR_ACTION_BOMB_X * 4) % 256, SCR_ACTION_BOMB_Y % 256, 35, 22);
+    *(long*)&scalepoly->r0 = 0x00808080;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2);
+    scalepoly->tpage = getTPage(0, 0, 492, 0);
+    setPolyFT4(scalepoly);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
+
+    temp_counter++;
+
+    u_short temp_counter_sel = (temp_counter<<3) > 4096 ? 4096 : temp_counter<<3;
+
+    if(temp_counter > 550) temp_counter = 0;
+
+    short cos_temp = (icos(temp_counter<<7) * (4096-(temp_counter_sel)))>>12;
+    short cos_half = 4096 + ((4096-(temp_counter_sel))+(cos_temp>>1));
+    short cos_half2 = 4096 + ((4096-(temp_counter_sel))+(cos_temp>>1));
+    short cos_half3 = 4096 + ((4096-(temp_counter_sel))+(cos_temp>>1));
+
+    short cos_half_offsx = (36 * cos_half)>>12;
+    short cos_half_offsy = (23 * cos_half)>>12;
+
+    short cos_half2_offsx = (37 * cos_half2)>>12;
+    short cos_half2_offsy = (24 * cos_half2)>>12;
+
+    short cos_half3_offsx = (35 * cos_half2)>>12;
+    short cos_half3_offsy = (22 * cos_half2)>>12;
+
+    
+    setXYWH(scalepoly, 256-36-(cos_half_offsx>>1), 120+22+23-(cos_half_offsy>>1), cos_half_offsx, cos_half_offsy);
+    setUVWH(scalepoly, (SCR_ACTION_BOMB_X * 4) % 256, SCR_ACTION_BOMB_Y % 256, 35, 22);
+    *(long*)&scalepoly->r0 = 0x00808080;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2);
+    scalepoly->tpage = getTPage(0, 0, 492, 0);
+    setPolyFT4(scalepoly);
+    setSemiTrans(scalepoly,1);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
+
+    
+    // 2x
+    setXYWH(scalepoly, 256+1, 120-22+1, 36*2, 23*2);
+    setUVWH(scalepoly, (SCR_ACTION_BOMB_X * 4) % 256, SCR_ACTION_BOMB_Y % 256, 35, 22);
+    *(long*)&scalepoly->r0 = 0x00808080;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2+1);
+    scalepoly->tpage = getTPage(0, 0, 492, 0);
+    setPolyFT4(scalepoly);
+    setSemiTrans(scalepoly,1);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
+
+    setXYWH(scalepoly, 256, 120-22, 36*2, 23*2);
+    setUVWH(scalepoly, (SCR_ACTION_BOMB_X * 4) % 256, SCR_ACTION_BOMB_Y % 256, 35, 22);
+    *(long*)&scalepoly->r0 = 0x00808080;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2);
+    scalepoly->tpage = getTPage(0, 0, 492, 0);
+    setPolyFT4(scalepoly);
+    setSemiTrans(scalepoly,1);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
+
+    // 2x
+    setXYWH(scalepoly, 256+36-(cos_half3_offsx>>1), 120+22+23-(cos_half3_offsy>>1), cos_half3_offsx, cos_half3_offsy);
+    setUVWH(scalepoly, (SCR_ACTION_BOMB_X * 4) % 256, SCR_ACTION_BOMB_Y % 256, 35, 22);
+    *(long*)&scalepoly->r0 = 0x00808080;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2+1);
+    scalepoly->tpage = getTPage(0, 0, 492, 0);
+    setPolyFT4(scalepoly);
+    setSemiTrans(scalepoly,1);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
+
+
+    setXYWH(scalepoly, 256+36-(cos_half2_offsx>>1), 120+22+23-(cos_half2_offsy>>1), cos_half2_offsx, cos_half2_offsy);
+    setUVWH(scalepoly, (SCR_ACTION_BOMB_X * 4) % 256, SCR_ACTION_BOMB_Y % 256, 35, 22);
+    *(long*)&scalepoly->r0 = 0x00808080;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2+1);
+    scalepoly->tpage = getTPage(0, 0, 492, 0);
+    setPolyFT4(scalepoly);
+    setSemiTrans(scalepoly,1);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
+
+    setXYWH(scalepoly, 256+36-(cos_half_offsx>>1), 120+22+23-(cos_half_offsy>>1), cos_half_offsx, cos_half_offsy);
+    setUVWH(scalepoly, (SCR_ACTION_BOMB_X * 4) % 256, SCR_ACTION_BOMB_Y % 256, 35, 22);
+    *(long*)&scalepoly->r0 = 0x00808080;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2);
+    scalepoly->tpage = getTPage(0, 0, 492, 0);
+    setPolyFT4(scalepoly);
+    setSemiTrans(scalepoly,1);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
+
+    // 4x
+    setXYWH(scalepoly, 256+36+36+1, 120-22+1, 36*4, 23*4);
+    setUVWH(scalepoly, (SCR_ACTION_BOMB_X * 4) % 256, SCR_ACTION_BOMB_Y % 256, 35, 22);
+    *(long*)&scalepoly->r0 = 0x00202020;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2+1);
+    scalepoly->tpage = getTPage(0, 1, 492, 0);
+    setPolyFT4(scalepoly);
+    setSemiTrans(scalepoly,1);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
+
+    setXYWH(scalepoly, 256+36+36+2, 120-22+2, 36*4, 23*4);
+    setUVWH(scalepoly, (SCR_ACTION_BOMB_X * 4) % 256, SCR_ACTION_BOMB_Y % 256, 35, 22);
+    *(long*)&scalepoly->r0 = 0x00202020;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2+1);
+    scalepoly->tpage = getTPage(0, 1, 492, 0);
+    setPolyFT4(scalepoly);
+    setSemiTrans(scalepoly,1);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
+
+    setXYWH(scalepoly, 256+36+36-1, 120-22-1, 36*4, 23*4);
+    setUVWH(scalepoly, (SCR_ACTION_BOMB_X * 4) % 256, SCR_ACTION_BOMB_Y % 256, 35, 22);
+    *(long*)&scalepoly->r0 = 0x00202020;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2+1);
+    scalepoly->tpage = getTPage(0, 1, 492, 0);
+    setPolyFT4(scalepoly);
+    setSemiTrans(scalepoly,1);
+    addPrim(G.pOt, scalepoly);
+    scalepoly++;
+
+    setXYWH(scalepoly, 256+36+36, 120-22, 36*4, 23*4);
+    setUVWH(scalepoly, (SCR_ACTION_BOMB_X * 4) % 256, SCR_ACTION_BOMB_Y % 256, 35, 22);
+    *(long*)&scalepoly->r0 = 0x00202020;
+    scalepoly->clut = getClut(SCR_ACTION_LABELS_CLUT_X, SCR_ACTION_LABELS_CLUT_Y+2);
+    scalepoly->tpage = getTPage(0, 0, 492, 0);
+    setPolyFT4(scalepoly);
+    setSemiTrans(scalepoly,1);
+    addPrim(G.pOt, scalepoly);
+    
+    scalepoly++;
+
+    packet_b_ptr = (u_char *)scalepoly;
+    */
 
     setDrawTPage((DR_TPAGE*)packet_b_ptr, 1, 0, getTPage(0, 0, 492, 0));
     addPrim(G.pOt, packet_b_ptr);
@@ -2015,9 +1958,6 @@ void SceneDraw() {
   if(fade_counter > 0) {
     addPrim(G.pOt, &fade_screen[0]);
     addPrim(G.pOt, &fade_blend[0]);
-
-    //addPrim(G.pOt, &fade_screen[1]);
-    //addPrim(G.pOt, &fade_blend[1]);
   }
 
   //FntPrint("LOGIC TIME=%d\n",prof_update);
@@ -2034,8 +1974,6 @@ void SceneDraw() {
   EndDraw();
 
   
-
-  //FntPrint("STARTING FROM SCRATCH scene.c\n");
   //FntPrint("START= %d END=%d FRAME= %d\n",prof_start_last, prof_end, prof_frametime);
   //FntPrint("PRAYER=X[%d] Y[%d] Z[%d]\n",playerActor->base.pos.vx, playerActor->base.pos.vy, playerActor->base.pos.vz);
 
@@ -2134,30 +2072,10 @@ void Scene_RemoveActorRoom(ActorList * list, u_char room, Scene_Ctx * scene) {
     // iterate
     current = current->next;
   }
-
-  /*current = list->start;
-  int idx = 0;
-  while(current != NULL) {
-    printf("list[%d] actor->prev = 0x%0X actor->next = 0x%0X\n", idx++, current->prev, current->next);
-    current = current->next;
-  }*/
 }
 
 struct ParticleEmitter * Scene_ParticleCreate(struct ParticleEmitter * emitter, Scene_Ctx * scene) {
   struct ParticleEmitter * itr = particle_list;
-  /*u_long idx = 0;
-  while(itr->flags && idx < MAX_PARTICLE_EMITTERS) { // Find first inactive
-    itr++; idx++;
-  }
-  if(idx == MAX_PARTICLE_EMITTERS-1 && itr->flags) {
-    // No free particles, ignore
-
-    return NULL;
-  }
-  *itr = *emitter; // Copy emitter to list
-  itr->flags = 1;
-  Particle3D_Create(itr);
-  return itr;*/
 
   for(int i = 0; i < MAX_PARTICLE_EMITTERS; i++) {
     if(particle_list[i].flags) {

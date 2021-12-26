@@ -44,21 +44,15 @@
   .global obj_grass_cut_tim
   .global obj_grass_cut_full_sgm2
   .global obj_grass_cut_half_sgm2
-  .global test_image_tim
-  .global test_image2_tim
-  .global test_image3_tim
-  .global test_image4_tim
   .global obj_dangeon_door_tim
   .global screen_lifebar_tim
-  .global main_ps_buttons_circle_tim
-  .global main_ps_buttons_cross_tim
-  .global main_ps_buttons_square_tim
-  .global main_ps_buttons_triangle_tim
   .global main_button_bg
   .global main_button_labels
   .global button_action_labels
   .global action_icon_bomb
   .global action_icon_hookshot
+  .global icon_256_a_16_tim
+  .global icon_256_b_16_tim
   .global texture_data_start
   .global texture_data_end
 
@@ -199,22 +193,6 @@ obj_grass_cut_tim:
   .incbin "../AGAME_PCDATA/obj_grass_cut.tim"
   .balign 16
 
-test_image_tim:
-  .incbin "../AGAME_PCDATA/item_icons/dekunuts-alpha-fs8.tim"
-  .balign 16
-
-test_image2_tim:
-  .incbin "../AGAME_PCDATA/item_icons/letter-alpha-fs8.tim"
-  .balign 16
-
-test_image3_tim:
-  .incbin "../AGAME_PCDATA/item_icons/triple_img.tim"
-  .balign 16
-
-test_image4_tim:
-  .incbin "../AGAME_PCDATA/item_icons/bow-multi-pal.tim"
-  .balign 16
-
 obj_dangeon_door_tim:
   .incbin "../AGAME_PCDATA/obj_dangeon_door.tim"
   .balign 16
@@ -223,24 +201,8 @@ screen_lifebar_tim:
   .incbin "../AGAME_PCDATA/screen_lifebar2.tim"
   .balign 16
 
-main_ps_buttons_circle_tim:
-  .incbin "../AGAME_PCDATA/ui/main_ps_buttons_circle-or8.tim"
-  .balign 16
-
-main_ps_buttons_cross_tim:
-  .incbin "../AGAME_PCDATA/ui/main_ps_buttons_cross-or8.tim"
-  .balign 16
-  
-main_ps_buttons_square_tim:
-  .incbin "../AGAME_PCDATA/ui/main_ps_buttons_square-or8.tim"
-  .balign 16
-
-main_ps_buttons_triangle_tim:
-  .incbin "../AGAME_PCDATA/ui/main_ps_buttons_triangle-or8.tim"
-  .balign 16
-
 main_button_bg:
-  .incbin "../AGAME_PCDATA/ui/modern/button_back-or8.tim"
+  .incbin "../AGAME_PCDATA/ui/modern/button_back_new-or8.tim"
   .balign 16
 
 main_button_labels:
@@ -259,5 +221,12 @@ action_icon_hookshot:
   .incbin "../AGAME_PCDATA/ui/modern/action_icon_hookshot-or8.tim"
   .balign 16
 
+icon_256_a_16_tim:
+  .incbin "../AGAME_PCDATA/icon_256_a-16.tim"
+  .balign 16
+
+icon_256_b_16_tim:
+  .incbin "../AGAME_PCDATA/icon_256_b-16.tim"
+  .balign 16
 
 texture_data_end:

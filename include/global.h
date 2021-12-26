@@ -94,8 +94,9 @@ POLY_GT4 *s, u_long *ot, DIVPOLYGON4 *divp);
 #define RAM_SIZE 0x200000
 
 /* screen resolution */
-#define camera_ASPECT 6553
+
 #define SCREEN_W	512
+#define camera_ASPECT (SCREEN_W / 292.3333) * 4096
 //#define camera_ASPECT 4096
 //#define SCREEN_W 320
 #define	SCREEN_H 240

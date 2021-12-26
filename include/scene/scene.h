@@ -66,7 +66,7 @@
 #define SCR_POS_BUTTON_CROSS_Y 46
 
 // Modern Ui Button Back
-#define SCR_BUTTON_BACK_X 483
+#define SCR_BUTTON_BACK_X 480
 #define SCR_BUTTON_BACK_Y 0
 #define SCR_BUTTON_BACK_CLUT_X 512
 #define SCR_BUTTON_BACK_CLUT_Y 251
