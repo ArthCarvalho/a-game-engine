@@ -39,6 +39,34 @@
 #define PLAYER_STATE_ONAIR        0x00000010
 #define PLAYER_CUTSCENE_MODE      0x08000000
 
+typedef enum {
+  ACTION_PUT_AWAY,
+  ACTION_CHECK,
+  ACTION_DECIDE,
+  ACTION_DIVE,
+  ACTION_ENTER,
+  ACTION_GRAB,
+  ACTION_JUMP,
+  ACTION_NEXT,
+  ACTION_OPEN,
+  ACTION_REEL,
+  ACTION_SAVE,
+  ACTION_THROW,
+  ACTION_CANCEL,
+  ACTION_BACK,
+  ACTION_CHECK_REPEAT,
+  ACTION_DOWN,
+  ACTION_DROP,
+  ACTION_FASTER,
+  ACTION_RETURN,
+  ACTION_STOP,
+  ACTION_ATTACK,
+  ACTION_SPEAK,
+  ACTION_MAX
+} MainAction;
+
+#define ACTION_NO_ACTION -1
+
 /*
 typedef struct NewPlayerActor {
   struct Actor actor; // Base class
@@ -139,6 +167,8 @@ void Player_Jump(Actor * player);
 void Player_Falling(Actor * player);
 
 void Player_ForceIdle(Actor * player);
+
+void Player_UpdateActions(Actor * player, void * Scene);
 
 extern u_long demo_counter;
 

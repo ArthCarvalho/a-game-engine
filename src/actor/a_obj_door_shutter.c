@@ -143,7 +143,8 @@ void ObjDoorShutterActorUpdate(struct Actor * a, void * scene) {
 	  tdist.vz = (tdist.vz + mask) ^ mask;
   }
   if(tdist.vx < 400 && tdist.vz < 400) {
-    pl->action = 8;
+    pl->interact = a;
+    //pl->action = ACTION_OPEN;
     if(actor->sub_timer == 0 && (g_pad_press & PAD_CIRCLE) && !(pl->state & PLAYER_CUTSCENE_MODE)) {
       actor->sub_timer = 1;
       scene_ctx->cinema_mode = 1;

@@ -373,7 +373,7 @@ void Scene_SpawnObject();
 
 void Scene_ScrollTexture2x(RECT * src, RECT * dest, u_char offs);
 
-void * Scene_AllocActor(ActorList * list, u_char type, u_long size);
+void * Scene_AllocActor(ActorList * list, u_short type, u_long size);
 
 void * Scene_AddActor(ActorList * list, Actor * actor);
 

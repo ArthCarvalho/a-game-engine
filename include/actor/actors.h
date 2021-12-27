@@ -34,7 +34,7 @@ typedef struct Actor_Descriptor {
   short scale_x, scale_y, scale_z;
   unsigned char room;
   unsigned char pad;
-  unsigned int actor_type;
+  unsigned short actor_type;
   int init_variables[9]; // 36 bytes for initialization
 } Actor_Descriptor;
 
@@ -49,8 +49,8 @@ typedef struct {
 } Actor_CollisionData;
 
 typedef struct Actor {
-  long id; // Actor id
-  u_char type; // Actor type
+  u_short type; // Actor type
+  u_char id; // Actor id
   u_char room; // Room it belongs to, 0xFF = Persistent/No Room
   SVECTOR pos;
   SVECTOR rot;

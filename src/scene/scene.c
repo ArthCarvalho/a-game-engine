@@ -604,11 +604,6 @@ unsigned long * test_pointer;
 
 ActorList Scene_ActorList[ACTOR_GROUP_MAX];
 
-enum Actor_Type {
-  ACTOR_TYPE_SWAP_PLANE,
-  ACTOR_TYPE_LAST_INDEX
-};
-
 // Init Settings, must be 36 bytes
 typedef struct Actor_SwapPlane_Initializer {
   short min_x;
@@ -1237,7 +1232,6 @@ void SceneMain() {
   if(g_pad_press & PAD_SQUARE) bone_select--;
   if(bone_select > 50) bone_select = 50;
   if(bone_select < 0) bone_select = 0;
-  
 
   // Process actor list
   // Exclude player type, process all categories
@@ -1280,31 +1274,31 @@ UVCOORD Screen_GetActionLabel(char action) {
 }
 
 SVECTOR action_label_vtx[] = {
-  -30+5, -7+3, 0, 0,
-  30+5, -7+3, 0, 0,
-  -30+5, 6+3, 0, 0,
-  30+5, 6+3, 0, 0
+  -30+5, 7-3, 0, 0,
+  30+5, 7-3, 0, 0,
+  -30+5, -6-3, 0, 0,
+  30+5, -6-3, 0, 0
 };
 
 SVECTOR action_button_icon_vtx[] = {
-  -21, -11, 0, 0,
-  -9, -11, 0, 0,
-  -21, -2, 0, 0,
-  -9, -2, 0, 0
+  -21, 11, 0, 0,
+  -9, 11, 0, 0,
+  -21, 2, 0, 0,
+  -9, 2, 0, 0
 };
 
 SVECTOR action_button_vtx[] = {
-  -21, -11, 0, 0,
-  21, -11, 0, 0,
-  -21, 12, 0, 0,
-  21, 12, 0, 0
+  -21, 11, 0, 0,
+  21, 11, 0, 0,
+  -21, -12, 0, 0,
+  21, -12, 0, 0
 };
 
 u_char * Screen_DrawActionButton(short x, short y, short scalex0, short scaley0, short scalex1, short scaley1, u_char fade, u_char button, char action, u_char * buffer) {
   MATRIX matrix = {
-    scalex0, 0, 0,
-    0, scaley0, 0,
-    0, 0, 4096,
+    scalex0,        0,    0,
+          0, -scaley0,    0,
+          0,        0, 4096,
     x-(SCREEN_W/2), y-(SCREEN_H/2), 256
   };
 
@@ -1343,7 +1337,7 @@ u_char * Screen_DrawActionButton(short x, short y, short scalex0, short scaley0,
   }
 
   matrix.m[0][0] = scalex1;
-  matrix.m[1][1] = scaley1;
+  matrix.m[1][1] = -scaley1;
 
   gte_SetRotMatrix(&matrix);
   gte_SetTransMatrix(&matrix);
@@ -2010,7 +2004,7 @@ void Scene_ScrollTexture2x(RECT * src, RECT * dest, u_char offs) {
   }
 }
 
-void * Scene_AllocActor(ActorList * list, u_char type, u_long size) {
+void * Scene_AllocActor(ActorList * list, u_short type, u_long size) {
   Actor * actor = Arena_Malloc(size);
   actor->type = type;
   actor->size = size;
@@ -2132,6 +2126,7 @@ void Scene_LoadRoom(Room_Data * room, Scene_Ctx * scene) {
 
 void Scene_CreateActor(Actor_Descriptor * actdesc, u_short group, Scene_Ctx * scene) {
   Actor * actor =  Scene_AllocActor(&Scene_ActorList[group], group, ActorDataSizes[actdesc->actor_type]);
+  actor->type = actdesc->actor_type;
   actor->Initialize = ActorInitFuncs[actdesc->actor_type];
   actor->Initialize(actor, actdesc, scene);
 }

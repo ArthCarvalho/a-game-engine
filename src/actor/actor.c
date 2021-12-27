@@ -30,7 +30,6 @@ void Actor_PopulateBase(Actor * actor, Actor_Descriptor * desc) {
   actor->scale.vy = desc->scale_y;
   actor->scale.vz = desc->scale_z;
   actor->room = desc->room;
-  actor->type = desc->actor_type;
 }
   
 // Checks between two cylinders if they intersect,

@@ -171,8 +171,8 @@ void PlayerCreateInstance(Actor * a, void * col_ctx) {
   actor->base.child = NULL;
   actor->base.parent = NULL;
 
-  actor->action = -1;
-  actor->sub_action = -1;
+  actor->action = ACTION_NO_ACTION;
+  actor->sub_action = ACTION_NO_ACTION;
 
   // Place player on ground
   {
@@ -305,7 +305,7 @@ void PlayerUpdate(Actor * a, void * scene) {
     model_head_arch += asm_fpmul64((model_head_arch_s - model_head_arch),FIXED(0.16));
 
     //FntPrint("HEAD ARCH %d\n", model_head_arch);
-
+    Player_UpdateActions(a, scene);
 
     // Execute player state action
     actor->process(a);
@@ -488,6 +488,9 @@ void PlayerUpdate(Actor * a, void * scene) {
     actor->base.child->rot.vy = actor->base.rot.vy;
     actor->base.child->room = 0xFF;
   }
+
+  // Reset Interact Actor
+  actor->interact = NULL;
 }
 
 
@@ -625,7 +628,7 @@ void Player_Normal(Actor * a) {
   switch(actor->state & 0x0000000F){
       default:
       case PLAYER_STATE_WAIT:
-      actor->action = -1;
+      //actor->action = ACTION_NO_ACTION;
       case PLAYER_STATE_MOVE:
       {
         long spdconst;
@@ -692,7 +695,7 @@ void Player_Normal(Actor * a) {
           anim_spd = fix12_mul(actor->xzspeed,128);
         }
         //FntPrint("PLAYER SPD: %d\n", actor->xzspeed);
-         if(actor->state & PLAYER_STATE_MOVE && actor->xzspeed > 100000) actor->action = 20;
+        //if(actor->state & PLAYER_STATE_MOVE && actor->xzspeed > 100000) actor->action = ACTION_ATTACK;
         if(g_pad_press & PAD_CIRCLE && (actor->xzspeed > 100000) && (actor->state & ~PLAYER_STATE_MASK) == PLAYER_STATE_MOVE){
           actor->state = (actor->state & PLAYER_STATE_MASK) | PLAYER_STATE_ROLL;
           actor->state_sub = 0;
@@ -806,4 +809,21 @@ void Player_ForceIdle(Actor * player) {
   p->xzspeed = 0;
   p->state = (p->state & PLAYER_STATE_MASK) | PLAYER_STATE_WAIT;
   p->current_anim = ANM_IdleFree;
+}
+
+void Player_UpdateActions(Actor * p, void * Scene) {
+  PlayerActor * player = (PlayerActor *)p;
+  Actor * interact = player->interact;
+  char action = ACTION_NO_ACTION;
+
+  if(player->holding == NULL) {
+    if(interact != NULL) {
+      if(interact->type == OBJ_DOOR_SHUTTER) {
+        action = ACTION_OPEN;
+      }
+    } else if (player->state & PLAYER_STATE_MOVE) {
+      action = ACTION_ATTACK;
+    }
+  }
+  player->action = action;
 }
