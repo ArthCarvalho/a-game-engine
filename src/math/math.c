@@ -852,3 +852,10 @@ long get_distanceXYZ(SVECTOR * dist) {
 	gte_stlvnl(&sqout);
   return SquareRoot0(sqout.vx + sqout.vy + sqout.vz);
 };
+
+short get_angleFromVectorXZ(SVECTOR * vec) {
+  long len = SquareRoot0(vec->vx * vec->vx + vec->vz * vec->vz);
+  short angv_x = (vec->vx<<12) / len;
+  short angv_z = (vec->vz<<12) / len;
+  return fix12_atan2s(angv_x, angv_z);
+}

@@ -53,6 +53,10 @@
   .global action_icon_hookshot
   .global icon_256_a_16_tim
   .global icon_256_b_16_tim
+  .global obj_dekunuts_plant_tim
+  .global obj_dekunuts_body_tim
+  .global obj_dekunuts_plant_sgm2
+  .global dekunuts_body_static_sgm2
   .global texture_data_start
   .global texture_data_end
 
@@ -227,6 +231,21 @@ icon_256_a_16_tim:
 
 icon_256_b_16_tim:
   .incbin "../AGAME_PCDATA/icon_256_b-16.tim"
+  .balign 16
+/*
+ * Objects - Enemies
+ */
+obj_dekunuts_plant_tim:
+  .incbin "../AGAME_PCDATA/objects/enemy/dekunuts/obj_dekunuts_plant.tim"
+  .balign 16
+obj_dekunuts_body_tim:
+  .incbin "../AGAME_PCDATA/objects/enemy/dekunuts/obj_dekunuts_body.tim"
+  .balign 16
+obj_dekunuts_plant_sgm2:
+  .incbin "../AGAME_PCDATA/objects/enemy/dekunuts/dekunuts_plant.sgm2"
+  .balign 16
+dekunuts_body_static_sgm2:
+  .incbin "../AGAME_PCDATA/objects/enemy/dekunuts/dekunuts_body_static.sgm2"
   .balign 16
 
 texture_data_end:

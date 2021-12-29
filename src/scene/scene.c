@@ -66,7 +66,8 @@ void * ActorInitFuncs[] = {
   ObjGrassActorInitialize,
   ObjGrassCutActorInitialize,
   ObjDoorShutterActorInitialize,
-  ObjSwapPlaneActorInitialize
+  ObjSwapPlaneActorInitialize,
+  ObjDekunutsActorInitialize
 };
 
 u_long ActorDataSizes[] = {
@@ -76,7 +77,8 @@ u_long ActorDataSizes[] = {
   sizeof(ObjGrassActor),
   sizeof(ObjGrassCutActor),
   sizeof(ObjDoorShutterActor),
-  sizeof(ObjSwapPlaneActor)
+  sizeof(ObjSwapPlaneActor),
+  sizeof(ObjSyokudaiActor)//sizeof(ObjDekunutsActor) // TODO -- FIND OUT ALLOCATION BUG
 };
 
 /*
@@ -142,10 +144,12 @@ u_long ActorDataSizes[] = {
     Actor_SwapPlane_Init(scene->transition_actors[3], &newactor, scene);
   }*/
 
+#define NUM_TRANSITION_ACTORS 5
+
 Actor_Descriptor transition_actors[] = {
   { // Door Rooms 0 - 1
     7833, -4096, 0,          // short x, y, z;
-    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
     4096, 4096, 4096, // short scale_x, scale_y, scale_z;
     0,                // unsigned char room;
     NULL,             // unsigned char pad;
@@ -156,7 +160,7 @@ Actor_Descriptor transition_actors[] = {
   },
   { // Swap Plane Rooms 1 - 2
     2374, -4330, 0,          // short x, y, z;
-    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
     4096, 4096, 4096, // short scale_x, scale_y, scale_z;
     0,                // unsigned char room;
     NULL,             // unsigned char pad;
@@ -167,7 +171,7 @@ Actor_Descriptor transition_actors[] = {
   },
   { // Swap Plane Rooms 2 - 3
     -2383, -4330, 0,          // short x, y, z;
-    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
     4096, 4096, 4096, // short scale_x, scale_y, scale_z;
     0,                // unsigned char room;
     NULL,             // unsigned char pad;
@@ -183,6 +187,17 @@ Actor_Descriptor transition_actors[] = {
     0,                // unsigned char room;
     NULL,             // unsigned char pad;
     OBJ_SWAP_PLANE,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      1, 4, 5844, (1392)-4096, -2658, 4820, (-255)-4096, -3682, 0 // [0]Front, [1]Back Rooms
+    }
+  },
+  { // Swap Plane Rooms 1 - 5
+    4608, (-256)-4096, 2664,          // short x, y, z;
+    0, 4096, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DOOR_SHUTTER,        // unsigned int actor_type; Actor ID
     {                 // unsigned int init_variables[9];
       1, 4, 5844, (1392)-4096, -2658, 4820, (-255)-4096, -3682, 0 // [0]Front, [1]Back Rooms
     }
@@ -230,6 +245,72 @@ Actor_Descriptor room0_actors[] = {
     0,                // unsigned char room;
     NULL,             // unsigned char pad;
     OBJ_GRASS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    8832+512, -4096, 300,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    8832+512, -4096, -300,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    8832+512+600, -4096, 300,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    8832+512+600, -4096, -300,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    8832+512+600+600, -4096, 300,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    8832+512+600+600, -4096, -300,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
     {                 // unsigned int init_variables[9];
       0, 0, 0, 0, 0, 0, 0, 0, 0
     }
@@ -292,6 +373,94 @@ Actor_Descriptor room1_actors[] = {
     {                 // unsigned int init_variables[9];
       0, 0, 0, 0, 0, 0, 0, 0, 0
     }
+  },
+  {
+    3328, -4096-256, 650,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    3328, -4096-256, -650,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    3328+950, -4096-256, 650,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    3328+950, -4096-256, -650,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    3328+950+950, -4096-256, 650,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    3328+950+950, -4096-256, -650,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    3328+950+950+950, -4096-256, 650,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    3328+950+950+950, -4096-256, -650,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
   }
   /*{
     7833, -4096, 0,          // short x, y, z;
@@ -323,7 +492,7 @@ Room_Data room_data[] = {
       0                     // Skybox Type
     },
     room0_actors,           // List of actor initialization parameters
-    4,                      // Number of actors in initialization list
+    5,                      // Number of actors in initialization list
     NULL,                   // Pointer to list of models in this room's background
     0,                      // Number of background models
   },
@@ -342,7 +511,7 @@ Room_Data room_data[] = {
       0                     // Skybox Type
     },
     room1_actors,           // List of actor initialization parameters
-    4,                      // Number of actors in initialization list
+    12,                      // Number of actors in initialization list
     NULL,                   // Pointer to list of models in this room's background
     0,                      // Number of background models
   },
@@ -360,7 +529,7 @@ Room_Data room_data[] = {
       0, 0,                 // Fog Start, End
       0                     // Skybox Type
     },
-    room0_actors,           // List of actor initialization parameters
+    room1_actors,           // List of actor initialization parameters
     0,                      // Number of actors in initialization list
     NULL,                   // Pointer to list of models in this room's background
     0,                      // Number of background models
@@ -420,7 +589,7 @@ Scene_Data scene_data[] = {
       0                       // Skybox Type
     },
     transition_actors,        // Transition Actor Initialization List
-    4,                        // Number of transition actors
+    NUM_TRANSITION_ACTORS,                        // Number of transition actors
     room_data,                // List of rooms
     5,                        // Number of rooms
     scene_col                 // Map Collision Mesh
@@ -975,12 +1144,15 @@ void SceneLoad(Scene_Data * scene_data) {
   obj_grass_cut_half_model->material[0].tpage = getTPage(0, 0, 36, 384);
   SGM2_OffsetTexCoords(obj_grass_cut_half_model, (36*4) & 0xFF, (416) & 0xFF);
 
+  // Load Enemies
+  ObjSyokudaiActorSetup();
+  ObjDekunutsActorSetup(NULL, scene);
 
   Scene_ActorList[ACTOR_GROUP_PLAYER].length = 1;
   Scene_ActorList[ACTOR_GROUP_PLAYER].start = (Actor*)playerActor;
   Scene_ActorList[ACTOR_GROUP_PLAYER].end = (Actor*)playerActor;
 
-  ObjSyokudaiActorSetup();
+  
   // Init Actors
   /*for(int i = 0; i < NUM_TEST_OBJ_SYOKUDAI; i++) {
     // Move this to ObjSyokudaiActorInitialize
@@ -1136,7 +1308,7 @@ void SceneMain() {
       default:
         break;
       case 2:
-        for(int i = 0; i < 64; i++) {
+        for(int i = 0; i < 50; i++) {
           ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjGrassCutActor));
           actor->base.room = scene->current_room_id;
           actor->base.pos.vx = (3514/2)-(rand() * 3514 / RAND_MAX);
@@ -1163,14 +1335,15 @@ void SceneMain() {
         break;
     }
   }
+
   if(scene->actor_cleanup) {
     Scene_RemoveOldActors(ACTOR_GROUP_BG, scene);
     scene->actor_cleanup = 0;
   }
-
   PlayerUpdate(scene->player, scene);
 
   Camera_Update(camera, scene);
+
 
   if(playerActor->base.pos.vy < void_out && fade_counter == 0 && !void_out_active) {
     fade_timer = 20;
@@ -1228,10 +1401,10 @@ void SceneMain() {
 
   ApplyMatrixLV(playerActor->L_Hand_matrix, &test_flame_offset, &test_flame_wp);
   
-  if(g_pad_press & PAD_TRIANGLE) bone_select++;
-  if(g_pad_press & PAD_SQUARE) bone_select--;
-  if(bone_select > 50) bone_select = 50;
-  if(bone_select < 0) bone_select = 0;
+  //if(g_pad_press & PAD_TRIANGLE) bone_select++;
+  //if(g_pad_press & PAD_SQUARE) bone_select--;
+  //if(bone_select > 50) bone_select = 50;
+  //if(bone_select < 0) bone_select = 0;
 
   // Process actor list
   // Exclude player type, process all categories
@@ -1530,9 +1703,9 @@ void SceneDraw() {
 
   SetSpadStack(SPAD_STACK_ADDR);
   if(!__DEBUG_TOGGLE){  // SGM2_RENDER_SUBDIV | 
-    packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 20, SGM2_RENDER_SUBDIV | SGM2_RENDER_AMBIENT, scene);
+    packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 40, SGM2_RENDER_SUBDIV | SGM2_RENDER_AMBIENT, scene);
   } else {
-    packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 20, SGM2_RENDER_SUBDIV, scene);
+    packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 40, SGM2_RENDER_SUBDIV, scene);
   }
   
   packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_AMBIENT, scene); // SGM2_RENDER_SUBDIV_HIGH
@@ -2120,6 +2293,7 @@ void Scene_LoadRoom(Room_Data * room, Scene_Ctx * scene) {
   // Initialize Actors
   for(long i = 0; i < room->actor_count; i++) {
     Actor_Descriptor * actdesc = &room->actor_init[i];
+    if(actdesc->room != -1) actdesc->room = room->id;
     Scene_CreateActor(actdesc, ACTOR_GROUP_BG, scene);
   }
 }

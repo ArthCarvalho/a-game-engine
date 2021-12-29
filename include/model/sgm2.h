@@ -120,4 +120,6 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
 
 void SGM2_OffsetTexCoords(SGM2_File * model, short x, short y);
 
+void SGM2_OffsetMatTexCoords(SGM2_File * model, u_short mat, short x, short y);
+
 #endif

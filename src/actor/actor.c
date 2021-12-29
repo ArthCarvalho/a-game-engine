@@ -31,6 +31,10 @@ void Actor_PopulateBase(Actor * actor, Actor_Descriptor * desc) {
   actor->scale.vz = desc->scale_z;
   actor->room = desc->room;
 }
+
+void Actor_CompileMatrix(Actor * actor, MATRIX * dest) {
+
+}
   
 // Checks between two cylinders if they intersect,
 // returns true if they do, false if they do not,

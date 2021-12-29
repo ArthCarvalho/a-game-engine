@@ -23,10 +23,10 @@ SGM2_File * SGM2_LoadFile(u_long * addr) {
   // Parse the offsets inside the file and change them to memory addresses instead of offsets.
   SGM2_File * dest = (SGM2_File *)addr;
 
-  printf("Loading SGM2\n");
+  //printf("Loading SGM2\n");
   //printf("vtx num: %d normal num: %d color num: %d mat num: %d\n",dest->vertex_count, dest->normal_count, dest->color_count, dest->mat_count);
-  printf("g4 %d g3 %d gt4 %d gt3 %d\n",dest->poly_g4_count, dest->poly_g3_count, dest->poly_gt4_count, dest->poly_gt3_count);
-  printf("g4 %x g3 %x gt4 %x gt3 %x\n",dest->poly_g4, dest->poly_g3, dest->poly_gt4, dest->poly_gt3);
+  //printf("g4 %d g3 %d gt4 %d gt3 %d\n",dest->poly_g4_count, dest->poly_g3_count, dest->poly_gt4_count, dest->poly_gt3_count);
+  //printf("g4 %x g3 %x gt4 %x gt3 %x\n",dest->poly_g4, dest->poly_g3, dest->poly_gt4, dest->poly_gt3);
 
   dest->vertex_data = (SVECTOR*)((char*)addr + ((long)dest->vertex_data));
   dest->normal_data = (SVECTOR*)((char*)addr + ((long)dest->normal_data));
@@ -53,7 +53,7 @@ SGM2_File * SGM2_LoadFile(u_long * addr) {
     gt3itr++;
   }
 
-  printf("g4 %x g3 %x gt4 %x gt3 %x\n",dest->poly_g4, dest->poly_g3, dest->poly_gt4, dest->poly_gt3);
+  //printf("g4 %x g3 %x gt4 %x gt3 %x\n",dest->poly_g4, dest->poly_g3, dest->poly_gt4, dest->poly_gt3);
   return dest;
 }
 
@@ -486,6 +486,39 @@ void SGM2_OffsetTexCoords(SGM2_File * model, short x, short y) {
   }
   pg_count = model->poly_gt3_count;
   for(i = 0; i < pg_count; i++, pgt3_ptr++) {
+    pgt3_ptr->u0 += x;
+    pgt3_ptr->v0 += y;
+    pgt3_ptr->u1 += x;
+    pgt3_ptr->v1 += y;
+    pgt3_ptr->u2 += x;
+    pgt3_ptr->v2 += y;
+  }
+}
+
+void SGM2_OffsetMatTexCoords(SGM2_File * model, u_short mat, short x, short y) {
+  u_int i;
+  SGM2_POLYGT4 * pgt4_ptr;
+  SGM2_POLYGT3 * pgt3_ptr;
+  u_int pg_count;
+
+  pgt4_ptr = model->poly_gt4;
+  pgt3_ptr = model->poly_gt3;
+  pg_count = model->poly_gt4_count;
+
+  for(i = 0; i < pg_count; i++, pgt4_ptr++) {
+    if(pgt4_ptr->material != mat) continue;
+    pgt4_ptr->u0 += x;
+    pgt4_ptr->v0 += y;
+    pgt4_ptr->u1 += x;
+    pgt4_ptr->v1 += y;
+    pgt4_ptr->u2 += x;
+    pgt4_ptr->v2 += y;
+    pgt4_ptr->u3 += x;
+    pgt4_ptr->v3 += y;
+  }
+  pg_count = model->poly_gt3_count;
+  for(i = 0; i < pg_count; i++, pgt3_ptr++) {
+    if(pgt3_ptr->material != mat) continue;
     pgt3_ptr->u0 += x;
     pgt3_ptr->v0 += y;
     pgt3_ptr->u1 += x;

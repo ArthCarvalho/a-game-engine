@@ -25,6 +25,9 @@ void ActorCreate(struct Actor * actor);
 // Populate basic actor data (Position, Rotation, Scale)
 void Actor_PopulateBase(Actor * actor, Actor_Descriptor * desc);
 
+// Compile local matrix
+void Actor_CompileMatrix(Actor * actor, MATRIX * dest);
+
 // Actor vs Actor Collision Functions
 
 // Cylinder vs Cylinder check

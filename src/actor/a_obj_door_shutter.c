@@ -99,8 +99,6 @@ void ObjDoorShutterActorInitialize(struct Actor * a, void * descriptor, void * s
   actor->matrix.t[1] = actor->base.pos.vy;
   actor->matrix.t[2] = actor->base.pos.vz;
 
-  actor->base.rot.vy = 1024;
-
   actor->front_room = desc->init_variables[0];
   actor->back_room = desc->init_variables[1];
 
@@ -123,7 +121,7 @@ void ObjDoorShutterActorUpdate(struct Actor * a, void * scene) {
   short plen = SquareRoot0(ppos.vx * ppos.vx + ppos.vz * ppos.vz);
   ppos.vx = (ppos.vx<<12)/plen;
   ppos.vz = (ppos.vz<<12)/plen;
-  SVECTOR z_dir = {actor->matrix.m[2][0], 0, actor->matrix.m[2][2], 0};
+  SVECTOR z_dir = {actor->matrix.m[2][0], 0, -actor->matrix.m[2][2], 0};
   long dot = dotProductXZ(&ppos, &z_dir);
   
   if(dot >= 0) {

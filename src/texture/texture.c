@@ -153,6 +153,15 @@ void load_tex_noclut_pos(u_long addr, u_long x, u_long y, u_long c_x, u_long c_y
   LoadImage(&rect,tim.pixel);
 }
 
+void load_clut_pos(u_long addr, u_long c_x, u_long c_y, u_char c_w, u_char c_h) {
+  RECT rect;
+  rect.x = c_x;
+  rect.y = c_y;
+  rect.w = c_w;
+  rect.h = c_h;
+  LoadImage(&rect,addr);
+}
+
 void GetTimInfo(unsigned long *im, TIMIMAGE * tim) {
   u_long * imptr;
   u_short * pptr;

@@ -127,4 +127,7 @@ long get_distanceXZsq(SVECTOR * dist);
 
 long get_distanceXYZ(SVECTOR * dist);
 
+// Vector to Angle
+short get_angleFromVectorXZ(SVECTOR * pos);
+
 #endif

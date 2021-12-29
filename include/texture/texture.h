@@ -29,5 +29,6 @@ void load_texture(u_long addr);
 void load_texture_pos(u_long addr, u_long x, u_long y, u_long c_x, u_long c_y);
 void load_texture_pos_fog(u_long addr, u_long x, u_long y, u_long c_x, u_long c_y, u_short fog);
 void load_tex_noclut_pos(u_long addr, u_long x, u_long y, u_long c_x, u_long c_y);
+void load_clut_pos(u_long addr, u_long c_x, u_long c_y, u_char c_w, u_char c_h);
 
 #endif
