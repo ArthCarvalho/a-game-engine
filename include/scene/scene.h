@@ -17,6 +17,7 @@
 #include "particles/particles.h"
 
 // Scene objects
+#include "actor/flame_common.h"
 #include "actor/a_obj_syokudai.h"
 #include "actor/a_obj_tsubo.h"
 #include "actor/a_obj_grass.h"
@@ -24,6 +25,7 @@
 #include "actor/a_obj_door_shutter.h"
 #include "actor/a_obj_swap_plane.h"
 #include "actor/a_obj_dekunuts.h"
+#include "actor/a_obj_flame.h"
 
 // Animated Flame Texture Source Location
 #define FLAME_TEX_X_SRC 496
@@ -286,6 +288,7 @@ enum {
     OBJ_DOOR_SHUTTER,
     OBJ_SWAP_PLANE,
     OBJ_DEKUNUTS,
+    OBJ_FLAME,
     OBJ_MAX
 };
 

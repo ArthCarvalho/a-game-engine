@@ -50,4 +50,15 @@ typedef struct {
   short vy;
 } ShortVector2D;
 
+typedef struct FlameEffObj {
+  SVECTOR pos;
+  SVECTOR scale;
+  u_char flame_color; // select flame color
+  u_char flame_rand; // Randomize flame animation per object
+  u_char flicker_frame;
+  u_char draw_flare;
+  u_short flare_scale;
+  short flare_dist; // Distance to display flare effect
+} FlameEffObj;
+
 #endif

@@ -16,6 +16,9 @@
 
 #include "texture/texture.h"
 
+#define FOG_LEVELS 8
+#define FOG_SHIFT 6
+
 //#include "particles/particles.h"
 
 /* Temporary Static Data Files */
@@ -27,6 +30,7 @@ extern unsigned long scene_tim[];
 extern unsigned long iwakabe_tim[];
 extern unsigned long iwakabe_far_tim[];
 extern unsigned long iwayuka_tim[];
+extern unsigned long deku_shrine_block000a[];
 extern unsigned long scene_col[];
 extern unsigned long scene_room00_sg2[];
 extern unsigned long scene_room01_sg2[];
@@ -57,6 +61,8 @@ extern unsigned long texture_data_end[];
     OBJ_GRASS,
     OBJ_GRASS_CUT,
     OBJ_DOOR_SHUTTER,
+    OBJ_DEKUNUTS,
+    OBJ_FLAME,
     OBJ_MAX
 */
 void * ActorInitFuncs[] = {
@@ -67,7 +73,8 @@ void * ActorInitFuncs[] = {
   ObjGrassCutActorInitialize,
   ObjDoorShutterActorInitialize,
   ObjSwapPlaneActorInitialize,
-  ObjDekunutsActorInitialize
+  ObjDekunutsActorInitialize,
+  ObjFlameActorInitialize
 };
 
 u_long ActorDataSizes[] = {
@@ -78,7 +85,8 @@ u_long ActorDataSizes[] = {
   sizeof(ObjGrassCutActor),
   sizeof(ObjDoorShutterActor),
   sizeof(ObjSwapPlaneActor),
-  sizeof(ObjSyokudaiActor)//sizeof(ObjDekunutsActor) // TODO -- FIND OUT ALLOCATION BUG
+  sizeof(ObjDekunutsActor)+64, // TODO -- FIND OUT ALLOCATION BUG
+  sizeof(ObjFlameActor)
 };
 
 /*
@@ -199,7 +207,7 @@ Actor_Descriptor transition_actors[] = {
     NULL,             // unsigned char pad;
     OBJ_DOOR_SHUTTER,        // unsigned int actor_type; Actor ID
     {                 // unsigned int init_variables[9];
-      1, 4, 5844, (1392)-4096, -2658, 4820, (-255)-4096, -3682, 0 // [0]Front, [1]Back Rooms
+      1, 1, 5844, (1392)-4096, -2658, 4820, (-255)-4096, -3682, 0 // [0]Front, [1]Back Rooms
     }
   }
 };
@@ -245,6 +253,73 @@ Actor_Descriptor room0_actors[] = {
     0,                // unsigned char room;
     NULL,             // unsigned char pad;
     OBJ_GRASS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    4913, (-256)-4096, 7128,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096*3, 4096*3, 4096*3, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_SYOKUDAI,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      1, 1, 4096*0.6, 0, 0, 0, 0, 0, 0 // Color, Show Flare, Flare Scale
+    }
+  },
+  {
+    1182, (-63)-4096, 10821,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096*3, 4096*3, 4096*3, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_FLAME,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      3, 1, 4096*0.6, 256*20, 0, 0, 0, 0, 0 // Color, Show Flare, Flare Scale, Flare Draw Distance
+    }
+  },
+  {
+    1182, (-63)-4096, 10153,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096*3, 4096*3, 4096*3, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_FLAME,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      3, 1, 4096*0.6, 256*20, 0, 0, 0, 0, 0 // Color, Show Flare, Flare Scale, Flare Draw Distance
+    }
+  },
+  {
+    -3211, (-63)-4096, 15881,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096*3, 4096*3, 4096*3, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_FLAME,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      5, 1, 4096*0.6, 256*20, 0, 0, 0, 0, 0 // Color, Show Flare, Flare Scale, Flare Draw Distance
+    }
+  },
+  {
+    -3962, (-63)-4096, 15881,          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096*3, 4096*3, 4096*3, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_FLAME,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      5, 1, 4096*0.6, 256*20, 0, 0, 0, 0, 0 // Color, Show Flare, Flare Scale, Flare Draw Distance
+    }
+  },
+  
+  {
+    4855, -4096-256, 10726,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
     {                 // unsigned int init_variables[9];
       0, 0, 0, 0, 0, 0, 0, 0, 0
     }
@@ -492,7 +567,7 @@ Room_Data room_data[] = {
       0                     // Skybox Type
     },
     room0_actors,           // List of actor initialization parameters
-    5,                      // Number of actors in initialization list
+    10,                      // Number of actors in initialization list
     NULL,                   // Pointer to list of models in this room's background
     0,                      // Number of background models
   },
@@ -964,6 +1039,11 @@ void SceneLoad(Scene_Data * scene_data) {
   map_model[6]->material[2].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y+13);
   map_model[6]->material[2].tpage = getTPage(0, 0, 128, 0);
 
+  map_model[5]->material[0].clut = GetClut(128, 496);
+  map_model[5]->material[0].tpage = getTPage(1, 0, 256, 0);
+  //map_model[5]->material[1].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y);
+  //map_model[5]->material[1].tpage = getTPage(1, 0, 256, 0);
+
   
 
   //map_model[6]->material[1].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y+10);
@@ -990,9 +1070,13 @@ void SceneLoad(Scene_Data * scene_data) {
   Camera_Update(camera, scene);
   scene->camera = camera;
 
-  G.clear.r = 98;
-  G.clear.g = 66;
+  //G.clear.r = 98;
+  //G.clear.g = 66;
   G.clear.b = 30;
+
+  G.clear.r = 0;
+  G.clear.g = 0;
+  G.clear.b = 0;
 
   //G.clear.r = 50;
   //G.clear.g = 115;
@@ -1036,12 +1120,13 @@ void SceneLoad(Scene_Data * scene_data) {
   //SetFarColor(128,128,128);
   //SetFarColor(98,66,30);
   // Daybreak
-  G.clear.r = 237;
-  G.clear.g = 192;
-  G.clear.b = 255;
+  //G.clear.r = 237;
+  //G.clear.g = 192;
+  //G.clear.b = 255;
   SetFarColor(134,134,215);
   SetBackColor(227,217,255);
   SetFarColor(164/2, 205/2, 230/2);
+  SetFarColor(73, 24, 98);
   // Sky blue
   //G.clear.r = 164;
   //G.clear.g = 209;
@@ -1060,10 +1145,11 @@ void SceneLoad(Scene_Data * scene_data) {
   //G.clear.b = 98;
   //SetFarColor(0,3,30);
   //SetBackColor(89,140,255);
-  //load_texture_pos_fog((unsigned long)dataptr, 0, 0, 512, 496,16);
-  load_texture_pos_fog((unsigned long)scene_tim, 0, 0, MAP_TEXTURE_CLUT_X, MAP_TEXTURE_CLUT_Y,16);
-  load_texture_pos_fog((unsigned long)iwakabe_tim, 128, 0, MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y,16);
-  //load_texture_pos_fog((unsigned long)iwayuka_tim, 128+32, 0, MAP_TEXTURE_CLUT_X+256+32+16, MAP_TEXTURE_CLUT_Y,16);
+  //load_texture_pos_fog((unsigned long)dataptr, 0, 0, 512, 496, FOG_LEVELS);
+  load_texture_pos_fog((unsigned long)scene_tim, 0, 0, MAP_TEXTURE_CLUT_X, MAP_TEXTURE_CLUT_Y, FOG_LEVELS);
+  load_texture_pos_fog((unsigned long)iwakabe_tim, 128, 0, MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y, FOG_LEVELS);
+  load_texture_pos_fog((unsigned long)deku_shrine_block000a, 256, 0, 128, 496,  FOG_LEVELS);
+  //load_texture_pos_fog((unsigned long)iwayuka_tim, 128+32, 0, MAP_TEXTURE_CLUT_X+256+32+16, MAP_TEXTURE_CLUT_Y, FOG_LEVELS);
   //load_tex_noclut_pos((unsigned long)iwakabe_far_tim, 128+32+16, 0, 0, 0);
   // Load animated fire textures
   // Syokudai
@@ -1144,8 +1230,9 @@ void SceneLoad(Scene_Data * scene_data) {
   obj_grass_cut_half_model->material[0].tpage = getTPage(0, 0, 36, 384);
   SGM2_OffsetTexCoords(obj_grass_cut_half_model, (36*4) & 0xFF, (416) & 0xFF);
 
+  Draw_SetupFlame();
   // Load Enemies
-  ObjSyokudaiActorSetup();
+  //ObjSyokudaiActorSetup();
   ObjDekunutsActorSetup(NULL, scene);
 
   Scene_ActorList[ACTOR_GROUP_PLAYER].length = 1;
@@ -1664,11 +1751,12 @@ void SceneDraw() {
       break;
   }
 
-  G.clear.r = daytime_sky.r;
-  G.clear.g = daytime_sky.g;
-  G.clear.b = daytime_sky.b;
-  SetFarColor(daytime_fog.r, daytime_fog.g, daytime_fog.b);
-  SetBackColor(daytime_sun.r, daytime_sun.g, daytime_sun.b);
+  //G.clear.r = daytime_sky.r;
+  //G.clear.g = daytime_sky.g;
+  //G.clear.b = daytime_sky.b;
+  //SetFarColor(daytime_fog.r, daytime_fog.g, daytime_fog.b);
+  //SetBackColor(daytime_sun.r, daytime_sun.g, daytime_sun.b);
+  SetBackColor(122, 113, 164);
 
   BeginDraw();
 
@@ -1684,9 +1772,9 @@ void SceneDraw() {
   gte_SetRotMatrix(&local_identity_far);
   gte_SetTransMatrix(&local_identity_far);
 
-  SetSpadStack(SPAD_STACK_ADDR);
-  packet_b_ptr = SGM2_UpdateModel(map_model[6], packet_b_ptr, (u_long*)G.pOt, 2048, SGM2_RENDER_AMBIENT, scene);
-  ResetSpadStack();
+  //SetSpadStack(SPAD_STACK_ADDR);
+  //packet_b_ptr = SGM2_UpdateModel(map_model[6], packet_b_ptr, (u_long*)G.pOt, 2048, SGM2_RENDER_AMBIENT, scene);
+  //ResetSpadStack();
 
   gte_SetRotMatrix(&local_identity);
   gte_SetTransMatrix(&local_identity);
@@ -1708,7 +1796,8 @@ void SceneDraw() {
     packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 40, SGM2_RENDER_SUBDIV, scene);
   }
   
-  packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_AMBIENT, scene); // SGM2_RENDER_SUBDIV_HIGH
+  //packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_AMBIENT | SGM2_RENDER_CLUTFOG, scene); // SGM2_RENDER_SUBDIV_HIGH
+  packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_CLUTFOG, scene);
   ResetSpadStack();
   if(scene->previous_room_m){
     SetSpadStack(SPAD_STACK_ADDR);

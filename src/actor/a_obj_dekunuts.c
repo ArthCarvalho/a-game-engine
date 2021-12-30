@@ -13,6 +13,14 @@
 
 #include "spadstk.h"
 
+// Animation Data
+#include "../../AGAME_PCDATA/objects/enemy/dekunuts/dekunuts.agm.anm.h"
+
+struct AGM_Model obj_dekunuts_model;
+struct ANM_Animation * obj_dekunuts_anim;
+u_short obj_dekunuts_tpage;
+u_short obj_dekunuts_clut[3];
+
 struct SGM2 * obj_dekunuts_plant_model;
 struct SGM2 * obj_dekunuts_body_model;
 
@@ -58,6 +66,16 @@ void ObjDekunutsActorSetup(struct Actor * a, void * scene) {
   obj_dekunuts_body_model->material[2].tpage = getTPage(0, 1, OBJ_DEKUNUTS_PLANT_TEXTURE_X, OBJ_DEKUNUTS_PLANT_TEXTURE_Y);
   SGM2_OffsetTexCoords(obj_dekunuts_body_model, 0, 0);
   SGM2_OffsetMatTexCoords(obj_dekunuts_body_model, 1, 0, 64);
+
+  obj_dekunuts_tpage = getTPage(0, 1, OBJ_DEKUNUTS_BODY_TEXTURE_X, OBJ_DEKUNUTS_BODY_TEXTURE_Y);
+  obj_dekunuts_clut[0] = obj_dekunuts_body_model->material[0].clut;
+  obj_dekunuts_clut[1] = obj_dekunuts_body_model->material[1].clut;
+  obj_dekunuts_clut[2] = obj_dekunuts_body_model->material[2].clut;
+
+  AGM_LoadModel(&obj_dekunuts_model, dekunuts_agm);
+  ANM_LoadAnimation(&obj_dekunuts_anim, (u_char*)dekunuts_anm);
+
+  AGM_OffsetTexByMaterial(&obj_dekunuts_model, 1, 0, 64);
 }
 
 void ObjDekunutsActorInitialize(struct Actor * a, void * descriptor, void * scene) {
@@ -136,13 +154,18 @@ void ObjDekunutsActorUpdate(struct Actor * a, void * scene) {
   } else {
 
   }
+
+  actor->anim++;
     
 }
 
 u_char * ObjDekunutsActorDraw(struct Actor * a, MATRIX * view, u_char * packet_ptr, void * scene) {
   ObjDekunutsActor * actor = (ObjDekunutsActor *)a;
   MATRIX local_identity;
-  CompMatrixLV(view, &actor->matrix, &local_identity);
+  MATRIX temp;
+  temp = actor->matrix;
+  temp.t[1] += 49;
+  CompMatrixLV(view, &temp, &local_identity);
   gte_SetRotMatrix(&local_identity);
   gte_SetTransMatrix(&local_identity);
 
@@ -161,10 +184,22 @@ u_char * ObjDekunutsActorDraw(struct Actor * a, MATRIX * view, u_char * packet_p
   if(vec0.vx < -128 || vec0.vx > SCREEN_W+128) return packet_ptr;
   if(vec0.vy < -128 || vec0.vy > SCREEN_H+128) return packet_ptr;
 
+  
+
+  //AGM_TransformBones(&obj_dekunuts_model, &local_identity, frameBuffer, player_bone_matrix);
+  SVECTOR * anim = &obj_dekunuts_anim->animation_data[obj_dekunuts_anim->animation_list[1].start + (actor->anim % (obj_dekunuts_anim->animation_list[0].length-1)) * obj_dekunuts_anim->frame_size];
+  AGM_TransformByBone(&obj_dekunuts_model, &temp, anim, view);
+  //AGM_TransformModelOnly(&obj_dekunuts_model, player_bone_matrix, view);
 
   SetSpadStack(SPAD_STACK_ADDR);
-  packet_ptr = SGM2_UpdateModel(actor->body_model, packet_ptr, (u_long*)G.pOt, 0, SGM2_RENDER_AMBIENT | SGM2_RENDER_NO_NCLIP, scene);
+  //packet_ptr = AGM_DrawModel(&obj_dekunuts_model, packet_ptr, (u_long*)G.pOt, 0);
+  packet_ptr = AGM_DrawModelTPage(&obj_dekunuts_model, packet_ptr, (u_long*)G.pOt, 0, obj_dekunuts_tpage, obj_dekunuts_clut);
   ResetSpadStack();
+
+
+  //SetSpadStack(SPAD_STACK_ADDR);
+  //packet_ptr = SGM2_UpdateModel(actor->body_model, packet_ptr, (u_long*)G.pOt, 0, SGM2_RENDER_AMBIENT | SGM2_RENDER_NO_NCLIP, scene);
+  //ResetSpadStack();
 
   CompMatrixLV(view, &actor->plant_matrix, &local_identity);
   gte_SetRotMatrix(&local_identity);

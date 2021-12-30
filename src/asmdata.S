@@ -20,6 +20,7 @@
   .global iwakabe_tim
   .global iwakabe_far_tim
   .global iwayuka_tim
+  .global deku_shrine_block000a
   .global scene_col
   .global scene_room00_sg2
   .global scene_room01_sg2
@@ -57,6 +58,8 @@
   .global obj_dekunuts_body_tim
   .global obj_dekunuts_plant_sgm2
   .global dekunuts_body_static_sgm2
+  .global dekunuts_agm
+  .global dekunuts_anm
   .global texture_data_start
   .global texture_data_end
 
@@ -101,7 +104,7 @@ scene_room05_sg2_ext:
   .balign 16
 
 scene_col:
-  .incbin "../AGAME_PCDATA/graphics/test_room_col_opt.col2"
+  .incbin "../AGAME_PCDATA/Map/Test/Collision/map_collision.col2"
   .balign 16
 
 obj_flame_sgm2:
@@ -167,6 +170,10 @@ iwakabe_far_tim:
 
 iwayuka_tim:
   .incbin "../AGAME_PCDATA/iwayuka_4bit.tim"
+  .balign 16
+
+deku_shrine_block000a:
+  .incbin "../AGAME_PCDATA/Map/Test/Textures/deku_shrine_block000a.tim"
   .balign 16
 
 obj_syokudai_tim:
@@ -246,6 +253,12 @@ obj_dekunuts_plant_sgm2:
   .balign 16
 dekunuts_body_static_sgm2:
   .incbin "../AGAME_PCDATA/objects/enemy/dekunuts/dekunuts_body_static.sgm2"
+  .balign 16
+dekunuts_agm:
+  .incbin "../AGAME_PCDATA/objects/enemy/dekunuts/dekunuts.agm"
+  .balign 16
+dekunuts_anm:
+  .incbin "../AGAME_PCDATA/objects/enemy/dekunuts/dekunuts.agm.anm"
   .balign 16
 
 texture_data_end:

@@ -165,6 +165,10 @@ void ANM_InterpolateFrames(SVECTOR * frameF, SVECTOR * frameA, SVECTOR * frameB,
 // TEMPORARY: REMOVE LATER
 void PrintMatrix(MATRIX * mat);
 
+u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot, short zoffset, u_short tpageid, u_short * clutid);
+
+void AGM_OffsetTexByMaterial(AGM_model * model, u_char material, u_char u, u_char v);
+
 extern char compare_bit;
 
 extern long temp_animcounter;

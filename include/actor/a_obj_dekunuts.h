@@ -11,6 +11,7 @@
 #ifndef A_OBJ_DEKUNUTS_H
 #define A_OBJ_DEKUNUTS_H
 
+#include "model/agm.h"
 #include "model/sgm2.h"
 #include "global.h"
 #include "actor/actors.h"
@@ -19,6 +20,11 @@ extern unsigned long obj_dekunuts_plant_tim[];
 extern unsigned long obj_dekunuts_body_tim[];
 extern unsigned long obj_dekunuts_plant_sgm2[];
 extern unsigned long dekunuts_body_static_sgm2[];
+extern unsigned long dekunuts_agm[];
+extern unsigned long dekunuts_anm[];
+
+extern struct AGM_Model obj_dekunuts_model;
+extern struct ANM_Animation * obj_dekunuts_anim;
 
 extern struct SGM2 * obj_dekunuts_plant_model;
 extern struct SGM2 * obj_dekunuts_body_model;
@@ -35,10 +41,12 @@ extern struct SGM2 * obj_dekunuts_body_model;
 
 typedef struct ObjDekunutsActor {
   struct Actor base;
+  struct AGM_Model * model;
   struct SGM2 * body_model;
   struct SGM2 * plant_model;
   MATRIX matrix;
   MATRIX plant_matrix;
+  u_short anim;
 } ObjDekunutsActor;
 
 void ObjDekunutsActorSetup(struct Actor * a, void * scene); // Loads and sets up data, called while loading new scenes, does not create instances

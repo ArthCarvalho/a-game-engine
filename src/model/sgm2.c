@@ -14,10 +14,10 @@
 #include <gtemac.h>
 
 #define SGM2_SUBDIV_LV1 180
-#define SGM2_SUBDIV_LV2 80
+#define SGM2_SUBDIV_LV2 60
 
 #define SGM2_SUBDIV_HIGH_LV1 400
-#define SGM2_SUBDIV_HIGH_LV2 200
+#define SGM2_SUBDIV_HIGH_LV2 100
 
 SGM2_File * SGM2_LoadFile(u_long * addr) {
   // Parse the offsets inside the file and change them to memory addresses instead of offsets.
@@ -268,9 +268,9 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
         }
 
         if(flags & SGM2_RENDER_CLUTFOG){
-          long fog = (otz-512) >> 8;
+          long fog = (otz-512) >> 7;
           if(fog < 0) fog = 0;
-          if(fog > 15) fog = 15;
+          if(fog > 7) fog = 7;
           clutid = clutid + (fog<<(6+16));
         }
         
@@ -428,9 +428,9 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
           }
 
           if(flags & SGM2_RENDER_CLUTFOG){
-            long fog = (otz-512) >> 8;
+            long fog = (otz-512) >> 7;
             if(fog < 0) fog = 0;
-            if(fog > 15) fog = 15;
+            if(fog > 7) fog = 7;
             clutid = clutid + (fog<<(6+16));
           }
 

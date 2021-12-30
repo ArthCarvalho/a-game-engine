@@ -149,16 +149,22 @@ void ObjDoorShutterActorUpdate(struct Actor * a, void * scene) {
       scene_ctx->interface_fade = 1;
       Player_ForceIdle(pl);
       pl->state |= PLAYER_CUTSCENE_MODE;
-      scene_ctx->room_swap = 1;
+      if(actor->back_room != actor->front_room) {
+        scene_ctx->room_swap = 1;
+      }
       if(!actor->flip_model) {
         pl->y_move_dir = (actor->base.rot.vy + 2048) % 4096;
-        scene_ctx->current_room_id = actor->back_room;
-        scene_ctx->previous_room_id = actor->front_room;
+        if(actor->back_room != actor->front_room) {
+          scene_ctx->current_room_id = actor->back_room;
+          scene_ctx->previous_room_id = actor->front_room;
+        }
         actor->camera_side = 0;
       } else {
         pl->y_move_dir = actor->base.rot.vy;
-        scene_ctx->current_room_id = actor->front_room;
-        scene_ctx->previous_room_id = actor->back_room;
+        if(actor->back_room != actor->front_room) {
+          scene_ctx->current_room_id = actor->front_room;
+          scene_ctx->previous_room_id = actor->back_room;
+        }
         actor->camera_side = 1;
       }
     }
@@ -204,8 +210,10 @@ void ObjDoorShutterActorUpdate(struct Actor * a, void * scene) {
     cam->state_fix = 0;
     scene_ctx->cinema_mode = 0;
     scene_ctx->interface_fade = 0;
-    scene_ctx->previous_room_m = NULL;
-    scene_ctx->actor_cleanup = 1;
+    if(actor->back_room != actor->front_room) {
+      scene_ctx->previous_room_m = NULL;
+      scene_ctx->actor_cleanup = 1;
+    }
     pl->state &= ~PLAYER_CUTSCENE_MODE;
   }
   //FntPrint("anim_timer %d\n", actor->anim_timer);

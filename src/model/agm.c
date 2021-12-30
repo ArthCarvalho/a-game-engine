@@ -1205,3 +1205,321 @@ void ANM_InterpolateFrames(SVECTOR * frameF, SVECTOR * frameA, SVECTOR * frameB,
     //FntPrint("QXYZW: %d %d %d %d\n",ptrf->vx,ptrf->vy,ptrf->vz,ptrf->pad);
   }
 }
+
+u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot, short zoffset, u_short tpageid, u_short * clutid) {
+  AGM_FILE * file = model->file;
+  AGM_POLYG4 * pg4_ptr = file->poly_g4;
+  AGM_POLYG3 * pg3_ptr = file->poly_g3;
+  AGM_POLYGT4 * pgt4_ptr = file->poly_gt4;
+  AGM_POLYGT3 * pgt3_ptr = file->poly_gt3;
+  POLY_G4 * dest_pg4_ptr = (POLY_G4*)packet_ptr;
+  POLY_G3 * dest_pg3_ptr;
+  POLY_GT4 * dest_pgt4_ptr;
+  POLY_GT3 * dest_pgt3_ptr;
+  long outer_product, otz;
+  long tempz0,tempz1,tempz2,tempz3;
+  short pg4_count = file->poly_g4_count;
+  short pg3_count = file->poly_g3_count;
+  short pgt4_count = file->poly_gt4_count;
+  short pgt3_count = file->poly_gt3_count;
+  short i;
+  
+  for(i = 0; i < pg4_count; i++, pg4_ptr++) {
+      SVECTOR * vec0 = &TransformBuffer[pg4_ptr->idx0];
+      SVECTOR * vec1 = &TransformBuffer[pg4_ptr->idx1];
+      SVECTOR * vec2 = &TransformBuffer[pg4_ptr->idx2];
+      SVECTOR * vec3 = &TransformBuffer[pg4_ptr->idx3];
+
+      // Load screen XY coordinates to GTE Registers
+      gte_ldsxy3(*(long*)&vec0->vx,*(long*)&vec1->vx,*(long*)&vec2->vx);
+      // Perform clipping calculation
+      gte_nclip();
+      // Store Outer Product
+      gte_stopz(&outer_product);
+      // Check side
+      if(outer_product <= 0) continue; // Skip back facing polys
+      //printf("rendering face %d\n",i);
+      // Load Z coordinates into GTE
+      tempz0 = vec0->vz;
+      tempz1 = vec1->vz;
+      tempz2 = vec2->vz;
+      tempz3 = vec3->vz;
+      //printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
+      gte_ldsz4(tempz0,tempz1,tempz2,tempz3);
+      // Get the average Z value
+      gte_avsz4();
+      // Store value to otz
+      gte_stotz(&otz);
+      // Reduce OTZ size
+      otz = (otz >> OTSUBDIV);
+      //otz = 50;
+      if (otz > OTMINCHAR && otz < OTSIZE) {
+        long temp0, temp1, temp2, temp3;
+        // If all tests have passed, now process the rest of the primitive.
+        // Copy values already in the registers
+        gte_stsxy3((long*)&dest_pg4_ptr->x0,
+                   (long*)&dest_pg4_ptr->x1,
+                   (long*)&dest_pg4_ptr->x2);
+        // Store 4th vertex from buffer directly
+
+        temp0 = *(long*)(&vec3->vx);
+        *(long*)(&dest_pg4_ptr->x3) = temp0;
+
+        gte_ldrgb((CVECTOR*)&pg4_ptr->r0);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pg4_ptr->r0);
+        gte_ldrgb((CVECTOR*)&pg4_ptr->r1);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pg4_ptr->r1);
+        gte_ldrgb((CVECTOR*)&pg4_ptr->r2);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pg4_ptr->r2);
+        gte_ldrgb((CVECTOR*)&pg4_ptr->r3);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pg4_ptr->r3);
+
+        setPolyG4(dest_pg4_ptr);
+        
+        // Add primitive to Ordering Table and advance pointer
+        // to point to the next primitive to be processed.
+        addPrim(ot+otz+zoffset, dest_pg4_ptr);
+        dest_pg4_ptr++;
+      }
+      
+  }
+  dest_pg3_ptr = (POLY_G3*)dest_pg4_ptr;
+  
+
+  for(i = 0; i < pg3_count; i++, pg3_ptr++) {
+      SVECTOR * vec0 = &TransformBuffer[pg3_ptr->idx0];
+      SVECTOR * vec1 = &TransformBuffer[pg3_ptr->idx1];
+      SVECTOR * vec2 = &TransformBuffer[pg3_ptr->idx2];
+      
+      // Load screen XY coordinates to GTE Registers
+      gte_ldsxy3(*(long*)&vec0->vx,*(long*)&vec1->vx,*(long*)&vec2->vx);
+      // Perform clipping calculation
+      gte_nclip();
+      // Store Outer Product
+      gte_stopz(&outer_product);
+      // Check side
+      if(outer_product <= 0) continue; // Skip back facing polys
+      //printf("rendering face %d\n",i);
+      // Load Z coordinates into GTE
+      tempz0 = vec0->vz;
+      tempz1 = vec1->vz;
+      tempz2 = vec2->vz;
+
+      gte_ldsz3(tempz0,tempz1,tempz2);
+      // Get the average Z value
+      gte_avsz3();
+      // Store value to otz
+      gte_stotz(&otz);
+      // Reduce OTZ size
+      otz = (otz >> OTSUBDIV);
+      //otz = 50;
+      if (otz > OTMINCHAR && otz < OTSIZE) {
+        // If all tests have passed, now process the rest of the primitive.
+        // Copy values already in the registers
+        gte_stsxy3((long*)&dest_pg3_ptr->x0,
+                   (long*)&dest_pg3_ptr->x1,
+                   (long*)&dest_pg3_ptr->x2);
+        // Vertex Colors
+        gte_ldrgb((CVECTOR*)&pg3_ptr->r0);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pg3_ptr->r0);
+        gte_ldrgb((CVECTOR*)&pg3_ptr->r1);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pg3_ptr->r1);
+        gte_ldrgb((CVECTOR*)&pg3_ptr->r2);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pg3_ptr->r2);
+
+        setPolyG3(dest_pg3_ptr);
+        
+        // Add primitive to Ordering Table and advance pointer
+        // to point to the next primitive to be processed.
+        addPrim(ot+otz+zoffset, dest_pg3_ptr);
+        dest_pg3_ptr++;
+      }
+      
+  }
+
+  dest_pgt4_ptr = (POLY_GT4*)dest_pg3_ptr;
+
+  for(i = 0; i < pgt4_count; i++, pgt4_ptr++) {
+      SVECTOR * vec0 = &TransformBuffer[pgt4_ptr->idx0];
+      SVECTOR * vec1 = &TransformBuffer[pgt4_ptr->idx1];
+      SVECTOR * vec2 = &TransformBuffer[pgt4_ptr->idx2];
+      SVECTOR * vec3 = &TransformBuffer[pgt4_ptr->idx3];
+            
+      // Load screen XY coordinates to GTE Registers
+      gte_ldsxy3(*(long*)&vec0->vx,*(long*)&vec1->vx,*(long*)&vec2->vx);
+      // Perform clipping calculation
+      gte_nclip();
+      // Store Outer Product
+      gte_stopz(&outer_product);
+      // Check side
+      //if(outer_product <= 0) continue; // Skip back facing polys
+      //printf("rendering face %d\n",i);
+      // Load Z coordinates into GTE
+      tempz0 = vec0->vz;
+      tempz1 = vec1->vz;
+      tempz2 = vec2->vz;
+      tempz3 = vec3->vz;
+      //printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
+      gte_ldsz4(tempz0,tempz1,tempz2,tempz3);
+      // Get the average Z value
+      gte_avsz4();
+      // Store value to otz
+      gte_stotz(&otz);
+      // Reduce OTZ size
+      otz = (otz >> OTSUBDIV);
+      //otz = 50;
+      if (otz > OTMINCHAR && otz < OTSIZE) {
+        long temp0, temp1, temp2, temp3;
+        // If all tests have passed, now process the rest of the primitive.
+        // Copy values already in the registers
+        gte_stsxy3((long*)&dest_pgt4_ptr->x0,
+                   (long*)&dest_pgt4_ptr->x1,
+                   (long*)&dest_pgt4_ptr->x2);
+        // Store 4th vertex from buffer directly
+        temp0 = *(long*)(&vec3->vx);
+        *(long*)(&dest_pgt4_ptr->x3) = temp0;
+        // Vertex Colors
+
+        gte_ldrgb((CVECTOR*)&pgt4_ptr->r0);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pgt4_ptr->r0);
+        gte_ldrgb((CVECTOR*)&pgt4_ptr->r1);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pgt4_ptr->r1);
+        gte_ldrgb((CVECTOR*)&pgt4_ptr->r2);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pgt4_ptr->r2);
+        gte_ldrgb((CVECTOR*)&pgt4_ptr->r3);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pgt4_ptr->r3);
+
+        // Texture Coordinates
+        // Set Texture Coordinates
+        temp1 = *(short*)(&pgt4_ptr->u0);
+        temp2 = *(short*)(&pgt4_ptr->u1);
+        temp3 = *(short*)(&pgt4_ptr->u2);
+        temp0 = *(short*)(&pgt4_ptr->u3);
+        *(short*)(&dest_pgt4_ptr->u0) = temp1;
+        *(short*)(&dest_pgt4_ptr->u1) = temp2;
+        *(short*)(&dest_pgt4_ptr->u2) = temp3;
+        *(short*)(&dest_pgt4_ptr->u3) = temp0;
+
+        // Set CLUT
+        //dest_pgt4_ptr->clut = clutid[pgt4_ptr->clutid];
+        dest_pgt4_ptr->clut = clutid[pgt4_ptr->clutid];
+        // Set Texture Page
+        dest_pgt4_ptr->tpage = tpageid;
+
+        setPolyGT4(dest_pgt4_ptr);
+        
+        // Add primitive to Ordering Table and advance pointer
+        // to point to the next primitive to be processed.
+        addPrim(ot+otz+zoffset, dest_pgt4_ptr);
+        dest_pgt4_ptr++;
+      }
+      
+  }
+  dest_pgt3_ptr = (POLY_GT3*)dest_pgt4_ptr;
+  
+  for(i = 0; i < pgt3_count; i++, pgt3_ptr++) {
+      SVECTOR * vec0 = &TransformBuffer[pgt3_ptr->idx0];
+      SVECTOR * vec1 = &TransformBuffer[pgt3_ptr->idx1];
+      SVECTOR * vec2 = &TransformBuffer[pgt3_ptr->idx2];
+      
+      // Load screen XY coordinates to GTE Registers
+      gte_ldsxy3(*(long*)&vec0->vx,*(long*)&vec1->vx,*(long*)&vec2->vx);
+      // Perform clipping calculation
+      gte_nclip();
+      // Store Outer Product
+      gte_stopz(&outer_product);
+      // Check side
+      //if(outer_product <= 0) continue; // Skip back facing polys
+      // Load Z coordinates into GTE
+      tempz0 = vec0->vz;
+      tempz1 = vec1->vz;
+      tempz2 = vec2->vz;
+      gte_ldsz3(tempz0,tempz1,tempz2);
+      // Get the average Z value
+      gte_avsz3();
+      // Store value to otz
+      gte_stotz(&otz);
+      // Reduce OTZ size
+      otz = (otz >> OTSUBDIV);
+      //otz = 50;
+      if (otz > OTMINCHAR && otz < OTSIZE) {
+        long temp0, temp1, temp2;
+        // If all tests have passed, now process the rest of the primitive.
+        // Copy values already in the registers
+        gte_stsxy3((long*)&dest_pgt3_ptr->x0,
+                   (long*)&dest_pgt3_ptr->x1,
+                   (long*)&dest_pgt3_ptr->x2);
+        // Vertex Colors
+        gte_ldrgb((CVECTOR*)&pgt3_ptr->r0);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pgt3_ptr->r0);
+        gte_ldrgb((CVECTOR*)&pgt3_ptr->r1);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pgt3_ptr->r1);
+        gte_ldrgb((CVECTOR*)&pgt3_ptr->r2);
+        gte_cc();
+        gte_strgb((CVECTOR*)&dest_pgt3_ptr->r2);
+
+        // Set Texture Coordinates
+        temp0 = *(short*)(&pgt3_ptr->u0);
+        temp1 = *(short*)(&pgt3_ptr->u1);
+        temp2 = *(short*)(&pgt3_ptr->u2);
+        *(short*)(&dest_pgt3_ptr->u0) = temp0;
+        *(short*)(&dest_pgt3_ptr->u1) = temp1;
+        *(short*)(&dest_pgt3_ptr->u2) = temp2;        
+        // Set CLUT
+        dest_pgt3_ptr->clut = clutid[pgt3_ptr->clutid];
+
+        // Set Texture Page
+        dest_pgt3_ptr->tpage = tpageid;
+
+        setPolyGT3(dest_pgt3_ptr);
+        
+        // Add primitive to Ordering Table and advance pointer
+        // to point to the next primitive to be processed.
+        addPrim(ot+otz+zoffset, dest_pgt3_ptr);
+        dest_pgt3_ptr++;
+      }
+      
+  }
+  return (char*)dest_pgt3_ptr;
+
+
+}
+
+void AGM_OffsetTexByMaterial(AGM_model * model, u_char material, u_char u, u_char v) {
+  for(int i = 0; i < model->file->poly_gt4_count; i++) {
+    AGM_POLYGT4 * poly = &model->file->poly_gt4[i];
+    if(poly->clutid != material) continue;
+    poly->u0 = (poly->u0 + u) % 256;
+    poly->v0 = (poly->v0 + v) % 256;
+    poly->u1 = (poly->u1 + u) % 256;
+    poly->v1 = (poly->v1 + v) % 256;
+    poly->u2 = (poly->u2 + u) % 256;
+    poly->v2 = (poly->v2 + v) % 256;
+    poly->u3 = (poly->u3 + u) % 256;
+    poly->v3 = (poly->v3 + v) % 256;
+  }
+
+  for(int i = 0; i < model->file->poly_gt3_count; i++) {
+    AGM_POLYGT3 * poly = &model->file->poly_gt3[i];
+    if(poly->clutid != material) continue;
+    poly->u0 = (poly->u0 + u) % 256;
+    poly->v0 = (poly->v0 + v) % 256;
+    poly->u1 = (poly->u1 + u) % 256;
+    poly->v1 = (poly->v1 + v) % 256;
+    poly->u2 = (poly->u2 + u) % 256;
+    poly->v2 = (poly->v2 + v) % 256;
+  }
+}
