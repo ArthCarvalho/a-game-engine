@@ -97,8 +97,10 @@ POLY_GT4 *s, u_long *ot, DIVPOLYGON4 *divp);
 
 #define SCREEN_W	512
 #define camera_ASPECT (SCREEN_W / 292.3333) * 4096
-//#define camera_ASPECT 4096
+
 //#define SCREEN_W 320
+//#define camera_ASPECT 4096
+
 #define	SCREEN_H 240
 #define BUFFER_A_PX 1024-SCREEN_W
 #define BUFFER_A_PY 0
@@ -111,8 +113,8 @@ POLY_GT4 *s, u_long *ot, DIVPOLYGON4 *divp);
 #define OTMIN 15
 #define OTMINCHAR 1
 //#define PACKET_SIZE 0x19000
-#define PACKET_SIZE 0x1A000
-//#define PACKET_SIZE 0x50000
+//#define PACKET_SIZE 0x1A000
+#define PACKET_SIZE 0x60000
 
 #define RGBPACK32(r,g,b) (r | (g<<8) | (b<<16))
 
@@ -183,6 +185,7 @@ extern unsigned long load_symbol[];
 // Temporary buffer to store transformed vertices for animated models
 extern long TransformBufferSize;
 extern SVECTOR * TransformBuffer;
+extern CVECTOR * NormalTransformBuffer;
 
 void  ResetGsEnv();
 void  BeginDraw();
@@ -195,5 +198,9 @@ void draw_load_screen();
 
 void file_load_temp(char * filename, unsigned long ** dest);
 unsigned long file_load_temp_noalloc(char * filename, unsigned long * dest);
+
+u_char * Draw_ContactShadow(SVECTOR * pos, short angle, u_short scale, u_short strength, u_char * packet_ptr, void * scene, short offset);
+
+void Draw_CalcNearestLight(Actor * actor, void * scene);
 
 #endif

@@ -8,14 +8,18 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. 
  */
 
+//sssD
+
 .section .data
         
   .global saveicon
   .global load_symbol
   .global player_tim
+  .global player_tunic_green_tim
   .global player_agm
   .global player_anm
   .global sword_sg2
+  .global shield_sgm2
   .global scene_tim
   .global iwakabe_tim
   .global iwakabe_far_tim
@@ -64,7 +68,8 @@
   .global texture_data_end
 
 player_agm:
-  .incbin "../AGAME_PCDATA/player_new.agm"
+  //.incbin "../AGAME_PCDATA/player_new.agm  "
+  .incbin "../zelda_assets/models/link_reference.agm" #  _global_normal
   .balign 16
 
 player_anm:
@@ -73,6 +78,10 @@ player_anm:
 
 sword_sg2:
   .incbin "../AGAME_PCDATA/prop_swerd.sgm2"
+  .balign 16
+
+shield_sgm2:
+  .incbin "../zelda_assets/models/hyral_shield.sgm2"
   .balign 16
 
 scene_room00_sg2:
@@ -153,7 +162,11 @@ load_symbol:
   .balign 16
 
 player_tim:
-  .incbin "../AGAME_PCDATA/graphics/player_area_composite.tim"
+  .incbin "../AGAME_PCDATA_OLD/4bit-test/link/parts/link_area_composite.TIM"
+  .balign 16
+
+player_tunic_green_tim:
+  .incbin "../AGAME_PCDATA_OLD/4bit-test/link/parts/green_tunic_pal.TIM"
   .balign 16
 
 scene_tim:
@@ -173,7 +186,7 @@ iwayuka_tim:
   .balign 16
 
 deku_shrine_block000a:
-  .incbin "../AGAME_PCDATA/Map/Test/Textures/deku_shrine_block000a.tim"
+  .incbin "../zelda_assets/textures_png/scenes/deku_shrine_block000a.tim"
   .balign 16
 
 obj_syokudai_tim:
@@ -255,10 +268,10 @@ dekunuts_body_static_sgm2:
   .incbin "../AGAME_PCDATA/objects/enemy/dekunuts/dekunuts_body_static.sgm2"
   .balign 16
 dekunuts_agm:
-  .incbin "../AGAME_PCDATA/objects/enemy/dekunuts/dekunuts.agm"
+  .incbin "../zelda_assets/models/enemy/dekunuts/dekunuts.agm"
   .balign 16
 dekunuts_anm:
-  .incbin "../AGAME_PCDATA/objects/enemy/dekunuts/dekunuts.agm.anm"
+  .incbin "../zelda_assets/models/enemy/dekunuts/dekunuts.agm.anm"
   .balign 16
 
-texture_data_end:
+texture_data_end: 

@@ -53,7 +53,7 @@ void ObjSyokudaiActorInitialize(struct Actor * a, void * descriptor, void * scen
   flame_pos.vy += SYOKUDAI_FLAME_HEIGHT;
 
   Draw_CreateFlame(&actor->flame, &flame_pos, &flame_scale, 1, 1);
-  
+
 }
 
 void ObjSyokudaiActorDestroy(struct Actor * a, void * scene) {
@@ -90,6 +90,21 @@ void ObjSyokudaiActorUpdate(struct Actor * a, void * scene) {
   if(ActorCollision_CheckCylinders(&col_obj, &col_player, &dist, &intersect, &deltax, &deltaz) == 1) {
     ActorCollision_DisplaceActor(player, dist, intersect, deltax, deltaz);
   }
+
+  Draw_CalcNearestLight(actor, scene);
+
+  /*if(actor->base.xzDistance < 1024) {
+    Scene_Ctx * scene_ctx = (Scene_Ctx*)scene;
+    PlayerActor * player = scene_ctx->player;
+    if(player->nearest_light_dist > actor->base.xzDistance) {
+      short dist_x = ((player->base.pos.vx - actor->base.pos.vx) << 12) / actor->base.xzDistance;
+      short dist_z = ((player->base.pos.vz - actor->base.pos.vz) << 12) / actor->base.xzDistance;
+      player->nearest_shadow_ang = fix12_atan2s(dist_x, dist_z);
+      player->nearest_light_dist = actor->base.xzDistance;
+    }
+  }*/
+
+
 
   /*short distXDelta = (player->pos.vx - actor->base.pos.vx);
   short distZDelta = (player->pos.vz - actor->base.pos.vz);

@@ -11,6 +11,7 @@
 #include "camera/camera.h"
 
 #include "global.h"
+#include "spadstk.h"
 
 // Realizing all global declarations promised on camera.h
 
@@ -294,6 +295,7 @@ void Camera_Update(struct Camera * cam, void * scene){
 					cam->rotation_v -= fix12_smul(FIXED(0.015), analog_r_y << 5);
 				}
 				if(!camera_to_back_state) {
+					SetSpadStack(0x1F8003FC);//SPAD_STACK_ADDR);
 					SVECTOR pforward;
 					Col_Result col_result;
 					short p_floor_a = 0;
@@ -330,6 +332,7 @@ void Camera_Update(struct Camera * cam, void * scene){
 						temp = Smoothing(cam->rotation_v, cam->rotation_v_s, 4096 * 0.0333333333333333);
 						cam->rotation_v_s = Smoothing(cam->rotation_v_s, temp, 4096 * 0.0075);
 					}
+					ResetSpadStack();
 				}
 				cam->rotation_h_s = cam->rotation_h;
     		//cam->rotation_v_s += ((cam->rotation_v - cam->rotation_v_s)>>5);

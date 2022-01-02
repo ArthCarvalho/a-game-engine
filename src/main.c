@@ -189,7 +189,7 @@ void main() {
 	G.Draw_env[0].dtd = G.Draw_env[1].dtd = 1; // Enable Dithering
 
   G.VSync_rate = 2; // Framerate: 0: 60FPS, 2: 30FPS, 3: 20FPS
-  //G.VSync_rate = 0; // Framerate: 0: 60FPS, 2: 30FPS, 3: 20FPS
+  //G.VSync_rate = 3; // Framerate: 0: 60FPS, 2: 30FPS, 3: 20FPS
   
   /* Set clip region */
 	setRECT( &G.screen_rect, 0, 0, SCREEN_W, SCREEN_H );

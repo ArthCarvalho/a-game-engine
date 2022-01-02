@@ -664,7 +664,8 @@ int PointInTriangleScratch (SVECTOR * pt, SVECTOR * v1, SVECTOR * v2, SVECTOR * 
 }
 
 short Col_GroundCheckPointScratch(Col2 * col, SVECTOR * pos) {
-  struct GroundCheckScratch * scratchPad = (struct GroundCheckScratch *) SCRATCH_PAD;
+  struct GroundCheckScratch * scratchPadLocal;
+  struct GroundCheckScratch * scratchPad = &scratchPadLocal;// = (struct GroundCheckScratch *) SCRATCH_PAD;
   Col_CellPos cell_pos;
   unsigned short cell_element;
   Col_Bucket * bucket;

@@ -14,6 +14,8 @@
 
 #include "../../AGAME_PCDATA/player_new.agm.anm.h"
 
+short col_queries_test = 0;
+
 /*
 // This multiplies two 32bit fixed point (format: 20.12)
 #define asm_fpmul64( result, a, b ) __asm__  volatile ( \
@@ -55,8 +57,8 @@
 #define PLAYER_MOVE_FALLING FIXED(0.3227272727272728)
 #define PLAYER_MOVE_FALLING_DEACCEL FIXED(0.6454545454545455)*/
 
-//#define SPEED_MULT 0.5
 #define SPEED_MULT 1.0
+//#define SPEED_MULT 1.0
 
 #define PLAYER_MOVE_SPEED FIXED(35.5*SPEED_MULT)
 #define PLAYER_ROLL_SPEED_LOW FIXED(19.36*SPEED_MULT)
@@ -73,6 +75,9 @@ u_long * PlayerAnmData;
 
 struct AGM_Model PlayerMdl;
 struct ANM_Animation * PlayerAnm;
+
+struct SGM2 * shield_prop;
+MATRIX shield_matrix;
 
 SVECTOR frameBuffer[20];
 
@@ -100,6 +105,8 @@ MATRIX player_bone_matrix[30];
 void PlayerSetupData(u_long * mdl, u_long * anim) {
   PlayerMdlData = mdl;
   PlayerAnmData = anim;
+
+  // Load
 }
 
 void PlayerLoadData() {
@@ -174,14 +181,26 @@ void PlayerCreateInstance(Actor * a, void * col_ctx) {
   actor->action = ACTION_NO_ACTION;
   actor->sub_action = ACTION_NO_ACTION;
 
+  actor->light_matrix.m[0][0] = 0;
+  actor->light_matrix.m[0][1] = 4096;
+  actor->light_matrix.m[0][2] = 0;
+  actor->light_matrix.m[1][0] = 0;  
+  actor->light_matrix.m[1][1] = 0;
+  actor->light_matrix.m[1][2] = 0;
+  actor->light_matrix.m[2][0] = 0;  
+  actor->light_matrix.m[2][1] = -1024;
+  actor->light_matrix.m[2][2] = 0;
+
   // Place player on ground
   {
+    SetSpadStack(SPAD_STACK_ADDR);
     SVECTOR pos = {actor->base.pos.vx, actor->base.pos.vy, actor->base.pos.vz, 0};
     Col_GroundCheckPoint(col_context_pl, &pos, 8129, actor->floor);
     if(actor->floor->face >= 0){
       actor->base.pos.vy = actor->floor->position.vy;
       actor->y_position = actor->floor->position.vy << 12;
     }
+    ResetSpadStack();
   }
 
   actor->L_Hand_matrix = &player_bone_matrix[5];
@@ -252,11 +271,11 @@ void PlayerUpdate(Actor * a, void * scene) {
       
       demo_counter--;
     } else {
-      if(g_pad & PAD_UP) analog_l_y = -128;
+      /*if(g_pad & PAD_UP) analog_l_y = -128;
       if(g_pad & PAD_DOWN) analog_l_y = 128;
 
       if(g_pad & PAD_LEFT) analog_l_x = -128;
-      if(g_pad & PAD_RIGHT) analog_l_x = 128;
+      if(g_pad & PAD_RIGHT) analog_l_x = 128;*/
 
       //FntPrint("analog: x=%d y=%d\n",analog_l_x,analog_l_y);
 
@@ -342,6 +361,8 @@ void PlayerUpdate(Actor * a, void * scene) {
 
       // Floor check
       floor_distance = (ray_pos.vy - 400) - actor->floor->position.vy;
+      actor->floor_height = actor->floor->position.vy;
+
 
       //FntPrint("result: %d, dist: %d", actor->floor->face, floor_distance);
       model_head_arch_s = 0;
@@ -489,17 +510,116 @@ void PlayerUpdate(Actor * a, void * scene) {
     actor->base.child->room = 0xFF;
   }
 
+  {
+    MATRIX local = {
+      0, 0, -4096,
+      0, 4096, 0,
+      -4096, 0, 0,
+      35, 25, 0
+    };
+    SVECTOR shield_offset = { 0, 0, 0 , 0 };
+    SVECTOR shield_rot = { (4096 * (35.0 / 360.0)), 3072, 0, 0 };
+
+    //RotMatrixYXZ(&shield_rot, &local);
+    RotMatrix_gte(&shield_rot, &local);
+
+    // Draw Props
+    CompMatrixLV(&player_bone_matrix[0], &local, &shield_matrix);
+
+    //shield_matrix = player_bone_matrix[0];
+  }
+  SetSpadStack(SPAD_STACK_ADDR);
+  Col_Result col_result;
+  SVECTOR shadow_pos = { player_bone_matrix[12].t[0], player_bone_matrix[12].t[1]+64, player_bone_matrix[12].t[2], 0 };
+  if(Col_GroundCheckPoint(col_context_pl, &shadow_pos, 256, &col_result)) {
+    actor->contact_shadow_l.vx = player_bone_matrix[12].t[0];
+    actor->contact_shadow_l.vy = col_result.position.vy;
+    actor->contact_shadow_l.vz = player_bone_matrix[12].t[2];
+    actor->contact_shadow_flags |= 0x01;
+  } else {
+    actor->contact_shadow_flags &= ~0x01;
+  }
+
+  shadow_pos.vx = player_bone_matrix[15].t[0];
+  shadow_pos.vy = player_bone_matrix[15].t[1]+64;
+  shadow_pos.vz = player_bone_matrix[15].t[2];
+
+  if(Col_GroundCheckPoint(col_context_pl, &shadow_pos, 256, &col_result)) {
+    actor->contact_shadow_r.vx = player_bone_matrix[15].t[0];
+    actor->contact_shadow_r.vy = col_result.position.vy; // actor->floor_height;
+    actor->contact_shadow_r.vz = player_bone_matrix[15].t[2];
+    actor->contact_shadow_flags |= 0x02;
+  } else {
+    actor->contact_shadow_flags &= ~0x02;
+  }
+
+  for(int i = 0; i < col_queries_test; i++) { 
+    
+    shadow_pos.vx = player_bone_matrix[15].t[0];
+    shadow_pos.vy = player_bone_matrix[15].t[1]+64;
+    shadow_pos.vz = player_bone_matrix[15].t[2];
+    Col_GroundCheckPoint(col_context_pl, &shadow_pos, 4096, &col_result);
+    actor->contact_shadow_r.vx = player_bone_matrix[15].t[0];
+    actor->contact_shadow_r.vy = col_result.position.vy; // actor->floor_height;
+    actor->contact_shadow_r.vz = player_bone_matrix[15].t[2];
+    
+  }
+  ResetSpadStack();
+
+  //FntPrint("Collision Queries: %d\n", col_queries_test);
+  if(g_pad_press & PAD_SELECT) col_queries_test--;
+  if(g_pad_press & PAD_START) col_queries_test++;
+    
   // Reset Interact Actor
   actor->interact = NULL;
 }
 
-
+//short temp_scale = 0;
 
 u_char * PlayerDraw(Actor * a, MATRIX * view, u_char * pbuff, void * scene) {
   PlayerActor * actor = (PlayerActor*)a;
   Scene_Ctx * scene_ctx = (Scene_Ctx *)scene;
-  /*MATRIX local_identity;
-  SVECTOR local_rotate; 
+  MATRIX local_identity;
+
+
+  // test lights
+  MATRIX idle = {
+    4096, 0, 0,
+    0, 4096, 0,
+    0, 0, 4096,
+  };
+    /*MATRIX lights = {
+      4096, 0, 0, // L1
+      0, 4096, 0, // L2
+      0, 0, 4096  // L3
+    };*/
+
+    /*MATRIX lights = {
+      0, -4096, 0, // L1
+      0, 4096, 0, // L2
+      0, 0, 0  // L3
+    };*/
+    MATRIX light_colors = {
+//   L1 L2 L3
+      4096,                 4096,                 4096*(75.0/255.0), // R
+      4096*(127.0/255.0),   4096*(127.0/255.0),   4096*(168.0/255.0), // G
+      4096*(39.0/255.0) ,   4096*(39.0/255.0) ,   4096*(218.0/255.0), // B
+    };
+    /*MATRIX light_colors = {
+//   L1 L2 L3
+      4096,                 0, 0, // R
+      0,   4096, 0, // G
+      0 ,   0, 4096, // B
+    };*/
+    MATRIX local_lights;
+
+    //MulMatrix0(&lights, &player_bone_matrix[0], &local_lights);
+    //MulMatrix0(&lights, &idle, &local_lights);
+    
+    SetColorMatrix(&light_colors);
+    SetLightMatrix(&actor->light_matrix);
+
+  /*SVECTOR local_rotate; 
   u_short animation_start;
   u_short animation_length;
   u_short animation_framesz;
@@ -507,6 +627,7 @@ u_char * PlayerDraw(Actor * a, MATRIX * view, u_char * pbuff, void * scene) {
   u_short angA = 1024;
   u_short angB = 4096;
   u_long prevFrame = 0;
+  
 
   // ANIMATION
   animation_start = PlayerAnm->animation_list[actor->current_anim].start;
@@ -558,11 +679,38 @@ u_char * PlayerDraw(Actor * a, MATRIX * view, u_char * pbuff, void * scene) {
   //AGM_TransformByBoneCopy(&PlayerMdl, &local_identity, frameBuffer, view, player_bone_matrix);
 
 
-  AGM_TransformModelOnly(&PlayerMdl, player_bone_matrix, view);
-
+  
+  AGM_TransformModelOnly(&PlayerMdl, player_bone_matrix, view, &actor->light_matrix);
   SetSpadStack(SPAD_STACK_ADDR);
+
+  //SetSpadStack(SPAD_STACK_ADDR);
   pbuff = AGM_DrawModel(&PlayerMdl, pbuff, (u_long*)G.pOt, 0);
   ResetSpadStack();
+
+  CompMatrixLV(view, &shield_matrix, &local_identity);
+  gte_SetRotMatrix(&local_identity);
+  gte_SetTransMatrix(&local_identity);
+
+  SetSpadStack(SPAD_STACK_ADDR);
+  pbuff = SGM2_UpdateModel(shield_prop, pbuff, (u_long*)G.pOt, -3, SGM2_RENDER_AMBIENT, scene);
+  ResetSpadStack();
+  
+  for(int i = 0; i < 2; i++) { 
+    pbuff = Draw_ContactShadow(&actor->contact_shadow_l, actor->nearest_shadow_ang[i], 4343, actor->nearest_light_str[i], pbuff, scene, -3);
+    pbuff = Draw_ContactShadow(&actor->contact_shadow_r, actor->nearest_shadow_ang[i], 4343, actor->nearest_light_str[i], pbuff, scene, -3);
+    actor->nearest_shadow_ang[i] = 1024+512;
+    actor->nearest_light_dist[i] = 0x7FFF;
+    actor->nearest_light_str[i] = 2048;
+    actor->light_matrix.m[i][0] = 0; 
+    actor->light_matrix.m[i][0] = 4096;
+    actor->light_matrix.m[i][0] = 0;
+  }
+
+  //if(g_pad & PAD_CIRCLE) temp_scale++;
+  //if(g_pad & PAD_CROSS) temp_scale--;
+
+  //FntPrint("TempScale %d\n", 4096+temp_scale);
+
 
   return pbuff;
 }
@@ -692,7 +840,7 @@ void Player_Normal(Actor * a) {
         if(actor->xzspeed > 0) {
           // ANM_AttackRoll ANM_RunFree
           actor->current_anim = ANM_RunFree;
-          anim_spd = fix12_mul(actor->xzspeed,128);
+          anim_spd = fix12_mul(actor->xzspeed,256*0.55);
         }
         //FntPrint("PLAYER SPD: %d\n", actor->xzspeed);
         //if(actor->state & PLAYER_STATE_MOVE && actor->xzspeed > 100000) actor->action = ACTION_ATTACK;

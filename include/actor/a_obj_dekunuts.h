@@ -47,6 +47,9 @@ typedef struct ObjDekunutsActor {
   MATRIX matrix;
   MATRIX plant_matrix;
   u_short anim;
+  short burrow_offset;
+  short burrow_offset_targ;
+  u_short material_flags[4];
 } ObjDekunutsActor;
 
 void ObjDekunutsActorSetup(struct Actor * a, void * scene); // Loads and sets up data, called while loading new scenes, does not create instances

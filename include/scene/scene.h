@@ -362,6 +362,10 @@ extern RECT anim_tex_flame_src;
 extern RECT anim_tex_flame_dest;
 //Scene * scene;
 
+extern SVECTOR contact_shadow_verts[];
+extern u_char contact_shadow_outter[];
+extern u_char contact_shadow_inner[];
+
 extern MATRIX player_bone_matrix[30];
 
 void SceneInitialize();
@@ -393,5 +397,7 @@ u_char * Scene_ParticleUpdate(Scene_Ctx * scene, MATRIX * view, u_char * buff);
 void Scene_LoadRoom(Room_Data * room, Scene_Ctx * scene);
 
 void Scene_CreateActor(Actor_Descriptor * actdesc, u_short group, Scene_Ctx * scene);
+
+void Draw_SetupContactShadow();
 
 #endif

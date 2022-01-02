@@ -73,6 +73,7 @@ void ObjFlameActorInitialize(struct Actor * a, void * descriptor, void * scene) 
   Draw_CreateFlame(&actor->flame, &flame_pos, &flame_scale, actor_descriptor->init_variables[0], actor_descriptor->init_variables[1]);
   actor->flame.flare_scale = actor_descriptor->init_variables[2];
   actor->flame.flare_dist = actor_descriptor->init_variables[3];
+
 }
 
 void ObjFlameActorDestroy(struct Actor * a, void * scene) {
@@ -80,6 +81,7 @@ void ObjFlameActorDestroy(struct Actor * a, void * scene) {
 }
 
 void ObjFlameActorUpdate(struct Actor * a, void * scene) {
+  Draw_CalcNearestLight(a, scene);
 }
 
 u_char * ObjFlameActorDraw(struct Actor * a, MATRIX * view, u_char * packet_ptr, void * scene) {

@@ -232,7 +232,7 @@ u_char * Draw_Flame(FlameEffObj * flame, MATRIX * view, u_char * packet_ptr, voi
     // Frustum culling
     if(vec1.vx < -64 || vec1.vx > SCREEN_W+64) return packet_ptr;
     if(vec1.vy < -64 || vec1.vy > SCREEN_H+64) return packet_ptr;
-    if(otzv < 1700) model = obj_flame_high_model;
+    if(otzv < 4000) model = obj_flame_high_model;
 
     if(flame->flare_dist >= 0 && otzv > flame->flare_dist ) {
       show_flare = 0;
@@ -305,19 +305,33 @@ u_char * Draw_Flame(FlameEffObj * flame, MATRIX * view, u_char * packet_ptr, voi
 
           setSemiTrans(dest_pgt3_ptr, 1);
           
-          addPrim(G.pOt+otz, dest_pgt3_ptr);
+          {
+            POLY_GT3 * prev = dest_pgt3_ptr;
+          
+            addPrim(G.pOt+otz, dest_pgt3_ptr);
 
-          dest_pgt3_ptr++;
+            dest_pgt3_ptr++;
+
+            *dest_pgt3_ptr = *prev; // Copy Contents
+            addPrim(G.pOt+otz, dest_pgt3_ptr);
+            dest_pgt3_ptr++;
+
+            //*dest_pgt3_ptr = *prev; // Copy Contents
+            //addPrim(G.pOt+otz, dest_pgt3_ptr);
+            //dest_pgt3_ptr++;
+          }
 
         }
     }
+
+    packet_ptr = (u_char*) dest_pgt3_ptr;
   }
 
   if(flame->draw_flare && show_flare) {
     SVECTOR flare_pos = flame->pos;
     flare_pos.vy += 32;
-    return Draw_ScreenFlare(&flame->pos, view, (u_char*)dest_pgt3_ptr, scene, flame->flicker_frame, (flame->scale.vy * flame->flare_scale) >> 12, flame->flame_color);
+    return Draw_ScreenFlare(&flame->pos, view, packet_ptr, scene, flame->flicker_frame, (flame->scale.vy * flame->flare_scale) >> 12, flame->flame_color);
   } else {
-    return (u_char*)dest_pgt3_ptr;
+    return packet_ptr;
   }
 }

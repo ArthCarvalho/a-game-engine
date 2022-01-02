@@ -13,6 +13,7 @@
 
 #include "global.h"
 #include "model/agm.h"
+#include "model/sgm2.h"
 
 //#include "collision/collision.h"
 
@@ -114,8 +115,17 @@ typedef struct PlayerActor{
   short last_floor_pos_z;
   short last_floor_dir;
   unsigned char last_floor_room;
+  short floor_height;
+  short nearest_shadow_ang[2];
+  short nearest_light_dist[2];
+  short nearest_light_str[2];
+  SVECTOR contact_shadow_l;
+  SVECTOR contact_shadow_r;
+  u_char contact_shadow_flags;
 
   MATRIX * L_Hand_matrix;
+
+  MATRIX light_matrix;
 
   // Collision
   struct ColResult * floor;
@@ -135,6 +145,7 @@ extern int PlayerDataLoaded;
 
 extern struct AGM_Model PlayerMdl;
 extern struct ANM_Animation * PlayerAnm;
+extern struct SGM2 * shield_prop;
 
 // Prepare Data (Load Assets)
 void PlayerLoadData();

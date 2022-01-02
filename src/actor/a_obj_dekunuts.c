@@ -19,7 +19,8 @@
 struct AGM_Model obj_dekunuts_model;
 struct ANM_Animation * obj_dekunuts_anim;
 u_short obj_dekunuts_tpage;
-u_short obj_dekunuts_clut[3];
+u_short obj_dekunuts_clut[4];
+u_short obj_dekunuts_mat[4] = {AGM_MATERIAL_NOLIGHTING, 0, AGM_MATERIAL_NOCULLING, AGM_MATERIAL_NOCULLING}; //{ AGM_MATERIAL_NOLIGHTING, 0, AGM_MATERIAL_NOCULLING, AGM_MATERIAL_NOCULLING };
 
 struct SGM2 * obj_dekunuts_plant_model;
 struct SGM2 * obj_dekunuts_body_model;
@@ -71,11 +72,13 @@ void ObjDekunutsActorSetup(struct Actor * a, void * scene) {
   obj_dekunuts_clut[0] = obj_dekunuts_body_model->material[0].clut;
   obj_dekunuts_clut[1] = obj_dekunuts_body_model->material[1].clut;
   obj_dekunuts_clut[2] = obj_dekunuts_body_model->material[2].clut;
+  obj_dekunuts_clut[3] = obj_dekunuts_body_model->material[2].clut;
 
   AGM_LoadModel(&obj_dekunuts_model, dekunuts_agm);
   ANM_LoadAnimation(&obj_dekunuts_anim, (u_char*)dekunuts_anm);
 
   AGM_OffsetTexByMaterial(&obj_dekunuts_model, 1, 0, 64);
+
 }
 
 void ObjDekunutsActorInitialize(struct Actor * a, void * descriptor, void * scene) {
@@ -103,6 +106,13 @@ void ObjDekunutsActorInitialize(struct Actor * a, void * descriptor, void * scen
   SVECTOR rot = actor->base.rot;
   RotMatrix_gte(&rot, &actor->matrix);
   actor->plant_matrix = actor->matrix;
+  actor->anim = rand() % obj_dekunuts_anim->animation_list[0].length;
+  actor->burrow_offset = 49-96;
+
+  actor->material_flags[0] = obj_dekunuts_mat[0];
+  actor->material_flags[1] = obj_dekunuts_mat[1];
+  actor->material_flags[2] = obj_dekunuts_mat[2];
+  actor->material_flags[3] = obj_dekunuts_mat[3];
 }
 
 void ObjDekunutsActorDestroy(struct Actor * a, void * scene) {
@@ -118,23 +128,7 @@ void ObjDekunutsActorUpdate(struct Actor * a, void * scene) {
   tdist.vx -= actor->base.pos.vx;
   tdist.vy -= actor->base.pos.vy;
   tdist.vz -= actor->base.pos.vz;
-  
-  {
-    // Look at player
-    short look_angle = get_angleFromVectorXZ(&tdist);
-    actor->base.rot.vy = look_angle;
-    SVECTOR rot = actor->base.rot;
-    RotMatrix_gte(&rot, &actor->matrix);
-  }
-  {
-    int mask = (tdist.vx >> 31);
-	  tdist.vx = (tdist.vx + mask) ^ mask;
-    //mask = (tdist.vy >> 31);
-	  //tdist.vy = (tdist.vy + mask) ^ mask;
-    mask = (tdist.vz >> 31);
-	  tdist.vz = (tdist.vz + mask) ^ mask;
-  }
-  if(tdist.vx < draw_dist && tdist.vz < draw_dist) {
+
     CollisionCylinder col_player;
     CollisionCylinder col_obj;
     short dist, intersect, deltax, deltaz;
@@ -151,11 +145,35 @@ void ObjDekunutsActorUpdate(struct Actor * a, void * scene) {
       ActorCollision_DisplaceActor(player, dist, intersect, deltax, deltaz);
     }
 
-  } else {
+    if(actor->base.xzDistance > (256 * 10)) {
+      actor->burrow_offset_targ = -128-96;
+    } else {
+      actor->burrow_offset_targ = 49-96;
+      actor->anim++;
+      // Look at player
+      short look_angle = get_angleFromVectorXZ(&tdist);
+      actor->base.rot.vy = look_angle;
+      SVECTOR rot = actor->base.rot;
+      RotMatrix_gte(&rot, &actor->matrix);
+    }
 
-  }
+    actor->burrow_offset = fix12_lerp(actor->burrow_offset, actor->burrow_offset_targ, 4096 * 0.4);
 
-  actor->anim++;
+    if(actor->burrow_offset < -64-96) {
+      actor->material_flags[0] |= AGM_MATERIAL_NORENDER;
+      actor->material_flags[1] |= AGM_MATERIAL_NORENDER;
+    } else {
+      actor->material_flags[0] &= ~AGM_MATERIAL_NORENDER;
+      actor->material_flags[1] &= ~AGM_MATERIAL_NORENDER;
+    }
+
+    if(actor->burrow_offset < -80-96) {
+      actor->material_flags[2] |= AGM_MATERIAL_NORENDER;
+    } else {
+      actor->material_flags[2] &= ~AGM_MATERIAL_NORENDER;
+
+    }
+    
     
 }
 
@@ -163,8 +181,30 @@ u_char * ObjDekunutsActorDraw(struct Actor * a, MATRIX * view, u_char * packet_p
   ObjDekunutsActor * actor = (ObjDekunutsActor *)a;
   MATRIX local_identity;
   MATRIX temp;
+
+
+  // test lights
+  MATRIX lights = {
+       4096, 0, 0, // L1
+      -4096, 0, 0, // L2
+          0, 0, 0  // L3
+    };
+    MATRIX light_colors = {
+//   L1 L2 L3
+      4096,                 4096*( 75.0/255.0), 0, // R
+      4096*(127.0/255.0),   4096*(168.0/255.0), 0, // G
+      4096*( 39.0/255.0),   4096*(218.0/255.0), 0, // B
+    };
+    MATRIX local_lights;
+
+    MulMatrix0(&lights, &actor->matrix, &local_lights);
+    SetColorMatrix(&light_colors);
+    SetLightMatrix(&local_lights);
+    
+
+
   temp = actor->matrix;
-  temp.t[1] += 49;
+  temp.t[1] += actor->burrow_offset;
   CompMatrixLV(view, &temp, &local_identity);
   gte_SetRotMatrix(&local_identity);
   gte_SetTransMatrix(&local_identity);
@@ -179,27 +219,6 @@ u_char * ObjDekunutsActorDraw(struct Actor * a, MATRIX * view, u_char * packet_p
   gte_stsxy((long*)&vec0.vx);
   gte_stsz(&otzv);
   if(otzv < 0) return packet_ptr;
-  if(otzv > 8000) return packet_ptr;
-  // Frustum culling
-  if(vec0.vx < -128 || vec0.vx > SCREEN_W+128) return packet_ptr;
-  if(vec0.vy < -128 || vec0.vy > SCREEN_H+128) return packet_ptr;
-
-  
-
-  //AGM_TransformBones(&obj_dekunuts_model, &local_identity, frameBuffer, player_bone_matrix);
-  SVECTOR * anim = &obj_dekunuts_anim->animation_data[obj_dekunuts_anim->animation_list[1].start + (actor->anim % (obj_dekunuts_anim->animation_list[0].length-1)) * obj_dekunuts_anim->frame_size];
-  AGM_TransformByBone(&obj_dekunuts_model, &temp, anim, view);
-  //AGM_TransformModelOnly(&obj_dekunuts_model, player_bone_matrix, view);
-
-  SetSpadStack(SPAD_STACK_ADDR);
-  //packet_ptr = AGM_DrawModel(&obj_dekunuts_model, packet_ptr, (u_long*)G.pOt, 0);
-  packet_ptr = AGM_DrawModelTPage(&obj_dekunuts_model, packet_ptr, (u_long*)G.pOt, 0, obj_dekunuts_tpage, obj_dekunuts_clut);
-  ResetSpadStack();
-
-
-  //SetSpadStack(SPAD_STACK_ADDR);
-  //packet_ptr = SGM2_UpdateModel(actor->body_model, packet_ptr, (u_long*)G.pOt, 0, SGM2_RENDER_AMBIENT | SGM2_RENDER_NO_NCLIP, scene);
-  //ResetSpadStack();
 
   CompMatrixLV(view, &actor->plant_matrix, &local_identity);
   gte_SetRotMatrix(&local_identity);
@@ -208,6 +227,31 @@ u_char * ObjDekunutsActorDraw(struct Actor * a, MATRIX * view, u_char * packet_p
   SetSpadStack(SPAD_STACK_ADDR);
   packet_ptr = SGM2_UpdateModel(actor->plant_model, packet_ptr, (u_long*)G.pOt, 0, SGM2_RENDER_AMBIENT | SGM2_RENDER_NO_NCLIP, scene);
   ResetSpadStack();
+
+  if(otzv > 8000) return packet_ptr;
+  // Frustum culling
+  if(vec0.vx < -128 || vec0.vx > SCREEN_W+128) return packet_ptr;
+  if(vec0.vy < -128 || vec0.vy > SCREEN_H+128) return packet_ptr;  
+
+  //AGM_TransformBones(&obj_dekunuts_model, &local_identity, frameBuffer, player_bone_matrix);
+
+    SVECTOR * anim = &obj_dekunuts_anim->animation_data[obj_dekunuts_anim->animation_list[1].start + (actor->anim % (obj_dekunuts_anim->animation_list[0].length)) * obj_dekunuts_anim->frame_size];
+    AGM_TransformByBone(&obj_dekunuts_model, &temp, anim, view);
+    //AGM_TransformModelOnly(&obj_dekunuts_model, player_bone_matrix, view);
+
+  SetSpadStack(SPAD_STACK_ADDR);
+  {
+    //packet_ptr = AGM_DrawModel(&obj_dekunuts_model, packet_ptr, (u_long*)G.pOt, 0);
+    packet_ptr = AGM_DrawModelTPage(&obj_dekunuts_model, packet_ptr, (u_long*)G.pOt, 0, obj_dekunuts_tpage, obj_dekunuts_clut, actor->material_flags);
+  }
+  ResetSpadStack();
+
+
+  //SetSpadStack(SPAD_STACK_ADDR);
+  //packet_ptr = SGM2_UpdateModel(actor->body_model, packet_ptr, (u_long*)G.pOt, 0, SGM2_RENDER_AMBIENT | SGM2_RENDER_NO_NCLIP, scene);
+  //ResetSpadStack();
+
+  
 
   return packet_ptr;
 }

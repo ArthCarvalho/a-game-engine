@@ -53,6 +53,15 @@ void AGM_LoadModel(AGM_model * model, u_long * addr){
     vertex->vy <<= 2;
     vertex->vz <<= 2;
   }*/
+
+  /*for(int i = 0; i < model->file->vertex_count; i++) {
+    SVECTOR * vertex = &model->file->normal_data[i];
+    long len = SquareRoot0(vertex->vx*vertex->vx+vertex->vy*vertex->vy+vertex->vz*vertex->vz);
+    vertex->vx = ((vertex->vx)<<12)/len;
+    vertex->vy = ((vertex->vy)<<12)/len;
+    vertex->vz = ((vertex->vz)<<12)/len;
+    //printf("index %d: normal x %d y %d z %d\n",i, vertex->vx, vertex->vy, vertex->vz);
+  }*/
   
   //printf("checking for skeleton data: %x\n",model->file->skeleton);
   
@@ -114,6 +123,7 @@ typedef struct AGM_SkelHeader {
 
 void AGM_Init(unsigned long buffer_size){
    TransformBuffer = LStack_Alloc(buffer_size);
+   NormalTransformBuffer = LStack_Alloc(buffer_size);
    
    TransformBufferSize = buffer_size;
    
@@ -199,7 +209,7 @@ void AGM_TransformByBone(AGM_model * model, MATRIX * mtx, SVECTOR * anim, MATRIX
   *AGM_MatrixStackPointer = *mtx;
  
   // Bone 0 is always the root bone
-  AGM_ProcessBone(skeleton->bone_list, 0, model->file->vertex_data, skeleton->vertex_indices, skeleton->matrix_list, anim, view);
+  AGM_ProcessBone(skeleton->bone_list, 0, model->file->vertex_data,  model->file->normal_data, skeleton->vertex_indices, skeleton->matrix_list, anim, view);
 
 }
 
@@ -235,16 +245,21 @@ void AGM_TransformBones(AGM_model * model, MATRIX * mtx, SVECTOR * anim, MATRIX 
 }
 
 // Process all children of the parent bone
-void AGM_ProcessBone(AGM_BONE * bones, u_short current_bone, SVECTOR * vtxbuff, u_short * idxbuff, MATRIX * matrixbuff, SVECTOR * anim, MATRIX * view) {  
+void AGM_ProcessBone(AGM_BONE * bones, u_short current_bone, SVECTOR * vtxbuff, SVECTOR * normalbuff, u_short * idxbuff, MATRIX * matrixbuff, SVECTOR * anim, MATRIX * view) {  
   AGM_BONE * cBone;
   MATRIX * parentMat;
   //MATRIX temp;
   MATRIX * temp;
   //SVECTOR anim_vec;
   SVECTOR * anim_vec;
+
+  MATRIX temp_mat;
+  SVECTOR temp_anim_vec;
   
-  temp = (MATRIX *)0x1F8003E0;
-  anim_vec = (SVECTOR *)0x1F8003D8;
+  //temp = (MATRIX *)0x1F8003E0;
+  //anim_vec = (SVECTOR *)0x1F8003D8;
+  temp = (MATRIX *)&temp_mat;
+  anim_vec = (SVECTOR *)&temp_anim_vec;
   
   
   // Get bone pointer from bone list
@@ -305,7 +320,7 @@ void AGM_ProcessBone(AGM_BONE * bones, u_short current_bone, SVECTOR * vtxbuff, 
 
     //if(g_pad & PAD_START) model_bend += 1;
     //if(g_pad & PAD_SELECT) model_bend -= 1;
-
+/*
     if(current_bone == 0){
       SVECTOR rot_mod;
       rot_mod.vx = 0;
@@ -327,7 +342,7 @@ void AGM_ProcessBone(AGM_BONE * bones, u_short current_bone, SVECTOR * vtxbuff, 
       rot_mod.vz = 0;
       fix12_toQuaternion((QUATERNION *)&rot_mod, &rot_mod);
       fix12_quaternionMul((QUATERNION *)anim_vec,(QUATERNION *)anim_vec,(QUATERNION *)&rot_mod);
-    }
+    }*/
 
     // Test Quaternion Code
     quaternionGetMatrix((QUATERNION *)anim_vec, temp);
@@ -358,11 +373,13 @@ void AGM_ProcessBone(AGM_BONE * bones, u_short current_bone, SVECTOR * vtxbuff, 
     gte_SetTransMatrix(temp);
     gte_SetRotMatrix(temp);
     // Transform vertices for this bone
-    AGM_TransformBlock(cBone, vtxbuff, idxbuff);
+    AGM_TransformBlock(cBone, vtxbuff, idxbuff, TransformBuffer);
+    //AGM_TransformBlock(cBone, normalbuff, idxbuff, NormalTransformBuffer);
+    
     // Check for children
     if(cBone->first_child != 0xFFFF){
       // Recursively process this bone's children
-      AGM_ProcessBone(bones, cBone->first_child, vtxbuff, idxbuff, matrixbuff, anim, view);
+      AGM_ProcessBone(bones, cBone->first_child, vtxbuff, normalbuff, idxbuff, matrixbuff, anim, view);
     }
     
     // Stop loop if current bone has no sibling
@@ -450,7 +467,7 @@ void AGM_ProcessBoneCopy(AGM_BONE * bones, u_short current_bone, SVECTOR * vtxbu
     gte_SetTransMatrix(temp);
     gte_SetRotMatrix(temp);
     // Transform vertices for this bone
-    AGM_TransformBlock(cBone, vtxbuff, idxbuff);
+    AGM_TransformBlock(cBone, vtxbuff, idxbuff, TransformBuffer);
     // Check for children
     if(cBone->first_child != 0xFFFF){
       // Recursively process this bone's children
@@ -556,7 +573,7 @@ void AGM_ProcessBoneToWorld(AGM_BONE * bones, u_short current_bone, MATRIX * mat
 }
 // AGM_model * model, MATRIX * mtx
 
-void AGM_TransformModelOnly(AGM_model * model, MATRIX * mtx, MATRIX * view) {
+void AGM_TransformModelOnly(AGM_model * model, MATRIX * mtx, MATRIX * view, MATRIX * light) {
   // Traverse the bone structure in order to transform each vertex by it's bone
   AGM_SKELHEADER * skeleton = model->file->skeleton;
   
@@ -566,12 +583,17 @@ void AGM_TransformModelOnly(AGM_model * model, MATRIX * mtx, MATRIX * view) {
   
   // Copy base matrix to stack pointer
   *AGM_MatrixStackPointer = *mtx;
- 
+
+
+ //for(int i = 0; i < model->file->vertex_count; i++) {
+ //  NormalTransformBuffer[i] = model->file->normal_data[i];
+ //}
+
   // Bone 0 is always the root bone
-  AGM_ProcessTransformModel(skeleton->bone_list, 0, model->file->vertex_data, skeleton->vertex_indices, mtx, view);
+  AGM_ProcessTransformModel(skeleton->bone_list, 0, model->file->vertex_data, model->file->normal_data, skeleton->vertex_indices, mtx, view, light);
 }
 
-void AGM_ProcessTransformModel(AGM_BONE * bones, u_short current_bone, SVECTOR * vtxbuff, u_short * idxbuff, MATRIX * matrixbuff, MATRIX * view) {
+void AGM_ProcessTransformModel(AGM_BONE * bones, u_short current_bone, SVECTOR * vtxbuff, SVECTOR * normalbuff, u_short * idxbuff, MATRIX * matrixbuff, MATRIX * view, MATRIX * light) {
   AGM_BONE * cBone;
   MATRIX * temp = (MATRIX *)0x1F800000;
 
@@ -582,17 +604,35 @@ void AGM_ProcessTransformModel(AGM_BONE * bones, u_short current_bone, SVECTOR *
     // Read LocalToWorld Matrix
     matrix = &matrixbuff[cBone->matrix_idx];
 
+    //gte_SetTransMatrix(temp);
+    //gte_SetRotMatrix(temp);
+    //AGM_TransformBlock(cBone, normalbuff, idxbuff, NormalTransformBuffer);
+
+    MulMatrix0(light, matrix, temp);
+
+    /*temp->m[0][1] = 0;
+    temp->m[0][2] = 0;
+    temp->m[1][0] = 0;
+    temp->m[1][2] = 0;
+    temp->m[2][0] = 0;
+    temp->m[2][1] = 0;
+    temp->m[2][2] = temp->m[1][1] = temp->m[0][0] = 4096;*/
+
+    gte_SetLightMatrix(temp);
+
+    AGM_LightBlock(cBone, normalbuff, idxbuff, NormalTransformBuffer);
+
     CompMatrixLV(view, matrix, temp);
     
     // Upload current stack matrix to GTE for transformation
     gte_SetTransMatrix(temp);
     gte_SetRotMatrix(temp);
     // Transform vertices for this bone
-    AGM_TransformBlock(cBone, vtxbuff, idxbuff);
+    AGM_TransformBlock(cBone, vtxbuff, idxbuff, TransformBuffer);
     // Check for children
     if(cBone->first_child != 0xFFFF){
       // Recursively process this bone's children
-      AGM_ProcessTransformModel(bones, cBone->first_child, vtxbuff, idxbuff, matrixbuff, view);
+      AGM_ProcessTransformModel(bones, cBone->first_child, vtxbuff, normalbuff, idxbuff, matrixbuff, view, light);
     }
     
     // Stop loop if current bone has no sibling
@@ -604,7 +644,7 @@ void AGM_ProcessTransformModel(AGM_BONE * bones, u_short current_bone, SVECTOR *
 }
 
 
-void AGM_TransformBlock(AGM_BONE * bone, SVECTOR * vtxbuff, u_short * idxbuff){
+void AGM_TransformBlock(AGM_BONE * bone, SVECTOR * vtxbuff, u_short * idxbuff, SVECTOR * dest){
   long i;
   short vtx_div3, vtx_rem, vtx_current;
   u_short * vertex_indices;
@@ -640,9 +680,9 @@ void AGM_TransformBlock(AGM_BONE * bone, SVECTOR * vtxbuff, u_short * idxbuff){
     // Use idle cycles waiting for the GTE to finish to do something else
     i++;
     // Get pointer to transform buffer address
-    dest_vec[0] = &TransformBuffer[idx_list[0]];
-    dest_vec[1] = &TransformBuffer[idx_list[1]];
-    dest_vec[2] = &TransformBuffer[idx_list[2]];
+    dest_vec[0] = &dest[idx_list[0]];
+    dest_vec[1] = &dest[idx_list[1]];
+    dest_vec[2] = &dest[idx_list[2]];
 
     gte_stsxy3((long *)&dest_vec[0]->vx,(long *)&dest_vec[1]->vx,(long *)&dest_vec[2]->vx);
     
@@ -666,10 +706,71 @@ void AGM_TransformBlock(AGM_BONE * bone, SVECTOR * vtxbuff, u_short * idxbuff){
     gte_ldv0(src_vec);
     gte_rtps();
     i++;
-    dest_vec = &TransformBuffer[idx];
+    dest_vec = &dest[idx];
     gte_stsxy((long *)&dest_vec->vx);
     gte_stsz(&tempz);
     dest_vec->vz = tempz;
+  }
+}
+
+void AGM_LightBlock(AGM_BONE * bone, SVECTOR * normalbuff, u_short * idxbuff, CVECTOR * dest){
+  long i;
+  short vtx_div3, vtx_rem, vtx_current;
+  u_short * vertex_indices;
+  
+  vtx_div3 = bone->vertex_count / 3;
+  vtx_rem = bone->vertex_count % 3;
+  
+  //printf("bone count=%d\n",bone->vertex_count);
+  //printf("bone vtx_div3=%d vtx_rem=%d\n",vtx_div3,vtx_rem);
+  
+  vertex_indices = &idxbuff[bone->vertex_start];
+
+  long neutralrgb = 0x00808080;
+  gte_ldrgb(&neutralrgb);
+  
+  // Transform vertices in groups of 3
+  for(i = 0; i < vtx_div3;){
+    SVECTOR * src_vec[3];
+    CVECTOR * dest_vec[3];
+    u_short idx_list[3];
+    
+    // Get Vertex Indices
+    idx_list[0] = *vertex_indices++;
+    idx_list[1] = *vertex_indices++;
+    idx_list[2] = *vertex_indices++;
+    
+    // Get Pointer to Vertices from Vertex Indices
+    src_vec[0] = &normalbuff[idx_list[0]];
+    src_vec[1] = &normalbuff[idx_list[1]];
+    src_vec[2] = &normalbuff[idx_list[2]];
+    
+    // Use GTE to transform vertices
+    gte_ldv3(src_vec[0],src_vec[1],src_vec[2]);
+    gte_ncct();
+    i++;
+    // Get pointer to transform buffer address
+    dest_vec[0] = &dest[idx_list[0]];
+    dest_vec[1] = &dest[idx_list[1]];
+    dest_vec[2] = &dest[idx_list[2]];
+
+    gte_strgb3(dest_vec[0], dest_vec[1], dest_vec[2]);
+  }
+  // Transform remaining vertices individually
+  for(i = 0; i < vtx_rem;){
+    SVECTOR * src_vec;
+    CVECTOR * dest_vec;
+    long tempz;
+    short idx;
+    
+    idx = *vertex_indices++;
+    src_vec = &normalbuff[idx];
+
+    gte_ldv0(src_vec);
+    gte_nccs();
+    i++;
+    dest_vec = &dest[idx];
+    gte_strgb(dest_vec);
   }
 }
 
@@ -759,7 +860,7 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
         *(long*)(&dest_pg4_ptr->r2) = temp3;
         *(long*)(&dest_pg4_ptr->r3) = temp0;*/
 
-        gte_ldrgb((CVECTOR*)&pg4_ptr->r0);
+        /*gte_ldrgb((CVECTOR*)&pg4_ptr->r0);
         gte_cc();
         gte_strgb((CVECTOR*)&dest_pg4_ptr->r0);
         gte_ldrgb((CVECTOR*)&pg4_ptr->r1);
@@ -770,7 +871,25 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
         gte_strgb((CVECTOR*)&dest_pg4_ptr->r2);
         gte_ldrgb((CVECTOR*)&pg4_ptr->r3);
         gte_cc();
-        gte_strgb((CVECTOR*)&dest_pg4_ptr->r3);
+        gte_strgb((CVECTOR*)&dest_pg4_ptr->r3);*/
+
+        /*gte_ldv3(
+            &NormalTransformBuffer[pg4_ptr->idx0],
+            &NormalTransformBuffer[pg4_ptr->idx1],
+            &NormalTransformBuffer[pg4_ptr->idx2]
+            );
+        gte_ldrgb((CVECTOR*)&pg4_ptr->r0);
+        gte_ncct();
+        gte_strgb3(&dest_pg4_ptr->r0, &dest_pg4_ptr->r1, &dest_pg4_ptr->r2);
+
+        gte_ldv0(&NormalTransformBuffer[pg4_ptr->idx3]);
+        gte_nccs();
+        gte_strgb(&dest_pg4_ptr->r3);*/
+
+        *(CVECTOR*)&dest_pg4_ptr->r0 = *(CVECTOR*)&NormalTransformBuffer[pg4_ptr->idx0];
+        *(CVECTOR*)&dest_pg4_ptr->r1 = *(CVECTOR*)&NormalTransformBuffer[pg4_ptr->idx1];
+        *(CVECTOR*)&dest_pg4_ptr->r2 = *(CVECTOR*)&NormalTransformBuffer[pg4_ptr->idx2];
+        *(CVECTOR*)&dest_pg4_ptr->r3 = *(CVECTOR*)&NormalTransformBuffer[pg4_ptr->idx3];
 
         /*dest_pg4_ptr->r0 = (pg4_ptr->r0 * 64) >> 8;
         dest_pg4_ptr->g0 = (pg4_ptr->g0 * 64) >> 8;
@@ -851,7 +970,7 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
         //*(long*)(&dest_pg3_ptr->r1) = *(long*)(&pg3_ptr->r1);
         //*(long*)(&dest_pg3_ptr->r2) = *(long*)(&pg3_ptr->r2);
 
-        gte_ldrgb((CVECTOR*)&pg3_ptr->r0);
+        /*gte_ldrgb((CVECTOR*)&pg3_ptr->r0);
         gte_cc();
         gte_strgb((CVECTOR*)&dest_pg3_ptr->r0);
         gte_ldrgb((CVECTOR*)&pg3_ptr->r1);
@@ -859,7 +978,20 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
         gte_strgb((CVECTOR*)&dest_pg3_ptr->r1);
         gte_ldrgb((CVECTOR*)&pg3_ptr->r2);
         gte_cc();
-        gte_strgb((CVECTOR*)&dest_pg3_ptr->r2);
+        gte_strgb((CVECTOR*)&dest_pg3_ptr->r2);*/
+
+        /*gte_ldv3(
+            &NormalTransformBuffer[pg3_ptr->idx0],
+            &NormalTransformBuffer[pg3_ptr->idx1],
+            &NormalTransformBuffer[pg3_ptr->idx2]
+            );
+        gte_ldrgb((CVECTOR*)&pg3_ptr->r0);
+        gte_ncct();
+        gte_strgb3(&dest_pg3_ptr->r0, &dest_pg3_ptr->r1, &dest_pg3_ptr->r2);*/
+
+        *(CVECTOR*)&dest_pg3_ptr->r0 = *(CVECTOR*)&NormalTransformBuffer[pg3_ptr->idx0];
+        *(CVECTOR*)&dest_pg3_ptr->r1 = *(CVECTOR*)&NormalTransformBuffer[pg3_ptr->idx1];
+        *(CVECTOR*)&dest_pg3_ptr->r2 = *(CVECTOR*)&NormalTransformBuffer[pg3_ptr->idx2];
 
         /*dest_pg3_ptr->r0 = (pg3_ptr->r0 * 64) >> 8;
         dest_pg3_ptr->g0 = (pg3_ptr->g0 * 64) >> 8;
@@ -946,7 +1078,7 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
         *(long*)(&dest_pgt4_ptr->r2) = temp3;
         *(long*)(&dest_pgt4_ptr->r3) = temp0;*/
 
-        gte_ldrgb((CVECTOR*)&pgt4_ptr->r0);
+        /*gte_ldrgb((CVECTOR*)&pgt4_ptr->r0);
         gte_cc();
         gte_strgb((CVECTOR*)&dest_pgt4_ptr->r0);
         gte_ldrgb((CVECTOR*)&pgt4_ptr->r1);
@@ -957,7 +1089,25 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
         gte_strgb((CVECTOR*)&dest_pgt4_ptr->r2);
         gte_ldrgb((CVECTOR*)&pgt4_ptr->r3);
         gte_cc();
-        gte_strgb((CVECTOR*)&dest_pgt4_ptr->r3);
+        gte_strgb((CVECTOR*)&dest_pgt4_ptr->r3);*/
+
+        /*gte_ldv3(
+            &NormalTransformBuffer[pgt4_ptr->idx0],
+            &NormalTransformBuffer[pgt4_ptr->idx1],
+            &NormalTransformBuffer[pgt4_ptr->idx2]
+            );
+        gte_ldrgb((CVECTOR*)&pgt4_ptr->r0);
+        gte_ncct();
+        gte_strgb3(&dest_pgt4_ptr->r0, &dest_pgt4_ptr->r1, &dest_pgt4_ptr->r2);
+
+        gte_ldv0(&NormalTransformBuffer[pgt4_ptr->idx3]);
+        gte_nccs();
+        gte_strgb(&dest_pgt4_ptr->r3);*/
+
+        *(CVECTOR*)&dest_pgt4_ptr->r0 = *(CVECTOR*)&NormalTransformBuffer[pgt4_ptr->idx0];
+        *(CVECTOR*)&dest_pgt4_ptr->r1 = *(CVECTOR*)&NormalTransformBuffer[pgt4_ptr->idx1];
+        *(CVECTOR*)&dest_pgt4_ptr->r2 = *(CVECTOR*)&NormalTransformBuffer[pgt4_ptr->idx2];
+        *(CVECTOR*)&dest_pgt4_ptr->r3 = *(CVECTOR*)&NormalTransformBuffer[pgt4_ptr->idx3];
 
         /*dest_pgt4_ptr->r0 = (pgt4_ptr->r0 * 64) >> 8;
         dest_pgt4_ptr->g0 = (pgt4_ptr->g0 * 64) >> 8;
@@ -1062,7 +1212,7 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
         *(long*)(&dest_pgt3_ptr->r0) = temp0;
         *(long*)(&dest_pgt3_ptr->r1) = temp1;
         *(long*)(&dest_pgt3_ptr->r2) = temp2;*/
-        gte_ldrgb((CVECTOR*)&pgt3_ptr->r0);
+        /*gte_ldrgb((CVECTOR*)&pgt3_ptr->r0);
         gte_cc();
         gte_strgb((CVECTOR*)&dest_pgt3_ptr->r0);
         gte_ldrgb((CVECTOR*)&pgt3_ptr->r1);
@@ -1070,7 +1220,20 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
         gte_strgb((CVECTOR*)&dest_pgt3_ptr->r1);
         gte_ldrgb((CVECTOR*)&pgt3_ptr->r2);
         gte_cc();
-        gte_strgb((CVECTOR*)&dest_pgt3_ptr->r2);
+        gte_strgb((CVECTOR*)&dest_pgt3_ptr->r2);*/
+
+        /*gte_ldv3(
+            &NormalTransformBuffer[pgt3_ptr->idx0],
+            &NormalTransformBuffer[pgt3_ptr->idx1],
+            &NormalTransformBuffer[pgt3_ptr->idx2]
+            );
+        gte_ldrgb((CVECTOR*)&pgt3_ptr->r0);
+        gte_ncct();
+        gte_strgb3(&dest_pgt3_ptr->r0, &dest_pgt3_ptr->r1, &dest_pgt3_ptr->r2);*/
+
+        *(CVECTOR*)&dest_pgt3_ptr->r0 = *(CVECTOR*)&NormalTransformBuffer[pgt3_ptr->idx0];
+        *(CVECTOR*)&dest_pgt3_ptr->r1 = *(CVECTOR*)&NormalTransformBuffer[pgt3_ptr->idx1];
+        *(CVECTOR*)&dest_pgt3_ptr->r2 = *(CVECTOR*)&NormalTransformBuffer[pgt3_ptr->idx2];
 
         /*dest_pgt3_ptr->r0 = (pgt3_ptr->r0 * 64) >> 8;
         dest_pgt3_ptr->g0 = (pgt3_ptr->g0 * 64) >> 8;
@@ -1206,7 +1369,7 @@ void ANM_InterpolateFrames(SVECTOR * frameF, SVECTOR * frameA, SVECTOR * frameB,
   }
 }
 
-u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot, short zoffset, u_short tpageid, u_short * clutid) {
+u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot, short zoffset, u_short tpageid, u_short * clutid, u_short * mat) {
   AGM_FILE * file = model->file;
   AGM_POLYG4 * pg4_ptr = file->poly_g4;
   AGM_POLYG3 * pg3_ptr = file->poly_g3;
@@ -1225,6 +1388,8 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
   short i;
   
   for(i = 0; i < pg4_count; i++, pg4_ptr++) {
+      u_short mat_flags = mat[pg4_ptr->clutid];
+      if(mat_flags & AGM_MATERIAL_NORENDER) continue;
       SVECTOR * vec0 = &TransformBuffer[pg4_ptr->idx0];
       SVECTOR * vec1 = &TransformBuffer[pg4_ptr->idx1];
       SVECTOR * vec2 = &TransformBuffer[pg4_ptr->idx2];
@@ -1237,7 +1402,7 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
       // Store Outer Product
       gte_stopz(&outer_product);
       // Check side
-      if(outer_product <= 0) continue; // Skip back facing polys
+      if(outer_product <= 0 && !(mat_flags & AGM_MATERIAL_NOCULLING)) continue; // Skip back facing polys
       //printf("rendering face %d\n",i);
       // Load Z coordinates into GTE
       tempz0 = vec0->vz;
@@ -1265,6 +1430,39 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
         temp0 = *(long*)(&vec3->vx);
         *(long*)(&dest_pg4_ptr->x3) = temp0;
 
+        if(mat_flags & AGM_MATERIAL_NOLIGHTING) {
+          *(CVECTOR*)&dest_pg4_ptr->r0 = *(CVECTOR*)&pg4_ptr->r0;
+          *(CVECTOR*)&dest_pg4_ptr->r1 = *(CVECTOR*)&pg4_ptr->r1;
+          *(CVECTOR*)&dest_pg4_ptr->r2 = *(CVECTOR*)&pg4_ptr->r2;
+          *(CVECTOR*)&dest_pg4_ptr->r3 = *(CVECTOR*)&pg4_ptr->r3;
+        } else {
+          /*gte_ldrgb((CVECTOR*)&pg4_ptr->r0);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pg4_ptr->r0);
+          gte_ldrgb((CVECTOR*)&pg4_ptr->r1);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pg4_ptr->r1);
+          gte_ldrgb((CVECTOR*)&pg4_ptr->r2);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pg4_ptr->r2);
+          gte_ldrgb((CVECTOR*)&pg4_ptr->r3);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pg4_ptr->r3);*/
+
+          gte_ldv3(
+            &model->file->normal_data[pg4_ptr->idx0],
+            &model->file->normal_data[pg4_ptr->idx1],
+            &model->file->normal_data[pg4_ptr->idx2]
+            );
+          gte_ldrgb((CVECTOR*)&pg4_ptr->r0);
+          gte_ncct();
+          gte_strgb3(&dest_pg4_ptr->r0, &dest_pg4_ptr->r1, &dest_pg4_ptr->r2);
+
+          gte_ldv0(&model->file->normal_data[pg4_ptr->idx3]);
+          gte_nccs();
+          gte_strgb(&dest_pg4_ptr->r3);
+        }
+/*
         gte_ldrgb((CVECTOR*)&pg4_ptr->r0);
         gte_cc();
         gte_strgb((CVECTOR*)&dest_pg4_ptr->r0);
@@ -1277,7 +1475,7 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
         gte_ldrgb((CVECTOR*)&pg4_ptr->r3);
         gte_cc();
         gte_strgb((CVECTOR*)&dest_pg4_ptr->r3);
-
+*/
         setPolyG4(dest_pg4_ptr);
         
         // Add primitive to Ordering Table and advance pointer
@@ -1291,6 +1489,8 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
   
 
   for(i = 0; i < pg3_count; i++, pg3_ptr++) {
+      u_short mat_flags = mat[pg3_ptr->clutid];
+      if(mat_flags & AGM_MATERIAL_NORENDER) continue;
       SVECTOR * vec0 = &TransformBuffer[pg3_ptr->idx0];
       SVECTOR * vec1 = &TransformBuffer[pg3_ptr->idx1];
       SVECTOR * vec2 = &TransformBuffer[pg3_ptr->idx2];
@@ -1302,7 +1502,7 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
       // Store Outer Product
       gte_stopz(&outer_product);
       // Check side
-      if(outer_product <= 0) continue; // Skip back facing polys
+      if(outer_product <= 0 && !(mat_flags & AGM_MATERIAL_NOCULLING)) continue; // Skip back facing polys
       //printf("rendering face %d\n",i);
       // Load Z coordinates into GTE
       tempz0 = vec0->vz;
@@ -1324,6 +1524,31 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
                    (long*)&dest_pg3_ptr->x1,
                    (long*)&dest_pg3_ptr->x2);
         // Vertex Colors
+        if(mat_flags & AGM_MATERIAL_NOLIGHTING) {
+          *(CVECTOR*)&dest_pg3_ptr->r0 = *(CVECTOR*)&pg3_ptr->r0;
+          *(CVECTOR*)&dest_pg3_ptr->r1 = *(CVECTOR*)&pg3_ptr->r1;
+          *(CVECTOR*)&dest_pg3_ptr->r2 = *(CVECTOR*)&pg3_ptr->r2;
+        } else {
+          /*gte_ldrgb((CVECTOR*)&pg3_ptr->r0);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pg3_ptr->r0);
+          gte_ldrgb((CVECTOR*)&pg3_ptr->r1);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pg3_ptr->r1);
+          gte_ldrgb((CVECTOR*)&pg3_ptr->r2);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pg3_ptr->r2);*/
+
+          gte_ldv3(
+            &model->file->normal_data[pg3_ptr->idx0],
+            &model->file->normal_data[pg3_ptr->idx1],
+            &model->file->normal_data[pg3_ptr->idx2]
+            );
+          gte_ldrgb((CVECTOR*)&pg3_ptr->r0);
+          gte_ncct();
+          gte_strgb3(&dest_pg3_ptr->r0, &dest_pg3_ptr->r1, &dest_pg3_ptr->r2);
+        }
+        /*
         gte_ldrgb((CVECTOR*)&pg3_ptr->r0);
         gte_cc();
         gte_strgb((CVECTOR*)&dest_pg3_ptr->r0);
@@ -1333,7 +1558,7 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
         gte_ldrgb((CVECTOR*)&pg3_ptr->r2);
         gte_cc();
         gte_strgb((CVECTOR*)&dest_pg3_ptr->r2);
-
+*/
         setPolyG3(dest_pg3_ptr);
         
         // Add primitive to Ordering Table and advance pointer
@@ -1347,6 +1572,9 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
   dest_pgt4_ptr = (POLY_GT4*)dest_pg3_ptr;
 
   for(i = 0; i < pgt4_count; i++, pgt4_ptr++) {
+      u_short clutval = clutid[pgt4_ptr->clutid];
+      u_short mat_flags = mat[pgt4_ptr->clutid];
+      if(mat_flags & AGM_MATERIAL_NORENDER) continue;
       SVECTOR * vec0 = &TransformBuffer[pgt4_ptr->idx0];
       SVECTOR * vec1 = &TransformBuffer[pgt4_ptr->idx1];
       SVECTOR * vec2 = &TransformBuffer[pgt4_ptr->idx2];
@@ -1359,7 +1587,7 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
       // Store Outer Product
       gte_stopz(&outer_product);
       // Check side
-      //if(outer_product <= 0) continue; // Skip back facing polys
+      if(outer_product <= 0 && !(mat_flags & AGM_MATERIAL_NOCULLING)) continue; // Skip back facing polys
       //printf("rendering face %d\n",i);
       // Load Z coordinates into GTE
       tempz0 = vec0->vz;
@@ -1386,19 +1614,39 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
         temp0 = *(long*)(&vec3->vx);
         *(long*)(&dest_pgt4_ptr->x3) = temp0;
         // Vertex Colors
+        if(mat_flags & AGM_MATERIAL_NOLIGHTING) {
+          *(CVECTOR*)&dest_pgt4_ptr->r0 = *(CVECTOR*)&pgt4_ptr->r0;
+          *(CVECTOR*)&dest_pgt4_ptr->r1 = *(CVECTOR*)&pgt4_ptr->r1;
+          *(CVECTOR*)&dest_pgt4_ptr->r2 = *(CVECTOR*)&pgt4_ptr->r2;
+          *(CVECTOR*)&dest_pgt4_ptr->r3 = *(CVECTOR*)&pgt4_ptr->r3;
+        } else {
+          /*gte_ldrgb((CVECTOR*)&pgt4_ptr->r0);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pgt4_ptr->r0);
+          gte_ldrgb((CVECTOR*)&pgt4_ptr->r1);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pgt4_ptr->r1);
+          gte_ldrgb((CVECTOR*)&pgt4_ptr->r2);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pgt4_ptr->r2);*/
+        
+          gte_ldv3(
+            &model->file->normal_data[pgt4_ptr->idx0],
+            &model->file->normal_data[pgt4_ptr->idx1],
+            &model->file->normal_data[pgt4_ptr->idx2]
+            );
+          gte_nct();
+          gte_strgb3(&dest_pgt4_ptr->r0, &dest_pgt4_ptr->r1, &dest_pgt4_ptr->r2);
 
-        gte_ldrgb((CVECTOR*)&pgt4_ptr->r0);
-        gte_cc();
-        gte_strgb((CVECTOR*)&dest_pgt4_ptr->r0);
-        gte_ldrgb((CVECTOR*)&pgt4_ptr->r1);
-        gte_cc();
-        gte_strgb((CVECTOR*)&dest_pgt4_ptr->r1);
-        gte_ldrgb((CVECTOR*)&pgt4_ptr->r2);
-        gte_cc();
-        gte_strgb((CVECTOR*)&dest_pgt4_ptr->r2);
-        gte_ldrgb((CVECTOR*)&pgt4_ptr->r3);
-        gte_cc();
-        gte_strgb((CVECTOR*)&dest_pgt4_ptr->r3);
+          gte_ldv0(&model->file->normal_data[pgt4_ptr->idx3]);
+          gte_ncs();
+          gte_strgb(&dest_pgt4_ptr->r3);
+
+          //gte_ldrgb((CVECTOR*)&pgt4_ptr->r3);
+          //gte_cc();
+          //gte_strgb((CVECTOR*)&dest_pgt4_ptr->r3);
+          //*(long*)&dest_pgt4_ptr->r3 = 0x00000000;
+        }
 
         // Texture Coordinates
         // Set Texture Coordinates
@@ -1413,7 +1661,7 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
 
         // Set CLUT
         //dest_pgt4_ptr->clut = clutid[pgt4_ptr->clutid];
-        dest_pgt4_ptr->clut = clutid[pgt4_ptr->clutid];
+        dest_pgt4_ptr->clut = clutval;
         // Set Texture Page
         dest_pgt4_ptr->tpage = tpageid;
 
@@ -1429,6 +1677,9 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
   dest_pgt3_ptr = (POLY_GT3*)dest_pgt4_ptr;
   
   for(i = 0; i < pgt3_count; i++, pgt3_ptr++) {
+      u_short clutval = clutid[pgt3_ptr->clutid];
+      u_short mat_flags = mat[pgt3_ptr->clutid];
+      if(mat_flags & AGM_MATERIAL_NORENDER) continue;
       SVECTOR * vec0 = &TransformBuffer[pgt3_ptr->idx0];
       SVECTOR * vec1 = &TransformBuffer[pgt3_ptr->idx1];
       SVECTOR * vec2 = &TransformBuffer[pgt3_ptr->idx2];
@@ -1440,7 +1691,7 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
       // Store Outer Product
       gte_stopz(&outer_product);
       // Check side
-      //if(outer_product <= 0) continue; // Skip back facing polys
+      if(outer_product <= 0  && !(mat_flags & AGM_MATERIAL_NOCULLING)) continue; // Skip back facing polys
       // Load Z coordinates into GTE
       tempz0 = vec0->vz;
       tempz1 = vec1->vz;
@@ -1461,6 +1712,29 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
                    (long*)&dest_pgt3_ptr->x1,
                    (long*)&dest_pgt3_ptr->x2);
         // Vertex Colors
+        if(mat_flags & AGM_MATERIAL_NOLIGHTING) {
+          *(CVECTOR*)&dest_pgt3_ptr->r0 = *(CVECTOR*)&pgt3_ptr->r0;
+          *(CVECTOR*)&dest_pgt3_ptr->r1 = *(CVECTOR*)&pgt3_ptr->r1;
+          *(CVECTOR*)&dest_pgt3_ptr->r2 = *(CVECTOR*)&pgt3_ptr->r1;
+        } else {
+          /*gte_ldrgb((CVECTOR*)&pgt3_ptr->r0);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pgt3_ptr->r0);
+          gte_ldrgb((CVECTOR*)&pgt3_ptr->r1);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pgt3_ptr->r1);
+          gte_ldrgb((CVECTOR*)&pgt3_ptr->r2);
+          gte_cc();
+          gte_strgb((CVECTOR*)&dest_pgt3_ptr->r2);*/
+          gte_ldv3(
+            &model->file->normal_data[pgt3_ptr->idx0],
+            &model->file->normal_data[pgt3_ptr->idx1],
+            &model->file->normal_data[pgt3_ptr->idx2]
+            );
+          gte_nct();
+          gte_strgb3(&dest_pgt3_ptr->r0, &dest_pgt3_ptr->r1, &dest_pgt3_ptr->r2);
+        }
+        /*
         gte_ldrgb((CVECTOR*)&pgt3_ptr->r0);
         gte_cc();
         gte_strgb((CVECTOR*)&dest_pgt3_ptr->r0);
@@ -1470,6 +1744,7 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
         gte_ldrgb((CVECTOR*)&pgt3_ptr->r2);
         gte_cc();
         gte_strgb((CVECTOR*)&dest_pgt3_ptr->r2);
+        */
 
         // Set Texture Coordinates
         temp0 = *(short*)(&pgt3_ptr->u0);
@@ -1479,7 +1754,7 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
         *(short*)(&dest_pgt3_ptr->u1) = temp1;
         *(short*)(&dest_pgt3_ptr->u2) = temp2;        
         // Set CLUT
-        dest_pgt3_ptr->clut = clutid[pgt3_ptr->clutid];
+        dest_pgt3_ptr->clut = clutval;
 
         // Set Texture Page
         dest_pgt3_ptr->tpage = tpageid;
@@ -1523,3 +1798,5 @@ void AGM_OffsetTexByMaterial(AGM_model * model, u_char material, u_char u, u_cha
     poly->v2 = (poly->v2 + v) % 256;
   }
 }
+
+// Transform by Bone Vertex and Normals

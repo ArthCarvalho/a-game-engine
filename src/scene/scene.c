@@ -23,9 +23,11 @@
 
 /* Temporary Static Data Files */
 extern unsigned long player_tim[];
+extern unsigned long player_tunic_green_tim[];
 extern unsigned long player_agm[];
 extern unsigned long player_anm[];
 extern unsigned long sword_sg2[];
+extern unsigned long shield_sgm2[];
 extern unsigned long scene_tim[];
 extern unsigned long iwakabe_tim[];
 extern unsigned long iwakabe_far_tim[];
@@ -80,13 +82,13 @@ void * ActorInitFuncs[] = {
 u_long ActorDataSizes[] = {
   sizeof(PlayerActor),
   sizeof(ObjTsuboActor),
-  sizeof(ObjSyokudaiActor),
+  sizeof(ObjSyokudaiActor)+64,
   sizeof(ObjGrassActor),
   sizeof(ObjGrassCutActor),
   sizeof(ObjDoorShutterActor),
   sizeof(ObjSwapPlaneActor),
   sizeof(ObjDekunutsActor)+64, // TODO -- FIND OUT ALLOCATION BUG
-  sizeof(ObjFlameActor)
+  sizeof(ObjFlameActor)+64
 };
 
 /*
@@ -271,7 +273,7 @@ Actor_Descriptor room0_actors[] = {
   {
     1182, (-63)-4096, 10821,          // short x, y, z;
     0, 0, 0,          // short rot_x, rot_y, rot_z;
-    4096*3, 4096*3, 4096*3, // short scale_x, scale_y, scale_z;
+    4096*2.5, 4096*2.5, 4096*2.5, // short scale_x, scale_y, scale_z;
     0,                // unsigned char room;
     NULL,             // unsigned char pad;
     OBJ_FLAME,        // unsigned int actor_type; Actor ID
@@ -282,7 +284,7 @@ Actor_Descriptor room0_actors[] = {
   {
     1182, (-63)-4096, 10153,          // short x, y, z;
     0, 0, 0,          // short rot_x, rot_y, rot_z;
-    4096*3, 4096*3, 4096*3, // short scale_x, scale_y, scale_z;
+    4096*2.5, 4096*2.5, 4096*2.5, // short scale_x, scale_y, scale_z;
     0,                // unsigned char room;
     NULL,             // unsigned char pad;
     OBJ_FLAME,        // unsigned int actor_type; Actor ID
@@ -293,7 +295,7 @@ Actor_Descriptor room0_actors[] = {
   {
     -3211, (-63)-4096, 15881,          // short x, y, z;
     0, 0, 0,          // short rot_x, rot_y, rot_z;
-    4096*3, 4096*3, 4096*3, // short scale_x, scale_y, scale_z;
+    4096*2.5, 4096*2.5, 4096*2.5, // short scale_x, scale_y, scale_z;
     0,                // unsigned char room;
     NULL,             // unsigned char pad;
     OBJ_FLAME,        // unsigned int actor_type; Actor ID
@@ -304,7 +306,29 @@ Actor_Descriptor room0_actors[] = {
   {
     -3962, (-63)-4096, 15881,          // short x, y, z;
     0, 0, 0,          // short rot_x, rot_y, rot_z;
-    4096*3, 4096*3, 4096*3, // short scale_x, scale_y, scale_z;
+    4096*2.5, 4096*2.5, 4096*2.5, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_FLAME,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      5, 1, 4096*0.6, 256*20, 0, 0, 0, 0, 0 // Color, Show Flare, Flare Scale, Flare Draw Distance
+    }
+  },
+  {
+    (256*-4.65992), (-63)-4096, (256*46.0892),          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096*2.5, 4096*2.5, 4096*2.5, // short scale_x, scale_y, scale_z;
+    0,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_FLAME,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      5, 1, 4096*0.6, 256*20, 0, 0, 0, 0, 0 // Color, Show Flare, Flare Scale, Flare Draw Distance
+    }
+  },
+  {
+    (256*-7.32035), (-63)-4096, (256*46.0892),          // short x, y, z;
+    0, 0, 0,          // short rot_x, rot_y, rot_z;
+    4096*2.5, 4096*2.5, 4096*2.5, // short scale_x, scale_y, scale_z;
     0,                // unsigned char room;
     NULL,             // unsigned char pad;
     OBJ_FLAME,        // unsigned int actor_type; Actor ID
@@ -472,7 +496,7 @@ Actor_Descriptor room1_actors[] = {
     }
   },
   {
-    3328+950, -4096-256, 650,          // short x, y, z;
+    3328+466, -4096-256, 650,          // short x, y, z;
     0, 1024, 0,          // short rot_x, rot_y, rot_z;
     4096, 4096, 4096, // short scale_x, scale_y, scale_z;
     1,                // unsigned char room;
@@ -483,7 +507,7 @@ Actor_Descriptor room1_actors[] = {
     }
   },
   {
-    3328+950, -4096-256, -650,          // short x, y, z;
+    3328+466, -4096-256, -650,          // short x, y, z;
     0, 1024, 0,          // short rot_x, rot_y, rot_z;
     4096, 4096, 4096, // short scale_x, scale_y, scale_z;
     1,                // unsigned char room;
@@ -494,7 +518,7 @@ Actor_Descriptor room1_actors[] = {
     }
   },
   {
-    3328+950+950, -4096-256, 650,          // short x, y, z;
+    3328+466+466, -4096-256, 650,          // short x, y, z;
     0, 1024, 0,          // short rot_x, rot_y, rot_z;
     4096, 4096, 4096, // short scale_x, scale_y, scale_z;
     1,                // unsigned char room;
@@ -505,7 +529,7 @@ Actor_Descriptor room1_actors[] = {
     }
   },
   {
-    3328+950+950, -4096-256, -650,          // short x, y, z;
+    3328+466+466, -4096-256, -650,          // short x, y, z;
     0, 1024, 0,          // short rot_x, rot_y, rot_z;
     4096, 4096, 4096, // short scale_x, scale_y, scale_z;
     1,                // unsigned char room;
@@ -516,7 +540,7 @@ Actor_Descriptor room1_actors[] = {
     }
   },
   {
-    3328+950+950+950, -4096-256, 650,          // short x, y, z;
+    3328+466+466+466, -4096-256, 650,          // short x, y, z;
     0, 1024, 0,          // short rot_x, rot_y, rot_z;
     4096, 4096, 4096, // short scale_x, scale_y, scale_z;
     1,                // unsigned char room;
@@ -527,7 +551,51 @@ Actor_Descriptor room1_actors[] = {
     }
   },
   {
-    3328+950+950+950, -4096-256, -650,          // short x, y, z;
+    3328+466+466+466, -4096-256, -650,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    3328+466+466+466+466, -4096-256, 650,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    3328+466+466+466+466, -4096-256, -650,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    3328+466+466+466+466+466, -4096-256, 650,          // short x, y, z;
+    0, 1024, 0,          // short rot_x, rot_y, rot_z;
+    4096, 4096, 4096, // short scale_x, scale_y, scale_z;
+    1,                // unsigned char room;
+    NULL,             // unsigned char pad;
+    OBJ_DEKUNUTS,        // unsigned int actor_type; Actor ID
+    {                 // unsigned int init_variables[9];
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    3328+466+466+466+466+466, -4096-256, -650,          // short x, y, z;
     0, 1024, 0,          // short rot_x, rot_y, rot_z;
     4096, 4096, 4096, // short scale_x, scale_y, scale_z;
     1,                // unsigned char room;
@@ -567,7 +635,7 @@ Room_Data room_data[] = {
       0                     // Skybox Type
     },
     room0_actors,           // List of actor initialization parameters
-    10,                      // Number of actors in initialization list
+    12,                      // Number of actors in initialization list
     NULL,                   // Pointer to list of models in this room's background
     0,                      // Number of background models
   },
@@ -586,7 +654,7 @@ Room_Data room_data[] = {
       0                     // Skybox Type
     },
     room1_actors,           // List of actor initialization parameters
-    12,                      // Number of actors in initialization list
+    16,                      // Number of actors in initialization list
     NULL,                   // Pointer to list of models in this room's background
     0,                      // Number of background models
   },
@@ -898,6 +966,8 @@ void SceneInitialize() {
   load_tex_noclut_pos((unsigned long)player_tim, 0, 256, 0, 0);
   DrawSync(0); // Wait for the transfer to end
 
+  load_tex_noclut_pos((unsigned long)player_tunic_green_tim,0,510,0,0);
+
   //datasize = file_load_temp_noalloc("\\DATA\\PLAYER.AGM;1", dataptr);
   //player_model = LStack_Alloc(datasize);
   player_model = (AGM_model*)player_agm;
@@ -912,12 +982,22 @@ void SceneInitialize() {
   //player_prop_sword = LStack_Alloc(datasize);
   player_prop_sword = (SGM2_File*)sword_sg2;
 
+  shield_prop = (SGM2_File*)shield_sgm2;
+
+  
+
   // Initialize player model
   PlayerSetupData((u_long*)player_model, (u_long*)player_anime);
   PlayerInitialize((Actor*)&playerActor);
 
   player_prop_sword = SGM2_LoadFile((u_long*)player_prop_sword);
   player_prop_sword->material[0].clut = GetClut(MAP_TEXTURE_CLUT_X, MAP_TEXTURE_CLUT_Y);
+
+  shield_prop = SGM2_LoadFile((u_long*)shield_prop);
+  shield_prop->material[0].tpage = getTPage(0, 0, 0, 256);
+  shield_prop->material[0].clut = GetClut(0, 511);
+  shield_prop->material[1].tpage = getTPage(0, 0, 0, 256);
+  shield_prop->material[1].clut = GetClut(0, 506);
 
   fade_screen[0].x0 = 0;
   fade_screen[0].y0 = 0;
@@ -1074,9 +1154,9 @@ void SceneLoad(Scene_Data * scene_data) {
   //G.clear.g = 66;
   G.clear.b = 30;
 
-  G.clear.r = 0;
-  G.clear.g = 0;
-  G.clear.b = 0;
+  G.clear.r = 0x00;
+  G.clear.g = 0x00;
+  G.clear.b = 0x00;
 
   //G.clear.r = 50;
   //G.clear.g = 115;
@@ -1231,6 +1311,7 @@ void SceneLoad(Scene_Data * scene_data) {
   SGM2_OffsetTexCoords(obj_grass_cut_half_model, (36*4) & 0xFF, (416) & 0xFF);
 
   Draw_SetupFlame();
+  Draw_SetupContactShadow();
   // Load Enemies
   //ObjSyokudaiActorSetup();
   ObjDekunutsActorSetup(NULL, scene);
@@ -1239,7 +1320,6 @@ void SceneLoad(Scene_Data * scene_data) {
   Scene_ActorList[ACTOR_GROUP_PLAYER].start = (Actor*)playerActor;
   Scene_ActorList[ACTOR_GROUP_PLAYER].end = (Actor*)playerActor;
 
-  
   // Init Actors
   /*for(int i = 0; i < NUM_TEST_OBJ_SYOKUDAI; i++) {
     // Move this to ObjSyokudaiActorInitialize
@@ -1756,7 +1836,26 @@ void SceneDraw() {
   //G.clear.b = daytime_sky.b;
   //SetFarColor(daytime_fog.r, daytime_fog.g, daytime_fog.b);
   //SetBackColor(daytime_sun.r, daytime_sun.g, daytime_sun.b);
-  SetBackColor(122, 113, 164);
+  //SetBackColor(122, 113, 164);
+  SetBackColor(30, 30, 40);
+
+  MATRIX light_view;
+  MATRIX lights = {
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+  };
+  
+  //CompMatrixLV(&lights, &camera->matrix, &light_view);
+
+  gte_SetLightMatrix(&light_view);
+
+  MATRIX light_colors = {
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+  };
+  gte_SetColorMatrix(&light_colors);
 
   BeginDraw();
 
@@ -1797,7 +1896,7 @@ void SceneDraw() {
   }
   
   //packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_AMBIENT | SGM2_RENDER_CLUTFOG, scene); // SGM2_RENDER_SUBDIV_HIGH
-  packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_CLUTFOG, scene);
+  packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 30, SGM2_RENDER_SUBDIV | SGM2_RENDER_CLUTFOG, scene);
   ResetSpadStack();
   if(scene->previous_room_m){
     SetSpadStack(SPAD_STACK_ADDR);
@@ -2393,3 +2492,192 @@ void Scene_CreateActor(Actor_Descriptor * actdesc, u_short group, Scene_Ctx * sc
   actor->Initialize = ActorInitFuncs[actdesc->actor_type];
   actor->Initialize(actor, actdesc, scene);
 }
+
+#define CONTACT_SHADOW_SEGMENTS 6
+#define CONTACT_SHADOW_SEGMENT_ANG (4096 / CONTACT_SHADOW_SEGMENTS)
+#define CONTACT_SHADOW_SEGMENTS2 (CONTACT_SHADOW_SEGMENTS * 2)
+#define CONTACT_SHADOW_INNER_RING_SCALE 1024
+
+#define CONTACT_SHADOW_SEGMENTS2 (CONTACT_SHADOW_SEGMENTS * 2) + 1
+#define CONTACT_SHADOW_SEGMENTS_INNER CONTACT_SHADOW_SEGMENTS * 3
+#define CONTACT_SHADOW_SEGMENTS_OUTTER CONTACT_SHADOW_SEGMENTS * 4
+#define CONTACT_SHADOW_RADIUS 45
+
+SVECTOR contact_shadow_verts[CONTACT_SHADOW_SEGMENTS2+32];
+u_char contact_shadow_outter[CONTACT_SHADOW_SEGMENTS_OUTTER+32];
+u_char contact_shadow_inner[CONTACT_SHADOW_SEGMENTS_INNER+32];
+
+void Draw_SetupContactShadow() {
+  // Generate Contact Shadow Mesh
+  short gen_ang = 0;
+  int step_tri = 0;
+  int step_quad = 0;
+  for(int i = 0; i < CONTACT_SHADOW_SEGMENTS; i++) {
+    gen_ang += CONTACT_SHADOW_SEGMENT_ANG;
+    short sin = (isin(gen_ang) * CONTACT_SHADOW_RADIUS) >> 12;
+    short cos = (icos(gen_ang) * CONTACT_SHADOW_RADIUS) >> 12;
+    contact_shadow_verts[i].vx = sin;
+    contact_shadow_verts[i].vy = 0;
+    contact_shadow_verts[i].vz = cos;
+    if(i == 5) {
+      contact_shadow_verts[i].vz += 256*0.8;
+    }
+    contact_shadow_verts[i+CONTACT_SHADOW_SEGMENTS].vx = (sin * CONTACT_SHADOW_INNER_RING_SCALE) >> 12;
+    contact_shadow_verts[i+CONTACT_SHADOW_SEGMENTS].vy = 0;
+    contact_shadow_verts[i+CONTACT_SHADOW_SEGMENTS].vz = (cos * CONTACT_SHADOW_INNER_RING_SCALE) >> 12;
+    if(i == 5) {
+      contact_shadow_verts[i+CONTACT_SHADOW_SEGMENTS].vz += 256*0.4;
+    }
+
+    contact_shadow_outter[step_quad] = i;
+    contact_shadow_outter[step_quad+1] = i + 1;
+    contact_shadow_outter[step_quad+2] = i + CONTACT_SHADOW_SEGMENTS + 0;
+    contact_shadow_outter[step_quad+3] = i + CONTACT_SHADOW_SEGMENTS + 1;
+    if(i == CONTACT_SHADOW_SEGMENTS-1) {
+      contact_shadow_outter[step_quad+1] -= CONTACT_SHADOW_SEGMENTS;
+      contact_shadow_outter[step_quad+3] -= CONTACT_SHADOW_SEGMENTS;
+    }
+    step_quad += 4;
+
+    contact_shadow_inner[step_tri] = i + CONTACT_SHADOW_SEGMENTS;
+    contact_shadow_inner[step_tri+1] = i + CONTACT_SHADOW_SEGMENTS + 1;
+    contact_shadow_inner[step_tri+2] = CONTACT_SHADOW_SEGMENTS2-1;
+    if(i == CONTACT_SHADOW_SEGMENTS-1) {
+      contact_shadow_inner[step_tri+1] -= CONTACT_SHADOW_SEGMENTS;
+    }
+    step_tri += 3;
+  }
+  SVECTOR zero = { 0, 0, 0, 0 };
+  contact_shadow_verts[CONTACT_SHADOW_SEGMENTS2-1] = zero;
+}
+
+
+
+u_char * Draw_ContactShadow(SVECTOR * pos, short angle, u_short scale, u_short strength, u_char * packet_ptr, void * scene, short offset) {
+  Scene_Ctx * scene_ctx = (Scene_Ctx *)scene;
+  MATRIX local_matrix, world_view;
+  MATRIX * view = &camera->matrix;
+  POLY_G4 * dest_pg4_ptr = (POLY_G4*) packet_ptr;
+  POLY_G3 * dest_pg3_ptr;
+  int step4 = 0;
+  int step3 = 0;
+  //long inner_color = 0x0;
+  u_short strlvl = (64 * strength) >> 12;
+  long inner_color = (strlvl << 0) | (strlvl << 8) | (strlvl << 16);
+  //long inner_color = 0x0808080;
+  long otz;
+  SVECTOR ang = {0, angle, 0, 0};
+  RotMatrix_gte(&ang, &local_matrix);
+  //RotMatrixY(&angle, &local_matrix);
+
+  /*local_matrix.m[0][0] = 4096;
+  local_matrix.m[0][1] = 0;
+  local_matrix.m[0][2] = 0;
+  local_matrix.m[1][0] = 0;
+  local_matrix.m[1][1] = 4096;
+  local_matrix.m[1][2] = 0;
+  local_matrix.m[2][0] = 0;
+  local_matrix.m[2][1] = 0;
+  local_matrix.m[2][2] = 4096;*/
+  local_matrix.t[0] = pos->vx;
+  local_matrix.t[1] = pos->vy;
+  local_matrix.t[2] = pos->vz;
+
+  VECTOR scl = {scale, scale, scale, 0};
+  ScaleMatrix(&local_matrix, &scl);
+
+
+  CompMatrixLV(view, &local_matrix, &world_view);
+
+  gte_SetRotMatrix(&world_view);
+  gte_SetTransMatrix(&world_view);
+  
+  SVECTOR localPos = { 0, 0, 0, 0 };
+  gte_ldv0(&localPos);
+
+  gte_rtps();
+  gte_stsz(&otz);
+  //otz = 0;
+  otz = ((otz >> 2) >> OTSUBDIV);
+  otz += offset;
+
+  if(otz <= OTMINCHAR || otz >= OTSIZE) {
+    return packet_ptr;
+  }
+
+  
+
+  for(int i = 0; i < CONTACT_SHADOW_SEGMENTS; i++) 
+    {*(long*)&dest_pg4_ptr->r0 = 0;
+    *(long*)&dest_pg4_ptr->r1 = 0;
+    *(long*)&dest_pg4_ptr->r2 = *(long*)(&inner_color);
+    *(long*)&dest_pg4_ptr->r3 = *(long*)(&inner_color);
+    setPolyG4(dest_pg4_ptr);
+    setSemiTrans(dest_pg4_ptr, 1);
+    gte_ldv3(
+      (SVECTOR*)&contact_shadow_verts[contact_shadow_outter[step4]],
+      (SVECTOR*)&contact_shadow_verts[contact_shadow_outter[step4+1]],
+      (SVECTOR*)&contact_shadow_verts[contact_shadow_outter[step4+2]]
+    );
+    gte_rtpt();
+    gte_stsxy3((long *)&dest_pg4_ptr->x0,(long *)&dest_pg4_ptr->x1,(long *)&dest_pg4_ptr->x2);
+    gte_ldv0((SVECTOR*)&contact_shadow_verts[contact_shadow_outter[step4+3]]);
+    gte_rtps();
+    gte_stsxy((long *)&dest_pg4_ptr->x3);
+
+    addPrim(G.pOt+otz, dest_pg4_ptr);
+    dest_pg4_ptr++;
+    step4+=4;
+
+    dest_pg3_ptr = (POLY_G3*)dest_pg4_ptr;
+    *(long*)&dest_pg3_ptr->r0 = *(long*)(&inner_color);
+    *(long*)&dest_pg3_ptr->r1 = *(long*)(&inner_color);
+    *(long*)&dest_pg3_ptr->r2 = *(long*)(&inner_color);
+    setPolyG3(dest_pg3_ptr);
+    setSemiTrans(dest_pg3_ptr, 1);
+    gte_ldv3(
+        (SVECTOR*)&contact_shadow_verts[contact_shadow_inner[step3]],
+        (SVECTOR*)&contact_shadow_verts[contact_shadow_inner[step3+1]],
+        (SVECTOR*)&contact_shadow_verts[contact_shadow_inner[step3+2]]
+      );
+    gte_rtpt();
+    gte_stsxy3((long *)&dest_pg3_ptr->x0,(long *)&dest_pg3_ptr->x1,(long *)&dest_pg3_ptr->x2);
+
+    addPrim(G.pOt+otz, dest_pg3_ptr);
+    dest_pg3_ptr++;
+    
+    dest_pg4_ptr = (POLY_G4*)dest_pg3_ptr;
+    step3+=3;
+  }
+
+  packet_ptr = (u_char *)dest_pg3_ptr;
+
+  setDrawTPage((DR_TPAGE*)packet_ptr, 1, 1, getTPage(0, 2, 0, 0));
+  addPrim(G.pOt+otz, packet_ptr);
+  packet_ptr += sizeof(DR_TPAGE);
+
+  return packet_ptr;
+}
+
+void Draw_CalcNearestLight(Actor * actor, void * scene) {
+    if(actor->xzDistance < 4096) {
+      Scene_Ctx * scene_ctx = (Scene_Ctx*)scene;
+      PlayerActor * player = scene_ctx->player;
+      u_short dist_lvl = (4096 - actor->xzDistance) << 1;
+      for(int i = 0; i < 2; i++) {
+        if(player->nearest_light_dist[i] > actor->xzDistance) {
+          short delta_x = (player->base.pos.vx - actor->pos.vx);
+          short delta_z = (player->base.pos.vz - actor->pos.vz);
+          short dist_x = (delta_x << 12) / actor->xzDistance;
+          short dist_z = (delta_z << 12) / actor->xzDistance;
+          player->nearest_shadow_ang[i] = fix12_atan2s(dist_x, dist_z);
+          player->nearest_light_dist[i] = actor->xzDistance;
+          player->nearest_light_str[i] = dist_lvl;
+          player->light_matrix.m[i][0] = -dist_x; 
+          player->light_matrix.m[i][1] = 0;
+          player->light_matrix.m[i][2] = -dist_z;
+          return;
+        }
+      }
+    }
+  }
