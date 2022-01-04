@@ -15,7 +15,7 @@
   .global saveicon
   .global load_symbol
   .global player_tim
-  .global player_tunic_green_tim
+  .global player_tunic_green_tim 
   .global player_agm
   .global player_anm
   .global sword_sg2
@@ -69,11 +69,11 @@
 
 player_agm:
   //.incbin "../AGAME_PCDATA/player_new.agm  "
-  .incbin "../zelda_assets/models/link_reference.agm" #  _global_normal
+  .incbin "../zelda_assets/models/link_reference.agm  " #_global_normal
   .balign 16
 
 player_anm:
-  .incbin "../AGAME_PCDATA/player_new.agm.anm"
+  .incbin "../zelda_assets/models/link_reference.agm.anm" #_global_normal
   .balign 16
 
 sword_sg2:

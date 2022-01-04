@@ -59,6 +59,7 @@ typedef struct FlameEffObj {
   u_char draw_flare;
   u_short flare_scale;
   short flare_dist; // Distance to display flare effect
+  u_char flicker_value;
 } FlameEffObj;
 
 #endif

@@ -36,6 +36,8 @@ extern u_char flare_index_outter_ring[];
 extern u_char flare_index_inner[];
 extern u_char flicker_frame[];
 
+extern CVECTOR flame_colors[];
+
 // Screen Flare, 8 segments
 #define SCREENFLARE_SEGMENTS 8
 #define SCREENFLARE_SEGMENTS2 (SCREENFLARE_SEGMENTS * 2) + 1

@@ -59,6 +59,9 @@ typedef struct Actor {
   //short rx,ry,rz; // Map Rotation
   u_short xzDistance;
   u_long xzDistanceSq;
+  MATRIX light_matrix;
+  MATRIX color_matrix;
+  short light_center_offset;
   struct Actor * prev; // Previous actor in actor list
   struct Actor * next; // Next actor in actor list
   struct Actor * parent; // Parent actor if any

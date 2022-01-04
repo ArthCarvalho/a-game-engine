@@ -26,6 +26,21 @@ CVECTOR flare_colors[] = {
   { 80, 40, 80, 0 }
 };
 
+CVECTOR flame_colors[] = {
+  // 0 White
+  { (64/80.0)*256.0, (64/80.0)*256.0, (64/80.0)*256.0, 0 },
+  // 1 Orange
+  { (80/80.0)*256.0, (67/80.0)*256.0, (40/80.0)*256.0, 0 },
+  // 2 Yellow
+  { (80/80.0)*256.0, (80/80.0)*256.0, (40/80.0)*256.0, 0 },
+  // 3 Green
+  { (67/80.0)*256.0, (80/80.0)*256.0, (40/80.0)*256.0, 0 },
+  // 4 Blue
+  { (40/80.0)*256.0, (67/80.0)*256.0, (80/80.0)*256.0, 0 },
+  // 5 Purple
+  { (80/80.0)*256.0, (40/80.0)*256.0, (80/80.0)*256.0, 0 }
+};
+
 u_char * Draw_ScreenFlare(SVECTOR * pos, MATRIX * view, u_char * packet_ptr, void * scene, u_char flicker, u_short scale, u_char color) {
   POLY_G4 * dest_pg4_ptr = (POLY_G4*) packet_ptr;
   POLY_G3 * dest_pg3_ptr;
@@ -202,6 +217,7 @@ u_char * Draw_Flame(FlameEffObj * flame, MATRIX * view, u_char * packet_ptr, voi
     flame_matrix.t[2] = flame->pos.vz;
     flame->flicker_frame++;
     flame->flicker_frame %= SCREENFLARE_FLICKER_FRAMES;
+    flame->flicker_value = flicker_frame[flame->flicker_frame];
 
     VECTOR scale = {flame->scale.vx, flame->scale.vy, flame->scale.vz, 0 };
     ScaleMatrix(&flame_matrix, &scale);

@@ -26,6 +26,7 @@
 typedef struct ObjFlameActor {
   struct Actor base;
   FlameEffObj flame;
+  struct Light * light;
 } ObjFlameActor;
 
 void ObjFlameActorSetup(); // Loads and sets up data, called while loading new scenes, does not create instances

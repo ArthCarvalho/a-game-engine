@@ -21,6 +21,7 @@ $(SRC_DIR)/actor/actor.c          		\
 $(SRC_DIR)/actor/a_player.c       		\
 $(SRC_DIR)/module/gameplay.c      		\
 $(SRC_DIR)/screen/screen.c     				\
+$(SRC_DIR)/scene/lights.c							\
 $(SRC_DIR)/scene/scene.c          		\
 $(SRC_DIR)/model/clip.c           		\
 $(SRC_DIR)/model/agm.c            		\

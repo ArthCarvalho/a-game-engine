@@ -12,7 +12,8 @@
 
 #include "spadstk.h"
 
-#include "../../AGAME_PCDATA/player_new.agm.anm.h"
+//#include "../../AGAME_PCDATA/player_new.agm.anm.h"
+#include "../../zelda_assets/models/link_reference.agm.anm.h"
 
 short col_queries_test = 0;
 
@@ -190,6 +191,8 @@ void PlayerCreateInstance(Actor * a, void * col_ctx) {
   actor->light_matrix.m[2][0] = 0;  
   actor->light_matrix.m[2][1] = -1024;
   actor->light_matrix.m[2][2] = 0;
+
+  actor->base.light_center_offset = 300;
 
   // Place player on ground
   {
@@ -472,6 +475,8 @@ void PlayerUpdate(Actor * a, void * scene) {
 
   RotMatrixZYX_gte(&local_rotate,&local_identity);
 
+  actor->light_matrix = local_identity;
+
   interp = interp % 4096;
 
   SetSpadStack(SPAD_STACK_ADDR);
@@ -531,7 +536,7 @@ void PlayerUpdate(Actor * a, void * scene) {
   SetSpadStack(SPAD_STACK_ADDR);
   Col_Result col_result;
   SVECTOR shadow_pos = { player_bone_matrix[12].t[0], player_bone_matrix[12].t[1]+64, player_bone_matrix[12].t[2], 0 };
-  if(Col_GroundCheckPoint(col_context_pl, &shadow_pos, 256, &col_result)) {
+  if(Col_GroundCheckPoint(col_context_pl, &shadow_pos, 256, &col_result) != -1) {
     actor->contact_shadow_l.vx = player_bone_matrix[12].t[0];
     actor->contact_shadow_l.vy = col_result.position.vy;
     actor->contact_shadow_l.vz = player_bone_matrix[12].t[2];
@@ -544,7 +549,7 @@ void PlayerUpdate(Actor * a, void * scene) {
   shadow_pos.vy = player_bone_matrix[15].t[1]+64;
   shadow_pos.vz = player_bone_matrix[15].t[2];
 
-  if(Col_GroundCheckPoint(col_context_pl, &shadow_pos, 256, &col_result)) {
+  if(Col_GroundCheckPoint(col_context_pl, &shadow_pos, 256, &col_result) != -1) {
     actor->contact_shadow_r.vx = player_bone_matrix[15].t[0];
     actor->contact_shadow_r.vy = col_result.position.vy; // actor->floor_height;
     actor->contact_shadow_r.vz = player_bone_matrix[15].t[2];
@@ -583,7 +588,7 @@ u_char * PlayerDraw(Actor * a, MATRIX * view, u_char * pbuff, void * scene) {
 
 
   // test lights
-  MATRIX idle = {
+  /*MATRIX idle = {
     4096, 0, 0,
     0, 4096, 0,
     0, 0, 4096,
@@ -599,7 +604,7 @@ u_char * PlayerDraw(Actor * a, MATRIX * view, u_char * pbuff, void * scene) {
       0, 4096, 0, // L2
       0, 0, 0  // L3
     };*/
-    MATRIX light_colors = {
+    /*MATRIX light_colors = {
 //   L1 L2 L3
       4096,                 4096,                 4096*(75.0/255.0), // R
       4096*(127.0/255.0),   4096*(127.0/255.0),   4096*(168.0/255.0), // G
@@ -611,13 +616,21 @@ u_char * PlayerDraw(Actor * a, MATRIX * view, u_char * pbuff, void * scene) {
       0,   4096, 0, // G
       0 ,   0, 4096, // B
     };*/
-    MATRIX local_lights;
+    /*MATRIX local_lights;
 
     //MulMatrix0(&lights, &player_bone_matrix[0], &local_lights);
     //MulMatrix0(&lights, &idle, &local_lights);
+    */
+
+    Lights_CalcNearest(&actor->base, scene);
+
+    MATRIX templocal;
+    //MulMatrix0(&actor->base.light_matrix, &actor->light_matrix, &templocal);
+    //MulMatrix0(&actor->base.light_matrix, &player_bone_matrix[0], &templocal);
     
-    SetColorMatrix(&light_colors);
-    SetLightMatrix(&actor->light_matrix);
+    SetColorMatrix(&actor->base.color_matrix);
+    //SetLightMatrix(&actor->base.light_matrix);
+    SetLightMatrix(&templocal);
 
   /*SVECTOR local_rotate; 
   u_short animation_start;
@@ -680,7 +693,7 @@ u_char * PlayerDraw(Actor * a, MATRIX * view, u_char * pbuff, void * scene) {
 
 
   
-  AGM_TransformModelOnly(&PlayerMdl, player_bone_matrix, view, &actor->light_matrix);
+  AGM_TransformModelOnly(&PlayerMdl, player_bone_matrix, view, &actor->base.light_matrix);
   SetSpadStack(SPAD_STACK_ADDR);
 
   //SetSpadStack(SPAD_STACK_ADDR);
@@ -696,8 +709,8 @@ u_char * PlayerDraw(Actor * a, MATRIX * view, u_char * pbuff, void * scene) {
   ResetSpadStack();
   
   for(int i = 0; i < 2; i++) { 
-    pbuff = Draw_ContactShadow(&actor->contact_shadow_l, actor->nearest_shadow_ang[i], 4343, actor->nearest_light_str[i], pbuff, scene, -3);
-    pbuff = Draw_ContactShadow(&actor->contact_shadow_r, actor->nearest_shadow_ang[i], 4343, actor->nearest_light_str[i], pbuff, scene, -3);
+    if(actor->contact_shadow_flags & 0x01) pbuff = Draw_ContactShadow(&actor->contact_shadow_l, actor->nearest_shadow_ang[i], 4343, actor->nearest_light_str[i], pbuff, scene, -3);
+    if(actor->contact_shadow_flags & 0x02) pbuff = Draw_ContactShadow(&actor->contact_shadow_r, actor->nearest_shadow_ang[i], 4343, actor->nearest_light_str[i], pbuff, scene, -3);
     actor->nearest_shadow_ang[i] = 1024+512;
     actor->nearest_light_dist[i] = 0x7FFF;
     actor->nearest_light_str[i] = 2048;

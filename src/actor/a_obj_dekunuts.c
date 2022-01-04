@@ -184,7 +184,7 @@ u_char * ObjDekunutsActorDraw(struct Actor * a, MATRIX * view, u_char * packet_p
 
 
   // test lights
-  MATRIX lights = {
+  /*MATRIX lights = {
        4096, 0, 0, // L1
       -4096, 0, 0, // L2
           0, 0, 0  // L3
@@ -194,11 +194,13 @@ u_char * ObjDekunutsActorDraw(struct Actor * a, MATRIX * view, u_char * packet_p
       4096,                 4096*( 75.0/255.0), 0, // R
       4096*(127.0/255.0),   4096*(168.0/255.0), 0, // G
       4096*( 39.0/255.0),   4096*(218.0/255.0), 0, // B
-    };
+    };*/
     MATRIX local_lights;
 
-    MulMatrix0(&lights, &actor->matrix, &local_lights);
-    SetColorMatrix(&light_colors);
+    Lights_CalcNearest(&actor->base, scene);
+
+    MulMatrix0(&actor->base.light_matrix, &actor->matrix, &local_lights);
+    SetColorMatrix(&actor->base.color_matrix);
     SetLightMatrix(&local_lights);
     
 

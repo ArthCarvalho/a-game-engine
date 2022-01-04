@@ -15,6 +15,7 @@
 #include "global.h"
 #include "actor/actors.h"
 #include "actor/flame_common.h"
+#include "scene/lights.h"
 
 extern unsigned long obj_syokudai_tim[];
 extern unsigned long obj_syokudai_sgm2[];
@@ -29,6 +30,7 @@ typedef struct ObjSyokudaiActor {
   struct SGM2 * body; // syokudai model
   MATRIX body_matrix; // Position matrix, calculated at init.
   FlameEffObj flame; // Flame Data
+  struct Light * light;
 } ObjSyokudaiActor;
 
 void ObjSyokudaiActorSetup(); // Loads and sets up data, called while loading new scenes, does not create instances

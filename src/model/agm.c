@@ -608,7 +608,17 @@ void AGM_ProcessTransformModel(AGM_BONE * bones, u_short current_bone, SVECTOR *
     //gte_SetRotMatrix(temp);
     //AGM_TransformBlock(cBone, normalbuff, idxbuff, NormalTransformBuffer);
 
-    MulMatrix0(light, matrix, temp);
+    /*MATRIX debug_color = {
+      4096, 0, 0,
+      0, 4096, 0,
+      0, 0, 4096
+    };
+
+    MATRIX tempmp = {
+      4096, 0, 0,
+      0, 4096, 0,
+      0, 0, 4096
+    };*/
 
     /*temp->m[0][1] = 0;
     temp->m[0][2] = 0;
@@ -617,10 +627,19 @@ void AGM_ProcessTransformModel(AGM_BONE * bones, u_short current_bone, SVECTOR *
     temp->m[2][0] = 0;
     temp->m[2][1] = 0;
     temp->m[2][2] = temp->m[1][1] = temp->m[0][0] = 4096;*/
+    //MulMatrix0(light, &tempmp, temp);
+    //MulMatrix0(&tempmp, matrix, temp);
+    MulMatrix0(light, matrix, temp);
+    //MulMatrix0(&tempmp, light, temp);
+    //MulMatrix0(&tempmp, matrix, temp);
 
+    //gte_SetColorMatrix(&debug_color);
+    //gte_SetLightMatrix(temp);
     gte_SetLightMatrix(temp);
 
     AGM_LightBlock(cBone, normalbuff, idxbuff, NormalTransformBuffer);
+
+    matrix = &matrixbuff[cBone->matrix_idx];
 
     CompMatrixLV(view, matrix, temp);
     

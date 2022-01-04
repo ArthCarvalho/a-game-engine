@@ -74,14 +74,26 @@ void ObjFlameActorInitialize(struct Actor * a, void * descriptor, void * scene) 
   actor->flame.flare_scale = actor_descriptor->init_variables[2];
   actor->flame.flare_dist = actor_descriptor->init_variables[3];
 
+  CVECTOR lcolor = { 255, 255, 255 };
+  actor->light = Lights_Create(&flame_pos, &lcolor, 2000, 0, scene);
+
 }
 
 void ObjFlameActorDestroy(struct Actor * a, void * scene) {
+  ObjFlameActor * actor = (ObjSyokudaiActor *)a;
+  Lights_Destroy(actor->light);
+  actor->light = NULL;
 
 }
 
 void ObjFlameActorUpdate(struct Actor * a, void * scene) {
+  ObjFlameActor * actor = (ObjSyokudaiActor *)a;
   Draw_CalcNearestLight(a, scene);
+  if(actor->light) {
+    actor->light->color.r = flame_colors[actor->flame.flame_color].r - (actor->flame.flicker_value*4); 
+    actor->light->color.g = flame_colors[actor->flame.flame_color].g - (actor->flame.flicker_value*4);
+    actor->light->color.b = flame_colors[actor->flame.flame_color].b - (actor->flame.flicker_value*4);
+  }
 }
 
 u_char * ObjFlameActorDraw(struct Actor * a, MATRIX * view, u_char * packet_ptr, void * scene) {

@@ -54,10 +54,16 @@ void ObjSyokudaiActorInitialize(struct Actor * a, void * descriptor, void * scen
 
   Draw_CreateFlame(&actor->flame, &flame_pos, &flame_scale, 1, 1);
 
+  CVECTOR lcolor = { 255, 255, 255 };
+
+  actor->light = Lights_Create(&flame_pos, &lcolor, 1500, 0, scene);
+
 }
 
 void ObjSyokudaiActorDestroy(struct Actor * a, void * scene) {
-
+  ObjSyokudaiActor * actor = (ObjSyokudaiActor *)a;
+  Lights_Destroy(actor->light);
+  actor->light = NULL;
 }
 
 void ObjSyokudaiActorUpdate(struct Actor * a, void * scene) {
@@ -121,6 +127,12 @@ void ObjSyokudaiActorUpdate(struct Actor * a, void * scene) {
       player->collisionData.displacement_z += disp_z;
     }
   }*/
+
+  if(actor->light) {
+    actor->light->color.r = flame_colors[actor->flame.flame_color].r - (actor->flame.flicker_value*4); 
+    actor->light->color.g = flame_colors[actor->flame.flame_color].g - (actor->flame.flicker_value*4);
+    actor->light->color.b = flame_colors[actor->flame.flame_color].b - (actor->flame.flicker_value*4);
+  }
 
 
 }

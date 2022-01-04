@@ -1312,6 +1312,7 @@ void SceneLoad(Scene_Data * scene_data) {
 
   Draw_SetupFlame();
   Draw_SetupContactShadow();
+  Lights_Initialize();
   // Load Enemies
   //ObjSyokudaiActorSetup();
   ObjDekunutsActorSetup(NULL, scene);
@@ -1836,8 +1837,8 @@ void SceneDraw() {
   //G.clear.b = daytime_sky.b;
   //SetFarColor(daytime_fog.r, daytime_fog.g, daytime_fog.b);
   //SetBackColor(daytime_sun.r, daytime_sun.g, daytime_sun.b);
-  //SetBackColor(122, 113, 164);
-  SetBackColor(30, 30, 40);
+  SetBackColor(122-50, 113-50, 164-50);
+  //SetBackColor(30, 30, 40);
 
   MATRIX light_view;
   MATRIX lights = {
@@ -2673,9 +2674,9 @@ void Draw_CalcNearestLight(Actor * actor, void * scene) {
           player->nearest_shadow_ang[i] = fix12_atan2s(dist_x, dist_z);
           player->nearest_light_dist[i] = actor->xzDistance;
           player->nearest_light_str[i] = dist_lvl;
-          player->light_matrix.m[i][0] = -dist_x; 
-          player->light_matrix.m[i][1] = 0;
-          player->light_matrix.m[i][2] = -dist_z;
+          //player->light_matrix.m[i][0] = -dist_x; 
+          //player->light_matrix.m[i][1] = 0;
+          //player->light_matrix.m[i][2] = -dist_z;
           return;
         }
       }
