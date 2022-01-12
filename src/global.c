@@ -29,7 +29,7 @@ unsigned long __stack_size = 0x4000;
 
 // Temporary buffer to store transformed vertices for animated models
 long TransformBufferSize = 0;
-SVECTOR * TransformBuffer = NULL;
+SVECTOR * AGM_TransformBuffer = NULL;
 CVECTOR * NormalTransformBuffer = NULL;
 
 /* Global Data */

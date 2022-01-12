@@ -122,16 +122,16 @@ typedef struct AGM_SkelHeader {
 */
 
 void AGM_Init(unsigned long buffer_size){
-   TransformBuffer = LStack_Alloc(buffer_size);
+   AGM_TransformBuffer = LStack_Alloc(buffer_size);
    NormalTransformBuffer = LStack_Alloc(buffer_size);
    
    TransformBufferSize = buffer_size;
    
-   printf("TransformBuffer: %x (size: %d)\n",TransformBuffer, TransformBufferSize);
+   printf("AGM_TransformBuffer: %x (size: %d)\n",AGM_TransformBuffer, TransformBufferSize);
 }
 
 void AGM_DeInit() {
-  //free3(TransformBuffer);
+  //free3(AGM_TransformBuffer);
   TransformBufferSize = 0;
 }
 
@@ -145,7 +145,7 @@ void AGM_TransformModel(SVECTOR * source, unsigned short vtx_count) {
   unsigned short i, idx;
   //short vtx_count = model->file->vertex_count;
   unsigned short vtx_div3, vtx_rem;
-  SVECTOR * vertex_buff_ptr = TransformBuffer;
+  SVECTOR * vertex_buff_ptr = AGM_TransformBuffer;
   SVECTOR * vertex_source = source;
   
   vtx_div3 = vtx_count / 3;
@@ -373,7 +373,7 @@ void AGM_ProcessBone(AGM_BONE * bones, u_short current_bone, SVECTOR * vtxbuff, 
     gte_SetTransMatrix(temp);
     gte_SetRotMatrix(temp);
     // Transform vertices for this bone
-    AGM_TransformBlock(cBone, vtxbuff, idxbuff, TransformBuffer);
+    AGM_TransformBlock(cBone, vtxbuff, idxbuff, AGM_TransformBuffer);
     //AGM_TransformBlock(cBone, normalbuff, idxbuff, NormalTransformBuffer);
     
     // Check for children
@@ -467,7 +467,7 @@ void AGM_ProcessBoneCopy(AGM_BONE * bones, u_short current_bone, SVECTOR * vtxbu
     gte_SetTransMatrix(temp);
     gte_SetRotMatrix(temp);
     // Transform vertices for this bone
-    AGM_TransformBlock(cBone, vtxbuff, idxbuff, TransformBuffer);
+    AGM_TransformBlock(cBone, vtxbuff, idxbuff, AGM_TransformBuffer);
     // Check for children
     if(cBone->first_child != 0xFFFF){
       // Recursively process this bone's children
@@ -647,7 +647,7 @@ void AGM_ProcessTransformModel(AGM_BONE * bones, u_short current_bone, SVECTOR *
     gte_SetTransMatrix(temp);
     gte_SetRotMatrix(temp);
     // Transform vertices for this bone
-    AGM_TransformBlock(cBone, vtxbuff, idxbuff, TransformBuffer);
+    AGM_TransformBlock(cBone, vtxbuff, idxbuff, AGM_TransformBuffer);
     // Check for children
     if(cBone->first_child != 0xFFFF){
       // Recursively process this bone's children
@@ -820,10 +820,10 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
   //clutid = GetClut(128,251);
   
   for(i = 0; i < pg4_count; i++, pg4_ptr++) {
-      SVECTOR * vec0 = &TransformBuffer[pg4_ptr->idx0];
-      SVECTOR * vec1 = &TransformBuffer[pg4_ptr->idx1];
-      SVECTOR * vec2 = &TransformBuffer[pg4_ptr->idx2];
-      SVECTOR * vec3 = &TransformBuffer[pg4_ptr->idx3];
+      SVECTOR * vec0 = &AGM_TransformBuffer[pg4_ptr->idx0];
+      SVECTOR * vec1 = &AGM_TransformBuffer[pg4_ptr->idx1];
+      SVECTOR * vec2 = &AGM_TransformBuffer[pg4_ptr->idx2];
+      SVECTOR * vec3 = &AGM_TransformBuffer[pg4_ptr->idx3];
       
       // Clip quads that are offscreen before any other operation
       //if(quad_clip( (DVECTOR*)vec0,
@@ -947,9 +947,9 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
   //printf("rendering tris count[%d]\n",pg3_count);
   
   for(i = 0; i < pg3_count; i++, pg3_ptr++) {
-      SVECTOR * vec0 = &TransformBuffer[pg3_ptr->idx0];
-      SVECTOR * vec1 = &TransformBuffer[pg3_ptr->idx1];
-      SVECTOR * vec2 = &TransformBuffer[pg3_ptr->idx2];
+      SVECTOR * vec0 = &AGM_TransformBuffer[pg3_ptr->idx0];
+      SVECTOR * vec1 = &AGM_TransformBuffer[pg3_ptr->idx1];
+      SVECTOR * vec2 = &AGM_TransformBuffer[pg3_ptr->idx2];
       
       // Clip quads that are offscreen before any other operation
       //if(tri_clip((DVECTOR*)vec0,
@@ -1037,10 +1037,10 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
   dest_pgt4_ptr = (POLY_GT4*)dest_pg3_ptr;
 
   for(i = 0; i < pgt4_count; i++, pgt4_ptr++) {
-      SVECTOR * vec0 = &TransformBuffer[pgt4_ptr->idx0];
-      SVECTOR * vec1 = &TransformBuffer[pgt4_ptr->idx1];
-      SVECTOR * vec2 = &TransformBuffer[pgt4_ptr->idx2];
-      SVECTOR * vec3 = &TransformBuffer[pgt4_ptr->idx3];
+      SVECTOR * vec0 = &AGM_TransformBuffer[pgt4_ptr->idx0];
+      SVECTOR * vec1 = &AGM_TransformBuffer[pgt4_ptr->idx1];
+      SVECTOR * vec2 = &AGM_TransformBuffer[pgt4_ptr->idx2];
+      SVECTOR * vec3 = &AGM_TransformBuffer[pgt4_ptr->idx3];
       
       // Clip quads that are offscreen before any other operation
       //if(quad_clip( (DVECTOR*)vec0,
@@ -1186,9 +1186,9 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
   dest_pgt3_ptr = (POLY_GT3*)dest_pgt4_ptr;
   
   for(i = 0; i < pgt3_count; i++, pgt3_ptr++) {
-      SVECTOR * vec0 = &TransformBuffer[pgt3_ptr->idx0];
-      SVECTOR * vec1 = &TransformBuffer[pgt3_ptr->idx1];
-      SVECTOR * vec2 = &TransformBuffer[pgt3_ptr->idx2];
+      SVECTOR * vec0 = &AGM_TransformBuffer[pgt3_ptr->idx0];
+      SVECTOR * vec1 = &AGM_TransformBuffer[pgt3_ptr->idx1];
+      SVECTOR * vec2 = &AGM_TransformBuffer[pgt3_ptr->idx2];
       
       // Clip quads that are offscreen before any other operation
       //if(tri_clip((DVECTOR*)vec0,
@@ -1409,10 +1409,10 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
   for(i = 0; i < pg4_count; i++, pg4_ptr++) {
       u_short mat_flags = mat[pg4_ptr->clutid];
       if(mat_flags & AGM_MATERIAL_NORENDER) continue;
-      SVECTOR * vec0 = &TransformBuffer[pg4_ptr->idx0];
-      SVECTOR * vec1 = &TransformBuffer[pg4_ptr->idx1];
-      SVECTOR * vec2 = &TransformBuffer[pg4_ptr->idx2];
-      SVECTOR * vec3 = &TransformBuffer[pg4_ptr->idx3];
+      SVECTOR * vec0 = &AGM_TransformBuffer[pg4_ptr->idx0];
+      SVECTOR * vec1 = &AGM_TransformBuffer[pg4_ptr->idx1];
+      SVECTOR * vec2 = &AGM_TransformBuffer[pg4_ptr->idx2];
+      SVECTOR * vec3 = &AGM_TransformBuffer[pg4_ptr->idx3];
 
       // Load screen XY coordinates to GTE Registers
       gte_ldsxy3(*(long*)&vec0->vx,*(long*)&vec1->vx,*(long*)&vec2->vx);
@@ -1510,9 +1510,9 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
   for(i = 0; i < pg3_count; i++, pg3_ptr++) {
       u_short mat_flags = mat[pg3_ptr->clutid];
       if(mat_flags & AGM_MATERIAL_NORENDER) continue;
-      SVECTOR * vec0 = &TransformBuffer[pg3_ptr->idx0];
-      SVECTOR * vec1 = &TransformBuffer[pg3_ptr->idx1];
-      SVECTOR * vec2 = &TransformBuffer[pg3_ptr->idx2];
+      SVECTOR * vec0 = &AGM_TransformBuffer[pg3_ptr->idx0];
+      SVECTOR * vec1 = &AGM_TransformBuffer[pg3_ptr->idx1];
+      SVECTOR * vec2 = &AGM_TransformBuffer[pg3_ptr->idx2];
       
       // Load screen XY coordinates to GTE Registers
       gte_ldsxy3(*(long*)&vec0->vx,*(long*)&vec1->vx,*(long*)&vec2->vx);
@@ -1594,10 +1594,10 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
       u_short clutval = clutid[pgt4_ptr->clutid];
       u_short mat_flags = mat[pgt4_ptr->clutid];
       if(mat_flags & AGM_MATERIAL_NORENDER) continue;
-      SVECTOR * vec0 = &TransformBuffer[pgt4_ptr->idx0];
-      SVECTOR * vec1 = &TransformBuffer[pgt4_ptr->idx1];
-      SVECTOR * vec2 = &TransformBuffer[pgt4_ptr->idx2];
-      SVECTOR * vec3 = &TransformBuffer[pgt4_ptr->idx3];
+      SVECTOR * vec0 = &AGM_TransformBuffer[pgt4_ptr->idx0];
+      SVECTOR * vec1 = &AGM_TransformBuffer[pgt4_ptr->idx1];
+      SVECTOR * vec2 = &AGM_TransformBuffer[pgt4_ptr->idx2];
+      SVECTOR * vec3 = &AGM_TransformBuffer[pgt4_ptr->idx3];
             
       // Load screen XY coordinates to GTE Registers
       gte_ldsxy3(*(long*)&vec0->vx,*(long*)&vec1->vx,*(long*)&vec2->vx);
@@ -1699,9 +1699,9 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
       u_short clutval = clutid[pgt3_ptr->clutid];
       u_short mat_flags = mat[pgt3_ptr->clutid];
       if(mat_flags & AGM_MATERIAL_NORENDER) continue;
-      SVECTOR * vec0 = &TransformBuffer[pgt3_ptr->idx0];
-      SVECTOR * vec1 = &TransformBuffer[pgt3_ptr->idx1];
-      SVECTOR * vec2 = &TransformBuffer[pgt3_ptr->idx2];
+      SVECTOR * vec0 = &AGM_TransformBuffer[pgt3_ptr->idx0];
+      SVECTOR * vec1 = &AGM_TransformBuffer[pgt3_ptr->idx1];
+      SVECTOR * vec2 = &AGM_TransformBuffer[pgt3_ptr->idx2];
       
       // Load screen XY coordinates to GTE Registers
       gte_ldsxy3(*(long*)&vec0->vx,*(long*)&vec1->vx,*(long*)&vec2->vx);

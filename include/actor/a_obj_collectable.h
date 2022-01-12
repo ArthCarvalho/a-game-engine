@@ -18,6 +18,11 @@
 
 typedef struct ObjCollectableActor {
   struct Actor base;
+  u_short item_type;
+  short roty;
+  short y_offset;
+  u_char state;
+  u_char counter;
 } ObjCollectableActor;
 
 void ObjCollectableActorSetup(); // Loads and sets up data, called while loading new scenes, does not create instances
@@ -26,5 +31,7 @@ void ObjCollectableActorInitialize(struct Actor * a, void * descriptor, void * s
 void ObjCollectableActorDestroy(struct Actor * a, void * scene);
 void ObjCollectableActorUpdate(struct Actor * a, void * scene);
 u_char * ObjCollectableActorDraw(struct Actor * a, MATRIX * view, u_char * pbuff, void * scene);
+
+
 
 #endif // A_OBJ_COLLECTABLE_H

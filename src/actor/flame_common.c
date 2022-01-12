@@ -271,9 +271,9 @@ u_char * Draw_Flame(FlameEffObj * flame, MATRIX * view, u_char * packet_ptr, voi
     for(i = 0; i < pg_count; i++, pgt3_ptr++) {
         long outer_product, otz;
         long tempz0,tempz1,tempz2;
-        SVECTOR * vec0 = &TransformBuffer[pgt3_ptr->idx0];
-        SVECTOR * vec1 = &TransformBuffer[pgt3_ptr->idx1];
-        SVECTOR * vec2 = &TransformBuffer[pgt3_ptr->idx2];
+        SVECTOR * vec0 = &AGM_TransformBuffer[pgt3_ptr->idx0];
+        SVECTOR * vec1 = &AGM_TransformBuffer[pgt3_ptr->idx1];
+        SVECTOR * vec2 = &AGM_TransformBuffer[pgt3_ptr->idx2];
               
         // Load screen XY coordinates to GTE Registers
         gte_ldsxy3(*(long*)&vec0->vx,*(long*)&vec1->vx,*(long*)&vec2->vx);

@@ -184,7 +184,7 @@ extern unsigned long load_symbol[];
 
 // Temporary buffer to store transformed vertices for animated models
 extern long TransformBufferSize;
-extern SVECTOR * TransformBuffer;
+extern SVECTOR * AGM_TransformBuffer;
 extern CVECTOR * NormalTransformBuffer;
 
 void  ResetGsEnv();

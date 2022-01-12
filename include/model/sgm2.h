@@ -114,6 +114,9 @@ typedef struct SGM2 {
 #define SGM2_RENDER_SUBDIV_HIGH	(1<<5)
 #define SGM2_RENDER_CLUTFOG			(1<<6)
 
+#define SGM2_REFLECTION_SHIFT 7
+#define SGM2_REFLECTION_SIZE 32
+
 SGM2_File * SGM2_LoadFile(u_long * addr);
 
 u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, short depth_offset, u_int flags, void * scene);
@@ -121,5 +124,9 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
 void SGM2_OffsetTexCoords(SGM2_File * model, short x, short y);
 
 void SGM2_OffsetMatTexCoords(SGM2_File * model, u_short mat, short x, short y);
+
+void SGM2_GenerateReflectionUV(SGM2_File * model, MATRIX * model_view, int x_offset, int y_offset);
+
+u_char * SGM2_UpdateModelColor(SGM2_File * model, u_char * packet_ptr, u_long * ot, short depth_offset, u_int flags, CVECTOR color, void * scene);
 
 #endif

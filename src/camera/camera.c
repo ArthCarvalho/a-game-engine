@@ -64,6 +64,8 @@ void Camera_Create(struct Camera * cam, void * col){
   cam->position.vy = 0;
   cam->position.vz = 0;
   cam->matrix = m_identity;
+	cam->matrix_unscaled = m_identity;
+	
   //cam->aspect.vx = 6554;
 	cam->aspect.vx = camera_ASPECT;
   cam->aspect.vy = 4096;
@@ -163,9 +165,17 @@ void Camera_LookAt(struct Camera * cam) {
 	crossProduct(&zaxis, &xaxis, &taxis);
 	VectorNormalS(&taxis, &yaxis);
   
-  cam->matrix.m[0][0] = xaxis.vx;	cam->matrix.m[1][0] = yaxis.vx;	cam->matrix.m[2][0] = zaxis.vx;
-	cam->matrix.m[0][1] = xaxis.vy;	cam->matrix.m[1][1] = yaxis.vy;	cam->matrix.m[2][1] = zaxis.vy;
-	cam->matrix.m[0][2] = xaxis.vz;	cam->matrix.m[1][2] = yaxis.vz;	cam->matrix.m[2][2] = zaxis.vz;
+  cam->matrix_unscaled.m[0][0] = cam->matrix.m[0][0] = xaxis.vx;
+	cam->matrix_unscaled.m[1][0] = cam->matrix.m[1][0] = yaxis.vx;
+	cam->matrix_unscaled.m[2][0] = cam->matrix.m[2][0] = zaxis.vx;
+
+	cam->matrix_unscaled.m[0][1] = cam->matrix.m[0][1] = xaxis.vy;
+	cam->matrix_unscaled.m[1][1] = cam->matrix.m[1][1] = yaxis.vy;
+	cam->matrix_unscaled.m[2][1] = cam->matrix.m[2][1] = zaxis.vy;
+	
+	cam->matrix_unscaled.m[0][2] = cam->matrix.m[0][2] = xaxis.vz;
+	cam->matrix_unscaled.m[1][2] = cam->matrix.m[1][2] = yaxis.vz;
+	cam->matrix_unscaled.m[2][2] = cam->matrix.m[2][2] = zaxis.vz;
 
   // Generate XZ plane (For Player Movement)
   // This might be better off moved somewhere else later.
@@ -212,6 +222,9 @@ void Camera_LookAt(struct Camera * cam) {
   ScaleMatrixL(&cam->matrix, &aspect_mod);
   ApplyMatrixLV(&cam->matrix, &pos, &vec);
 	TransMatrix(&cam->matrix, &vec);
+	
+	ApplyMatrixLV(&cam->matrix_unscaled, &pos, &vec);
+	TransMatrix(&cam->matrix_unscaled, &vec);
 }
 
 short camera_rot_smooth = 0;

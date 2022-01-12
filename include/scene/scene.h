@@ -297,6 +297,7 @@ enum {
     OBJ_SWAP_PLANE,
     OBJ_DEKUNUTS,
     OBJ_FLAME,
+    OBJ_COLLECTABLE,
     OBJ_MAX
 };
 

@@ -122,7 +122,7 @@ typedef struct ANM_Animation {
 
 // Temporary buffer to store transformed vertices for animated models
 extern long AGM_TransformBufferSize;
-extern SVECTOR * AGM_TransfomBuffer;
+extern SVECTOR * AGM_TransformBuffer;
 extern SVECTOR * AGM_NormalTransfomBuffer;
 
 // Transform Matrix Stack, max depth = 6

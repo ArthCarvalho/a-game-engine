@@ -70,12 +70,14 @@
   .global dekunuts_body_static_sgm2
   .global dekunuts_agm
   .global dekunuts_anm
+  .global obj_item_sphere_sgm2
+  .global obj_item_sphere_tim
   .global texture_data_start
   .global texture_data_end
 
 player_agm:
-  //.incbin "../AGAME_PCDATA/player_new.agm  "
-  .incbin "../zelda_assets/models/link_reference.agm  " #_global_normal
+  //.incbin "../AGAME_PCDATA/player_new.agm"
+  .incbin "../zelda_assets/models/link_reference.agm" #_global_normal
   .balign 16
 
 player_anm:
@@ -299,5 +301,10 @@ dekunuts_agm:
 dekunuts_anm:
   .incbin "../zelda_assets/models/enemy/dekunuts/dekunuts_new.agm.anm"
   .balign 16
-
+obj_item_sphere_sgm2:
+  .incbin "../zelda_assets/models/item_sphere.sgm2                    "
+  .balign 16
+obj_item_sphere_tim:
+  .incbin "../zelda_assets/textures_png/reflection_sphere.tim"
+  .balign 16
 texture_data_end: 

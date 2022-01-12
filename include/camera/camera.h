@@ -45,6 +45,7 @@ typedef struct Camera {
   VECTOR target_pos;
   VECTOR position;
   MATRIX matrix;
+  MATRIX matrix_unscaled;
   VECTOR aspect;
   struct Actor * target;
   SVECTOR target_offset;
