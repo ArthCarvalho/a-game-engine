@@ -25,6 +25,11 @@
   .global iwakabe_far_tim
   .global iwayuka_tim
   .global deku_shrine_block000a
+  .global deku_shrine_block000b
+  .global deku_shrine_block000b_000
+  .global deku_shrine_block000b_001
+  .global deku_shrine_block000b_002
+  .global deku_shrine_block000b_003
   .global scene_col
   .global scene_room00_sg2
   .global scene_room01_sg2
@@ -43,6 +48,7 @@
   .global obj_tsubo_sgm2
   .global obj_tsubo_low_sgm2
   .global obj_grass_tim
+
   .global obj_grass_sgm2
   .global obj_grass_low_sgm2
   .global obj_grass_low2_sgm2
@@ -105,7 +111,7 @@ scene_room04_sg2:
   .balign 16
 
 scene_room05_sg2:
-  .incbin "../AGAME_PCDATA/Map/Test/room_005.sgm2"
+  .incbin "../AGAME_PCDATA/Map/Test/room_005.sgm2 "
   .balign 16
 
 scene_room05_sg2_ext:
@@ -189,6 +195,26 @@ deku_shrine_block000a:
   .incbin "../zelda_assets/textures_png/scenes/deku_shrine_block000a.tim"
   .balign 16
 
+deku_shrine_block000b:
+  .incbin "../zelda_assets/textures_png/scenes/deku_shrine_block000b.tim"
+  .balign 16
+
+deku_shrine_block000b_000:
+  .incbin "../zelda_assets/textures_png/scenes/deku_shrine_block000b_000.tim"
+  .balign 16
+
+deku_shrine_block000b_001:
+  .incbin "../zelda_assets/textures_png/scenes/deku_shrine_block000b_001.tim"
+  .balign 16
+
+deku_shrine_block000b_002:
+  .incbin "../zelda_assets/textures_png/scenes/deku_shrine_block000b_002.tim"
+  .balign 16
+
+deku_shrine_block000b_003:
+  .incbin "../zelda_assets/textures_png/scenes/deku_shrine_block000b_003.tim"
+  .balign 16
+
 obj_syokudai_tim:
   .incbin "../AGAME_PCDATA/obj_syokudai.tim"
   .balign 16
@@ -268,10 +294,10 @@ dekunuts_body_static_sgm2:
   .incbin "../AGAME_PCDATA/objects/enemy/dekunuts/dekunuts_body_static.sgm2"
   .balign 16
 dekunuts_agm:
-  .incbin "../zelda_assets/models/enemy/dekunuts/dekunuts.agm"
+  .incbin "../zelda_assets/models/enemy/dekunuts/dekunuts_new.agm"
   .balign 16
 dekunuts_anm:
-  .incbin "../zelda_assets/models/enemy/dekunuts/dekunuts.agm.anm"
+  .incbin "../zelda_assets/models/enemy/dekunuts/dekunuts_new.agm.anm"
   .balign 16
 
 texture_data_end: 

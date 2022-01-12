@@ -59,9 +59,10 @@ short col_queries_test = 0;
 #define PLAYER_MOVE_FALLING_DEACCEL FIXED(0.6454545454545455)*/
 
 #define SPEED_MULT 1.0
-//#define SPEED_MULT 1.0
+//#define SPEED_MULT 1.5
 
-#define PLAYER_MOVE_SPEED FIXED(35.5*SPEED_MULT)
+//#define PLAYER_MOVE_SPEED FIXED(35.5*SPEED_MULT)
+#define PLAYER_MOVE_SPEED FIXED(33.0*SPEED_MULT)
 #define PLAYER_ROLL_SPEED_LOW FIXED(19.36*SPEED_MULT)
 //#define PLAYER_ROLL_SPEED FIXED(53.25)
 #define PLAYER_ROLL_SPEED FIXED(60.25*SPEED_MULT)
@@ -152,8 +153,8 @@ void PlayerCreateInstance(Actor * a, void * col_ctx) {
   col_context_pl = (Col2*) col_ctx;
 
   actor->speed_fall = 0;
-  actor->gravity = (-5.25 * 4096);
-  actor->max_speed_y = -120<<12;
+  actor->gravity = (-5.25 * 4096) * SPEED_MULT;
+  actor->max_speed_y = (-120<<12) * SPEED_MULT;
 
   actor->process = Player_Normal;
 
@@ -221,7 +222,7 @@ void PlayerInitialize(Actor * a) {
 void PlayerDestroy(Actor * a) {
 }
 
-long anim_spd = 4096;
+long anim_spd = 4096 * SPEED_MULT;
 
 short analog_l_x_n = 0, analog_l_y_n = 0;
 short analog_r_x_n = 0, analog_r_y_n = 0;
@@ -317,10 +318,17 @@ void PlayerUpdate(Actor * a, void * scene) {
       input_a = ((analog_l_mag - ANALOG_MIN)<<12) / ANALOG_RANGE;
     }
 
-
     if(actor->state & PLAYER_STATE_ONAIR) {
       actor->process = Player_Falling;
     } else {
+      if(actor->process == Player_Falling) {
+        actor->current_anim = ANM_Landing2Wait;
+        anim_spd = 4096;
+        interp = 0;
+        anim_interp = 0;
+        actor->anim_frame = 0;
+        actor->state = 0x80000000;
+      }
       actor->process = Player_Normal;
     }
 
@@ -336,7 +344,7 @@ void PlayerUpdate(Actor * a, void * scene) {
     //FntPrint("Spd: %d.%d\n",(actor->xzspeed>>12),((actor->xzspeed*1000)>>12)%1000);
     actor->speed_fall += actor->gravity;
 
-    if(g_pad & PAD_R1) actor->speed_fall = FIXED(50);
+    if(g_pad & PAD_R1) actor->speed_fall = FIXED(50 * SPEED_MULT);
 
     if(actor->speed_fall < actor->max_speed_y) actor->speed_fall = actor->max_speed_y;
 
@@ -431,6 +439,8 @@ void PlayerUpdate(Actor * a, void * scene) {
     actor->base.pos.vy = FROM_FIXED(actor->y_position);
     actor->base.pos.vz = FROM_FIXED(actor->z_position);
 
+    //FntPrint("pos x%d y%d z%d\n", actor->base.pos.vx, actor->base.pos.vy, actor->base.pos.vz);
+
     actor->base.rot.vy = actor->y_rotation;
 
     actor->base.collisionData.displacement_x = 0;
@@ -520,16 +530,19 @@ void PlayerUpdate(Actor * a, void * scene) {
       0, 0, -4096,
       0, 4096, 0,
       -4096, 0, 0,
-      35, 25, 0
+      35, 25, 0// hand-5, 30, 0
     };
     SVECTOR shield_offset = { 0, 0, 0 , 0 };
     SVECTOR shield_rot = { (4096 * (35.0 / 360.0)), 3072, 0, 0 };
+    //SVECTOR shield_rot = { 0, 0, 3072, 0 };
 
     //RotMatrixYXZ(&shield_rot, &local);
     RotMatrix_gte(&shield_rot, &local);
 
     // Draw Props
     CompMatrixLV(&player_bone_matrix[0], &local, &shield_matrix);
+
+    //CompMatrixLV(&player_bone_matrix[7], &local, &shield_matrix);
 
     //shield_matrix = player_bone_matrix[0];
   }
@@ -571,7 +584,7 @@ void PlayerUpdate(Actor * a, void * scene) {
   }
   ResetSpadStack();
 
-  //FntPrint("Collision Queries: %d\n", col_queries_test);
+  FntPrint("Collision Queries: %d\n", col_queries_test);
   if(g_pad_press & PAD_SELECT) col_queries_test--;
   if(g_pad_press & PAD_START) col_queries_test++;
     
@@ -777,8 +790,45 @@ void Player_Normal(Actor * a) {
   PlayerActor * actor = (PlayerActor *)a;
   //FntPrint("Player: Normal\n");
 
-  actor->current_anim = ANM_IdleFree;
-  anim_spd = 2048;
+  FntPrint("actor->state %x\n", actor->state);
+  FntPrint("actor->anim_frame = %d\n", actor->anim_frame);
+  if(actor->current_anim == ANM_Landing2Wait) {
+    if(actor->anim_frame >= 17) {
+      actor->current_anim = ANM_IdleFree;
+      anim_interp = 0;
+      interp = 0;
+      actor->anim_frame = 0;
+    }
+  } else if((actor->state == 0x80000000)) {
+    
+    if(actor->current_anim != ANM_IdleFree) {
+      if(actor->current_anim != ANM_WalkEndLFree && actor->current_anim != ANM_WalkEndRFree) {
+        anim_interp = 0;
+        interp = 0;
+        actor->anim_frame = 0;
+      }
+      if(actor->anim_frame <= 9) {
+        actor->current_anim = ANM_WalkEndLFree;
+      } else {
+        actor->current_anim = ANM_WalkEndRFree;
+      }
+      
+      anim_spd = 4096 * SPEED_MULT;
+      if(actor->anim_frame >= 9) {
+        actor->current_anim = ANM_IdleFree;
+        anim_spd = 2048 * SPEED_MULT;
+        anim_interp = 0;
+        interp = 0;
+        actor->anim_frame = 0;
+      }
+    } else {
+      actor->current_anim = ANM_IdleFree;
+    }
+  }
+  
+
+  //actor->current_anim = ANM_IdleFree;
+  //anim_spd = 2048 * SPEED_MULT;
   actor->anim_no_loop = 0;
 
   if(last_state & PLAYER_STATE_ONAIR) {
@@ -853,7 +903,7 @@ void Player_Normal(Actor * a) {
         if(actor->xzspeed > 0) {
           // ANM_AttackRoll ANM_RunFree
           actor->current_anim = ANM_RunFree;
-          anim_spd = fix12_mul(actor->xzspeed,256*0.55);
+          anim_spd = fix12_mul(actor->xzspeed,256*0.59);
         }
         //FntPrint("PLAYER SPD: %d\n", actor->xzspeed);
         //if(actor->state & PLAYER_STATE_MOVE && actor->xzspeed > 100000) actor->action = ACTION_ATTACK;
@@ -865,7 +915,7 @@ void Player_Normal(Actor * a) {
       break;
       case PLAYER_STATE_ROLL:
         //anim_spd = 4096;
-        anim_spd = 5120;
+        anim_spd = 5120 * SPEED_MULT;
         if(actor->state_sub == 0){
           actor->current_anim = ANM_AttackRoll;
           
@@ -918,7 +968,6 @@ void Player_Jump(Actor * a) {
 }
 void Player_Falling(Actor * a) {
   PlayerActor * actor = (PlayerActor *)a;
-  //FntPrint("Player: Falling\n");
   if(!(last_state & PLAYER_STATE_ONAIR) && actor->xzspeed > FIXED(19.36)) {
     actor->current_anim = ANM_JumpFront;
     actor->speed_fall = 50<<12;
@@ -932,6 +981,10 @@ void Player_Falling(Actor * a) {
     actor->current_anim = ANM_LandingWait;
     actor->anim_no_loop = 0;
     anim_spd = 4096;
+    interp = 0;
+    anim_interp = 0;
+    actor->anim_frame = 0;
+    actor->anim_frame_sub = 0;
   }
   
   model_bend = turn_bend = 0;

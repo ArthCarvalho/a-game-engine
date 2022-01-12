@@ -112,9 +112,9 @@ POLY_GT4 *s, u_long *ot, DIVPOLYGON4 *divp);
 #define OTSUBDIV 1
 #define OTMIN 15
 #define OTMINCHAR 1
-//#define PACKET_SIZE 0x19000
+#define PACKET_SIZE 0x19000
 //#define PACKET_SIZE 0x1A000
-#define PACKET_SIZE 0x60000
+//#define PACKET_SIZE 0x60000
 
 #define RGBPACK32(r,g,b) (r | (g<<8) | (b<<16))
 

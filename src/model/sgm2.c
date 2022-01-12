@@ -19,6 +19,9 @@
 #define SGM2_SUBDIV_HIGH_LV1 400
 #define SGM2_SUBDIV_HIGH_LV2 100
 
+#define SGM2_FOG_SHIFT 6
+#define SGM2_FOG_MAX 16
+
 SGM2_File * SGM2_LoadFile(u_long * addr) {
   // Parse the offsets inside the file and change them to memory addresses instead of offsets.
   SGM2_File * dest = (SGM2_File *)addr;
@@ -125,11 +128,6 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
     clutid = (u_long)(model->material[pgt4_ptr->material].clut + ((flags & SGM2_RENDER_BUMPCLUT) << 3)) << 16;
     tpageid = (u_long)model->material[pgt4_ptr->material].tpage << 16;
 
-    //if(quad_clip( (DVECTOR*)&vec0->vx,
-    //              (DVECTOR*)&vec1->vx,
-    //              (DVECTOR*)&vec2->vx,
-    //              (DVECTOR*)&vec3->vx)) continue;
-
     // Load screen XY coordinates to GTE Registers
     gte_ldsxy3(*(long*)&vec0->vx,*(long*)&vec1->vx,*(long*)&vec2->vx);
 
@@ -162,6 +160,10 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
     //if(otz >= OTSIZE) otz = OTSIZE-1;
 
     if (otz < OTSIZE) {
+      if(quad_clip( (DVECTOR*)&vec0->vx,
+                  (DVECTOR*)&vec1->vx,
+                  (DVECTOR*)&vec2->vx,
+                  (DVECTOR*)&vec3->vx)) continue;
       if(otz < subdiv_lvl1 && flags & SGM2_RENDER_SUBDIV) {
         u_long uvcode0, uvcode1, uvcode2, uvcode3;
         CVECTOR col0, col1, col2, col3;
@@ -268,9 +270,9 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
         }
 
         if(flags & SGM2_RENDER_CLUTFOG){
-          long fog = (otz-512) >> 7;
+          long fog = (otz-512) >> SGM2_FOG_SHIFT;
           if(fog < 0) fog = 0;
-          if(fog > 7) fog = 7;
+          if(fog > SGM2_FOG_MAX-1) fog = SGM2_FOG_MAX-1;
           clutid = clutid + (fog<<(6+16));
         }
         
@@ -314,11 +316,6 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
       clutid = (u_long)(model->material[pgt3_ptr->material].clut + ((flags & SGM2_RENDER_BUMPCLUT) << 3)) << 16;
       tpageid = (u_long)model->material[pgt3_ptr->material].tpage << 16;
       
-      // Clip quads that are offscreen before any other operation
-      //if(tri_clip((DVECTOR*)vec0,
-      //            (DVECTOR*)vec1,
-      //            (DVECTOR*)vec2)) continue;
-      
       // Load screen XY coordinates to GTE Registers
       gte_ldsxy3(*(long*)&vec0->vx,*(long*)&vec1->vx,*(long*)&vec2->vx);
       // Perform clipping calculation
@@ -345,6 +342,10 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
       //otz = 50;
       if(otz >= OTSIZE) otz = OTSIZE-1;
       if (otz > OTMIN) {
+        // Clip quads that are offscreen before any other operation
+        if(tri_clip((DVECTOR*)vec0,
+                    (DVECTOR*)vec1,
+                    (DVECTOR*)vec2)) continue;
         if(otz < subdiv_lvl1 && flags & SGM2_RENDER_SUBDIV) {
           u_long uvcode0, uvcode1, uvcode2;
           CVECTOR col0, col1, col2;
@@ -419,9 +420,9 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
           }
 
           if(flags & SGM2_RENDER_CLUTFOG){
-            long fog = (otz-512) >> 7;
+            long fog = (otz-512) >> SGM2_FOG_SHIFT;
             if(fog < 0) fog = 0;
-            if(fog > 7) fog = 7;
+            if(fog > SGM2_FOG_MAX-1) fog = SGM2_FOG_MAX-1;
             clutid = clutid + (fog<<(6+16));
           }
 

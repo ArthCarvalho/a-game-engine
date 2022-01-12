@@ -190,6 +190,8 @@ void main() {
 
   G.VSync_rate = 2; // Framerate: 0: 60FPS, 2: 30FPS, 3: 20FPS
   //G.VSync_rate = 3; // Framerate: 0: 60FPS, 2: 30FPS, 3: 20FPS
+
+  //G.VSync_rate = 8; // Framerate: 0: 60FPS, 2: 30FPS, 3: 20FPS
   
   /* Set clip region */
 	setRECT( &G.screen_rect, 0, 0, SCREEN_W, SCREEN_H );

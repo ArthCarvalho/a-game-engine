@@ -305,7 +305,7 @@ u_char * ObjDoorShutterActorDraw(struct Actor * a, MATRIX * view, u_char * packe
 
     *(u_long*)&poly->r0 = *(u_long*)&color.r;
 
-    poly->tpage = getTPage(0, 0, 192, 0);
+    poly->tpage = getTPage(0, 0, 384, 0);
     poly->clut = getClut(784,500);
 
     setPolyFT4(poly);
@@ -325,7 +325,7 @@ u_char * ObjDoorShutterActorDraw(struct Actor * a, MATRIX * view, u_char * packe
 
     *(u_long*)&poly->r0 = *(u_long*)&color.r;
 
-    poly->tpage = getTPage(0, 0, 192, 0);
+    poly->tpage = getTPage(0, 0, 384, 0);
     poly->clut = getClut(784,500);
 
     setPolyFT4(poly);

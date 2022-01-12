@@ -16,7 +16,7 @@
 
 #include "texture/texture.h"
 
-#define FOG_LEVELS 8
+#define FOG_LEVELS 16
 #define FOG_SHIFT 6
 
 //#include "particles/particles.h"
@@ -33,6 +33,11 @@ extern unsigned long iwakabe_tim[];
 extern unsigned long iwakabe_far_tim[];
 extern unsigned long iwayuka_tim[];
 extern unsigned long deku_shrine_block000a[];
+extern unsigned long deku_shrine_block000b[];
+extern unsigned long deku_shrine_block000b_000[];
+extern unsigned long deku_shrine_block000b_001[];
+extern unsigned long deku_shrine_block000b_002[];
+extern unsigned long deku_shrine_block000b_003[];
 extern unsigned long scene_col[];
 extern unsigned long scene_room00_sg2[];
 extern unsigned long scene_room01_sg2[];
@@ -336,6 +341,8 @@ Actor_Descriptor room0_actors[] = {
       5, 1, 4096*0.6, 256*20, 0, 0, 0, 0, 0 // Color, Show Flare, Flare Scale, Flare Draw Distance
     }
   },
+
+/*  (256.0*(80.9656*-1.0)), (256.0*-16.9229), (256.0*-23.3968)*/
   
   {
     4855, -4096-256, 10726,          // short x, y, z;
@@ -349,7 +356,7 @@ Actor_Descriptor room0_actors[] = {
     }
   },
   {
-    8832+512, -4096, 300,          // short x, y, z;
+    (256*(71.3411)), (256*-16.9243)-4096, (256*(-24.0123*-1.0)), //8832+512, -4096, 300,          // short x, y, z;
     0, 1024, 0,          // short rot_x, rot_y, rot_z;
     4096, 4096, 4096, // short scale_x, scale_y, scale_z;
     0,                // unsigned char room;
@@ -360,7 +367,7 @@ Actor_Descriptor room0_actors[] = {
     }
   },
   {
-    8832+512, -4096, -300,          // short x, y, z;
+    (256*(69.0186)), (256*-16.9243)-4096, (256*(-40.4901*-1.0)), //8832+512, -4096, -300,          // short x, y, z;
     0, 1024, 0,          // short rot_x, rot_y, rot_z;
     4096, 4096, 4096, // short scale_x, scale_y, scale_z;
     0,                // unsigned char room;
@@ -371,7 +378,7 @@ Actor_Descriptor room0_actors[] = {
     }
   },
   {
-    8832+512+600, -4096, 300,          // short x, y, z;
+    (256*(52.0915)), (256*-15.8954)-4096, (256*(-43.9153*-1.0)), //8832+512+600, -4096, 300,          // short x, y, z;
     0, 1024, 0,          // short rot_x, rot_y, rot_z;
     4096, 4096, 4096, // short scale_x, scale_y, scale_z;
     0,                // unsigned char room;
@@ -635,7 +642,7 @@ Room_Data room_data[] = {
       0                     // Skybox Type
     },
     room0_actors,           // List of actor initialization parameters
-    12,                      // Number of actors in initialization list
+    15,                      // Number of actors in initialization list
     NULL,                   // Pointer to list of models in this room's background
     0,                      // Number of background models
   },
@@ -1120,9 +1127,24 @@ void SceneLoad(Scene_Data * scene_data) {
   map_model[6]->material[2].tpage = getTPage(0, 0, 128, 0);
 
   map_model[5]->material[0].clut = GetClut(128, 496);
-  map_model[5]->material[0].tpage = getTPage(1, 0, 256, 0);
-  //map_model[5]->material[1].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y);
-  //map_model[5]->material[1].tpage = getTPage(1, 0, 256, 0);
+  map_model[5]->material[0].tpage = getTPage(1, 0, 128, 0);
+  map_model[5]->material[1].clut = GetClut(128, 496-17);
+  map_model[5]->material[1].tpage = getTPage(1, 0, 128+128, 0);
+
+  /*map_model[5]->material[2].clut = GetClut(128, 496-17);
+  map_model[5]->material[2].tpage = getTPage(1, 0, 128+128, 0);*/
+  /*map_model[5]->material[3].clut = GetClut(128, 496);
+  map_model[5]->material[3].tpage = getTPage(1, 0, 128, 0);*/
+  map_model[5]->material[2].clut = GetClut(128+256, 496);
+  map_model[5]->material[2].tpage = getTPage(0, 0, 128+128+32, 0);
+  map_model[5]->material[3].clut = GetClut(128+256, 496-17);
+  map_model[5]->material[3].tpage = getTPage(0, 0, 128+128-32, 0);
+
+  map_model[5]->material[4].clut = GetClut(384+16, 496);
+  map_model[5]->material[4].tpage = getTPage(0, 0, 128+128+32, 0);
+
+  map_model[5]->material[5].clut = GetClut(384+16+16, 496);
+  map_model[5]->material[5].tpage = getTPage(0, 0, 128+128+32, 64);
 
   
 
@@ -1228,7 +1250,12 @@ void SceneLoad(Scene_Data * scene_data) {
   //load_texture_pos_fog((unsigned long)dataptr, 0, 0, 512, 496, FOG_LEVELS);
   load_texture_pos_fog((unsigned long)scene_tim, 0, 0, MAP_TEXTURE_CLUT_X, MAP_TEXTURE_CLUT_Y, FOG_LEVELS);
   load_texture_pos_fog((unsigned long)iwakabe_tim, 128, 0, MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y, FOG_LEVELS);
-  load_texture_pos_fog((unsigned long)deku_shrine_block000a, 256, 0, 128, 496,  FOG_LEVELS);
+  load_texture_pos_fog((unsigned long)deku_shrine_block000a, 128, 0, 128, 496,  FOG_LEVELS);
+  load_texture_pos_fog((unsigned long)deku_shrine_block000b, 128+128, 0, 128, 496-17,  FOG_LEVELS);
+  load_texture_pos_fog((unsigned long)deku_shrine_block000b_000, 128+128, 128, 384, 496,  FOG_LEVELS);
+  load_texture_pos_fog((unsigned long)deku_shrine_block000b_001, 128+128-32, 0, 384, 496-17,  FOG_LEVELS);
+  load_texture_pos_fog((unsigned long)deku_shrine_block000b_002, 128+128+32, 0, 384+16, 496,  FOG_LEVELS);
+  load_texture_pos_fog((unsigned long)deku_shrine_block000b_003, 128+128+32, 64, 384+16+16, 496,  FOG_LEVELS);
   //load_texture_pos_fog((unsigned long)iwayuka_tim, 128+32, 0, MAP_TEXTURE_CLUT_X+256+32+16, MAP_TEXTURE_CLUT_Y, FOG_LEVELS);
   //load_tex_noclut_pos((unsigned long)iwakabe_far_tim, 128+32+16, 0, 0, 0);
   // Load animated fire textures
@@ -1241,7 +1268,7 @@ void SceneLoad(Scene_Data * scene_data) {
   load_texture_pos((unsigned long)obj_grass_tim, 36, 384, FLAME_TEX_CLUT_X+16, FLAME_TEX_CLUT_Y);
   load_texture_pos((unsigned long)obj_grass_cut_tim, 36, 416, FLAME_TEX_CLUT_X+16, FLAME_TEX_CLUT_Y+2);
   // Door Textures
-  load_texture_pos((unsigned long)obj_dangeon_door_tim, 192, 0, 784, 500);
+  load_texture_pos((unsigned long)obj_dangeon_door_tim, 384, 0, 784, 500);
 
   load_texture_pos((unsigned long)screen_lifebar_tim, LIFEMETER_TEX_X, LIFEMETER_TEX_Y, LIFEMETER_CLUT_X, LIFEMETER_CLUT_Y);
 

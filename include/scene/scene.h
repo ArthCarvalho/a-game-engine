@@ -267,6 +267,13 @@ typedef struct RoomEntry {
     struct Room * room;                            // Pointer to actual room data when loaded
 } RoomEntry;
 
+typedef struct TargetContext {
+    SVECTOR targetPosition;
+    CVECTOR targetColor;
+    Actor * targettedActor;
+    Actor * nextTargetActor;    
+} TargetContext;
+
 //struct COL{
 //    unsigned long temp;
 //};
