@@ -8,3 +8,5 @@
 # Executables
 *.exe
 *.elf
+SEND_WTTY_DEBUG.bat
+SEND_WTTY.bat
