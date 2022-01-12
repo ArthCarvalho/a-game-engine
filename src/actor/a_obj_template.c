@@ -31,11 +31,11 @@ void ObjTemplateActorInitialize(struct Actor * a, void * descriptor, void * scen
 }
 
 void ObjTemplateActorDestroy(struct Actor * a, void * scene) {
-  ObjTemplateActor * actor = (ObjSyokudaiActor *)a;
+  ObjTemplateActor * actor = (ObjTemplateActor *)a;
 }
 
 void ObjTemplateActorUpdate(struct Actor * a, void * scene) {
-  ObjTemplateActor * actor = (ObjSyokudaiActor *)a;
+  ObjTemplateActor * actor = (ObjTemplateActor *)a;
 }
 
 u_char * ObjTemplateActorDraw(struct Actor * a, MATRIX * view, u_char * packet_ptr, void * scene) {

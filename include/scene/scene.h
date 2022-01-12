@@ -26,6 +26,7 @@
 #include "actor/a_obj_swap_plane.h"
 #include "actor/a_obj_dekunuts.h"
 #include "actor/a_obj_flame.h"
+#include "actor/a_obj_collectable.h"
 
 // Animated Flame Texture Source Location
 #define FLAME_TEX_X_SRC 496

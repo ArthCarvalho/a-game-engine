@@ -38,6 +38,7 @@ $(SRC_DIR)/actor/a_obj_door_shutter.c	\
 $(SRC_DIR)/actor/a_obj_swap_plane.c		\
 $(SRC_DIR)/actor/a_obj_dekunuts.c			\
 $(SRC_DIR)/actor/a_obj_flame.c				\
+$(SRC_DIR)/actor/a_obj_collectable.c	\
 $(SRC_DIR)/particles/particles.c  		\
 $(SRC_DIR)/fpmath.S							  		\
 $(SRC_DIR)/lz77.S                 		\

@@ -81,7 +81,8 @@ void * ActorInitFuncs[] = {
   ObjDoorShutterActorInitialize,
   ObjSwapPlaneActorInitialize,
   ObjDekunutsActorInitialize,
-  ObjFlameActorInitialize
+  ObjFlameActorInitialize,
+  ObjCollectableActorInitialize
 };
 
 u_long ActorDataSizes[] = {
@@ -93,7 +94,8 @@ u_long ActorDataSizes[] = {
   sizeof(ObjDoorShutterActor),
   sizeof(ObjSwapPlaneActor),
   sizeof(ObjDekunutsActor)+64, // TODO -- FIND OUT ALLOCATION BUG
-  sizeof(ObjFlameActor)+64
+  sizeof(ObjFlameActor)+64,
+  sizeof(ObjCollectableActor)+64
 };
 
 /*
