@@ -71,6 +71,7 @@ short col_queries_test = 0;
 
 // Prepare Data (Load Assets)
 int PlayerDataLoaded = 0;
+short PlayerOToffset = 0;
 
 u_long * PlayerMdlData;
 u_long * PlayerAnmData;
@@ -125,7 +126,7 @@ void PlayerLoadData() {
 }
 
 
-u_long demo_counter = 50;
+u_long demo_counter = 0;
 short demo_dir = 4096;
 
 void PlayerUnloadData() {
@@ -158,15 +159,16 @@ void PlayerCreateInstance(Actor * a, void * col_ctx) {
 
   actor->process = Player_Normal;
 
-  actor->base.pos.vx = 43 * 256;
+  //actor->base.pos.vx = 43 * 256;
+  actor->base.pos.vx = 0;
   actor->base.pos.vy = 0;
-  actor->base.pos.vz = 0;
+  actor->base.pos.vz = 13824;
 
   actor->base.rot.vx = 0;
-  actor->base.rot.vy = 3072;
+  actor->y_rotation = actor->base.rot.vy = 2048;//3072;
   actor->base.rot.vz = 0;
   actor->x_position = actor->base.pos.vx << 12;
-  actor->y_position = actor->base.pos.vz << 12;
+  actor->y_position = actor->base.pos.vy << 12;
   actor->z_position = actor->base.pos.vz << 12;
 
   actor->base.collisionData.radius = 90;
@@ -174,7 +176,7 @@ void PlayerCreateInstance(Actor * a, void * col_ctx) {
 
   actor->void_out = 0;
 
-  actor->y_rotation = 3072;
+  //actor->y_rotation = 0;
   actor->y_move_dir = actor->y_rotation;
 
   actor->base.child = NULL;
@@ -196,7 +198,7 @@ void PlayerCreateInstance(Actor * a, void * col_ctx) {
   actor->base.light_center_offset = 300;
 
   // Place player on ground
-  {
+  /*{
     SetSpadStack(SPAD_STACK_ADDR);
     SVECTOR pos = {actor->base.pos.vx, actor->base.pos.vy, actor->base.pos.vz, 0};
     Col_GroundCheckPoint(col_context_pl, &pos, 8129, actor->floor);
@@ -205,7 +207,7 @@ void PlayerCreateInstance(Actor * a, void * col_ctx) {
       actor->y_position = actor->floor->position.vy << 12;
     }
     ResetSpadStack();
-  }
+  }*/
 
   actor->L_Hand_matrix = &player_bone_matrix[5];
   //printf("transfomed: %x\n",player_bone_matrix);
@@ -248,6 +250,12 @@ void PlayerUpdate(Actor * a, void * scene) {
 
   actor->action_prev = actor->action;
   actor->sub_action_prev = actor->sub_action;
+
+  if(__DEBUG_TOGGLE || actor->state & PLAYER_STATE_ONAIR) {
+    PlayerOToffset = 30;
+  } else {
+    PlayerOToffset = 0;
+  }
 
   
   if(actor->state & PLAYER_ENABLE_CONTROL){
@@ -710,7 +718,7 @@ u_char * PlayerDraw(Actor * a, MATRIX * view, u_char * pbuff, void * scene) {
   SetSpadStack(SPAD_STACK_ADDR);
 
   //SetSpadStack(SPAD_STACK_ADDR);
-  pbuff = AGM_DrawModel(&PlayerMdl, pbuff, (u_long*)G.pOt, 0);
+  pbuff = AGM_DrawModel(&PlayerMdl, pbuff, (u_long*)G.pOt, PlayerOToffset);
   ResetSpadStack();
 
   CompMatrixLV(view, &shield_matrix, &local_identity);
@@ -718,7 +726,7 @@ u_char * PlayerDraw(Actor * a, MATRIX * view, u_char * pbuff, void * scene) {
   gte_SetTransMatrix(&local_identity);
 
   SetSpadStack(SPAD_STACK_ADDR);
-  pbuff = SGM2_UpdateModel(shield_prop, pbuff, (u_long*)G.pOt, -3, SGM2_RENDER_AMBIENT, scene);
+  pbuff = SGM2_UpdateModel(shield_prop, pbuff, (u_long*)G.pOt, PlayerOToffset-3, SGM2_RENDER_AMBIENT, scene);
   ResetSpadStack();
   
   for(int i = 0; i < 2; i++) { 
@@ -741,7 +749,10 @@ u_char * PlayerDraw(Actor * a, MATRIX * view, u_char * pbuff, void * scene) {
   return pbuff;
 }
 
-long accel_up = FIXED(12.0f);
+//long accel_up = FIXED(12.0f);
+//long accel_down = FIXED(-8.5f);
+
+long accel_up = FIXED(12.0f*0.5f);
 long accel_down = FIXED(-8.5f);
 /*
 long sign(long x)
@@ -792,12 +803,14 @@ void Player_Normal(Actor * a) {
 
   FntPrint("actor->state %x\n", actor->state);
   FntPrint("actor->anim_frame = %d\n", actor->anim_frame);
+  FntPrint("xzspeed %d\n", actor->xzspeed);
   if(actor->current_anim == ANM_Landing2Wait) {
     if(actor->anim_frame >= 17) {
       actor->current_anim = ANM_IdleFree;
       anim_interp = 0;
       interp = 0;
       actor->anim_frame = 0;
+      actor->xzspeed = 0;
     }
   } else if((actor->state == 0x80000000)) {
     
@@ -820,6 +833,7 @@ void Player_Normal(Actor * a) {
         anim_interp = 0;
         interp = 0;
         actor->anim_frame = 0;
+        actor->xzspeed = 0;
       }
     } else {
       actor->current_anim = ANM_IdleFree;

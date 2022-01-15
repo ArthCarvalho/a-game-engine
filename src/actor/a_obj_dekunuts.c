@@ -145,6 +145,8 @@ void ObjDekunutsActorUpdate(struct Actor * a, void * scene) {
       ActorCollision_DisplaceActor(player, dist, intersect, deltax, deltaz);
     }
 
+    actor->base.xzDistance = SquareRoot0(actor->base.xzDistanceSq);
+
     if(actor->base.xzDistance > (256 * 10)) {
       actor->burrow_offset_targ = -128-96;
     } else {

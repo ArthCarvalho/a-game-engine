@@ -20,10 +20,10 @@
   .global player_anm
   .global sword_sg2
   .global shield_sgm2
-  .global scene_tim
-  .global iwakabe_tim
-  .global iwakabe_far_tim
-  .global iwayuka_tim
+  //.global scene_tim
+  //.global iwakabe_tim
+  //.global iwakabe_far_tim
+  //.global iwayuka_tim
   .global deku_shrine_block000a
   .global deku_shrine_block000b
   .global deku_shrine_block000b_000
@@ -32,12 +32,12 @@
   .global deku_shrine_block000b_003
   .global scene_col
   .global scene_room00_sg2
-  .global scene_room01_sg2
-  .global scene_room02_sg2
-  .global scene_room03_sg2
-  .global scene_room04_sg2
-  .global scene_room05_sg2
-  .global scene_room05_sg2_ext
+  //.global scene_room01_sg2
+  //.global scene_room02_sg2
+  //.global scene_room03_sg2
+  //.global scene_room04_sg2
+  //.global scene_room05_sg2
+  //.global scene_room05_sg2_ext
   .global obj_syokudai_tim
   .global obj_syokudai_sgm2
   .global obj_flame_tim
@@ -71,6 +71,7 @@
   .global dekunuts_agm
   .global dekunuts_anm
   .global obj_item_sphere_sgm2
+  .global obj_item_sphere_low_sgm2
   .global obj_item_sphere_tim
   .global texture_data_start
   .global texture_data_end
@@ -93,9 +94,9 @@ shield_sgm2:
   .balign 16
 
 scene_room00_sg2:
-  .incbin "../AGAME_PCDATA/Map/Test/room_000.sgm2"
+  .incbin "../zelda_assets/scenes/test_dampei/room_000.sgm2"
   .balign 16
-
+/*
 scene_room01_sg2:
   .incbin "../AGAME_PCDATA/Map/Test/room_001.sgm2"
   .balign 16
@@ -113,15 +114,16 @@ scene_room04_sg2:
   .balign 16
 
 scene_room05_sg2:
-  .incbin "../AGAME_PCDATA/Map/Test/room_005.sgm2 "
+  .incbin "../AGAME_PCDATA/Map/Test/room_005.sgm2"
   .balign 16
 
 scene_room05_sg2_ext:
   .incbin "../AGAME_PCDATA/Map/Test/room_005-external.sgm2"
   .balign 16
-
+*/
 scene_col:
-  .incbin "../AGAME_PCDATA/Map/Test/Collision/map_collision.col2"
+  //.incbin "../AGAME_PCDATA/Map/Test/Collision/map_collision.col2" 
+  .incbin "../zelda_assets/scenes/test_dampei/collision/complete_test_room_deku_shrine.col2"
   .balign 16
 
 obj_flame_sgm2:
@@ -176,11 +178,11 @@ player_tim:
 player_tunic_green_tim:
   .incbin "../AGAME_PCDATA_OLD/4bit-test/link/parts/green_tunic_pal.TIM"
   .balign 16
-
+/*
 scene_tim:
   .incbin "../AGAME_PCDATA/graphics/replace_block-psnew2225.tim"
-  .balign 16
-
+  .balign 16*/
+/*
 iwakabe_tim:
   .incbin "../AGAME_PCDATA/iwakabeyuka_composite_v2.tim"
   .balign 16
@@ -192,7 +194,7 @@ iwakabe_far_tim:
 iwayuka_tim:
   .incbin "../AGAME_PCDATA/iwayuka_4bit.tim"
   .balign 16
-
+*/
 deku_shrine_block000a:
   .incbin "../zelda_assets/textures_png/scenes/deku_shrine_block000a.tim"
   .balign 16
@@ -302,7 +304,10 @@ dekunuts_anm:
   .incbin "../zelda_assets/models/enemy/dekunuts/dekunuts_new.agm.anm"
   .balign 16
 obj_item_sphere_sgm2:
-  .incbin "../zelda_assets/models/item_sphere.sgm2                    "
+  .incbin "../zelda_assets/models/item_sphere.sgm2"
+  .balign 16
+obj_item_sphere_low_sgm2:
+  .incbin "../zelda_assets/models/item_sphere_low.sgm2"
   .balign 16
 obj_item_sphere_tim:
   .incbin "../zelda_assets/textures_png/reflection_sphere.tim"

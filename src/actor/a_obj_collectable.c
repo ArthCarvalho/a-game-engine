@@ -19,8 +19,10 @@
 #define REFLECTION_CLUT_Y 478
 
 extern unsigned long obj_item_sphere_sgm2[];
+extern unsigned long obj_item_sphere_low_sgm2[];
 extern unsigned long obj_item_sphere_tim[];
 SGM2_File * item_model;
+SGM2_File * item_model_low;
 
 CVECTOR ruppy_color[] = {
   {145*0.75, 255*0.75, 34*0.75, 0},   // Green
@@ -53,8 +55,9 @@ short y_offset_anim [] = {
 void ObjCollectableActorSetup() {
   load_texture_pos((unsigned long)obj_item_sphere_tim, REFLECTION_VRAM_X, REFLECTION_VRAM_Y, REFLECTION_CLUT_X, REFLECTION_CLUT_Y);
   item_model = SGM2_LoadFile((u_long*)obj_item_sphere_sgm2);
-  item_model->material[0].tpage =  GetTPage(1, 0, REFLECTION_VRAM_X, REFLECTION_VRAM_Y);
-  item_model->material[0].clut = GetClut(REFLECTION_CLUT_X, REFLECTION_CLUT_Y);
+  item_model_low = SGM2_LoadFile((u_long*)obj_item_sphere_low_sgm2);
+  item_model_low->material[0].tpage = item_model->material[0].tpage = GetTPage(1, 0, REFLECTION_VRAM_X, REFLECTION_VRAM_Y);
+  item_model_low->material[0].clut = item_model->material[0].clut = GetClut(REFLECTION_CLUT_X, REFLECTION_CLUT_Y);
 }
 
 void ObjCollectableActorInitialize(struct Actor * a, void * descriptor, void * scene) {
@@ -89,7 +92,7 @@ void ObjCollectableActorUpdate(struct Actor * a, void * scene) {
 
   switch(actor->state) {
     case 0:
-      if(actor->base.xzDistance < 200 && (player->base.pos.vy < (actor->base.pos.vy + 128)) && (player->base.pos.vy > (actor->base.pos.vy - 128))){
+      if(actor->base.xzDistanceSq < (200*200) && (player->base.pos.vy < (actor->base.pos.vy + 128)) && (player->base.pos.vy > (actor->base.pos.vy - 128))){
         actor->state = 1;
       }
       break;
@@ -109,15 +112,18 @@ void ObjCollectableActorUpdate(struct Actor * a, void * scene) {
 u_char * ObjCollectableActorDraw(struct Actor * a, MATRIX * view, u_char * packet_ptr, void * scene) {
   ObjCollectableActor * actor = (ObjCollectableActor *)a;
   Scene_Ctx * scene_ctx = (Scene_Ctx *)scene;
+  SGM2_File * model = item_model;
   MATRIX local_identity;
   MATRIX base_mat;
 
-  SetSpadStack(SPAD_STACK_ADDR);
   SVECTOR rot = {0, actor->roty, 0, 0};
   RotMatrixZYX(&rot, &base_mat);
   base_mat.t[0] = actor->base.pos.vx;
   base_mat.t[1] = actor->base.pos.vy;
   base_mat.t[2] = actor->base.pos.vz;
+
+
+  SetSpadStack(SPAD_STACK_ADDR);
 
   MATRIX view_scale = scene_ctx->camera->matrix_unscaled;
   VECTOR scalev = {30, 30, 30, 0};
@@ -125,14 +131,31 @@ u_char * ObjCollectableActorDraw(struct Actor * a, MATRIX * view, u_char * packe
 
   CompMatrixLV(&view_scale, &base_mat, &local_identity);
 
-  SGM2_GenerateReflectionUV(item_model, &local_identity, 0, 0);
+  SGM2_GenerateReflectionUV(model, &local_identity, 0, 0);
 
   CompMatrixLV(view, &base_mat, &local_identity);
 
   gte_SetRotMatrix(&local_identity);
   gte_SetTransMatrix(&local_identity);
 
-  packet_ptr = SGM2_UpdateModelColor(item_model, packet_ptr, (u_long*)G.pOt, 0, 0, ruppy_color[actor->item_type], scene);
+
+  /*SVECTOR vec0, vec1;
+  long otzv;
+  vec0.vx = 0;
+  vec0.vy = 0;
+  vec0.vz = 0;
+  gte_ldv0(&vec0);
+  gte_rtps();
+  gte_stsxy((long*)&vec1.vx);
+  gte_stsz(&otzv);
+  // Z culling
+  if(otzv < 0) return packet_ptr;
+  // Frustum culling
+  if(vec1.vx < -64 || vec1.vx > SCREEN_W+64) return packet_ptr;
+  if(vec1.vy < -64 || vec1.vy > SCREEN_H+64) return packet_ptr;
+  if(otzv < 4000) model = item_model;*/
+
+  packet_ptr = SGM2_UpdateModelColor(model, packet_ptr, (u_long*)G.pOt, 0, 0, ruppy_color[actor->item_type], scene);
   
   ResetSpadStack();
 

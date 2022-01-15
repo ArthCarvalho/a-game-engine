@@ -532,14 +532,17 @@ void SGM2_GenerateReflectionUV(SGM2_File * model, MATRIX * model_view, int x_off
   pgt3_ptr = model->poly_gt3;
   transform_uv = AGM_TransformBuffer;
 
-  //gte_SetRotMatrix(model_view);
+  gte_SetRotMatrix(model_view);
   // Batch transform normals
   for(int i = 0; i < model->normal_count; i++, normal_ptr++, transform_uv++) {
     VECTOR	result;
     SVECTOR final;
-    //gte_SetRotMatrix(model_view);
-    gte_ApplyMatrix(model_view, normal_ptr, &result);
-    //ApplyRotMatrix(normal_ptr, &result);
+
+    //gte_ApplyMatrix(model_view, normal_ptr, &result);
+
+    gte_ldv0(normal_ptr);
+    gte_rtv0();
+    gte_stlvnl(&result);
 
     //final.vx = (-result.vx >> SGM2_REFLECTION_SHIFT)+1;
     //final.vy = (-result.vy >> SGM2_REFLECTION_SHIFT)+1;

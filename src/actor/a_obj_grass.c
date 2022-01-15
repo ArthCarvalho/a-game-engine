@@ -54,6 +54,8 @@ void ObjGrassActorUpdate(struct Actor * a, void * scene) {
   struct Scene_Ctx * scene_ctx = (struct Scene_Ctx*)scene;
   Actor * player = scene_ctx->player;
 
+  actor->base.xzDistance = SquareRoot0(actor->base.xzDistanceSq);
+
   if(actor->base.xzDistance < 512) {
     CollisionCylinder col_player;
     CollisionCylinder col_obj;

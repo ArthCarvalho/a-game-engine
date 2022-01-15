@@ -40,12 +40,12 @@ extern unsigned long deku_shrine_block000b_002[];
 extern unsigned long deku_shrine_block000b_003[];
 extern unsigned long scene_col[];
 extern unsigned long scene_room00_sg2[];
-extern unsigned long scene_room01_sg2[];
-extern unsigned long scene_room02_sg2[];
-extern unsigned long scene_room03_sg2[];
-extern unsigned long scene_room04_sg2[];
-extern unsigned long scene_room05_sg2[];
-extern unsigned long scene_room05_sg2_ext[];
+//extern unsigned long scene_room01_sg2[];
+//extern unsigned long scene_room02_sg2[];
+//extern unsigned long scene_room03_sg2[];
+//extern unsigned long scene_room04_sg2[];
+//extern unsigned long scene_room05_sg2[];
+//extern unsigned long scene_room05_sg2_ext[];
 extern unsigned long screen_lifebar_tim[];
 extern unsigned long main_button_bg[];
 extern unsigned long main_button_labels[];
@@ -435,7 +435,7 @@ Actor_Descriptor room0_actors[] = {
     }
   },
   {
-    (256*(52.7472)), (256*-15.8636)-4096, (256*(-44.0649*-1.0)),          // short x, y, z;
+    (256*(52.4395)), (256*-15.8636)-4096, (256*(-42.493*-1.0)),          // short x, y, z;
     0, 1024, 0,          // short rot_x, rot_y, rot_z;
     4096, 4096, 4096, // short scale_x, scale_y, scale_z;
     0,                // unsigned char room;
@@ -1111,12 +1111,12 @@ void SceneLoad(Scene_Data * scene_data) {
   //datasize = file_load_temp_noalloc("\\DATA\\ROOM00.SG2;1", dataptr);
   //map_model = LStack_Alloc(datasize);
   map_model[0] = (SGM2_File*)scene_room00_sg2;
-  map_model[1] = (SGM2_File*)scene_room01_sg2;
-  map_model[2] = (SGM2_File*)scene_room02_sg2;
-  map_model[3] = (SGM2_File*)scene_room03_sg2;
-  map_model[4] = (SGM2_File*)scene_room04_sg2;
-  map_model[5] = (SGM2_File*)scene_room05_sg2;
-  map_model[6] = (SGM2_File*)scene_room05_sg2_ext;
+  //map_model[1] = (SGM2_File*)scene_room01_sg2;
+  //map_model[2] = (SGM2_File*)scene_room02_sg2;
+  //map_model[3] = (SGM2_File*)scene_room03_sg2;
+  //map_model[4] = (SGM2_File*)scene_room04_sg2;
+  //map_model[5] = (SGM2_File*)scene_room05_sg2;
+  //map_model[6] = (SGM2_File*)scene_room05_sg2_ext;
 
   printf("Col_LoadFile\n");
 
@@ -1136,19 +1136,19 @@ void SceneLoad(Scene_Data * scene_data) {
 
   // Initialize Map Geometry
   map_model[0] = SGM2_LoadFile((u_long*)map_model[0]);
-  map_model[1] = SGM2_LoadFile((u_long*)map_model[1]);
+  /*map_model[1] = SGM2_LoadFile((u_long*)map_model[1]);
   map_model[2] = SGM2_LoadFile((u_long*)map_model[2]);
   map_model[3] = SGM2_LoadFile((u_long*)map_model[3]);
   map_model[4] = SGM2_LoadFile((u_long*)map_model[4]);
   map_model[5] = SGM2_LoadFile((u_long*)map_model[5]);
-  map_model[6] = SGM2_LoadFile((u_long*)map_model[6]);
+  map_model[6] = SGM2_LoadFile((u_long*)map_model[6]);*/
 
-  for(int i = 0; i < 5; i++) {
+  /*for(int i = 0; i < 5; i++) {
     map_model[i]->material[0].clut = GetClut(MAP_TEXTURE_CLUT_X, MAP_TEXTURE_CLUT_Y);
     map_model[i]->material[0].tpage = getTPage(1, 0, 0, 0);
-  }
+  }*/
 
-  map_model[5]->material[0].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y);
+  /*map_model[5]->material[0].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y);
   map_model[5]->material[0].tpage = getTPage(0, 0, 128, 0);
   //map_model[5]->material[1].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32+16, MAP_TEXTURE_CLUT_Y);
   map_model[5]->material[1].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y);
@@ -1170,7 +1170,7 @@ void SceneLoad(Scene_Data * scene_data) {
   map_model[5]->material[2].tpage = getTPage(1, 0, 128+128, 0);*/
   /*map_model[5]->material[3].clut = GetClut(128, 496);
   map_model[5]->material[3].tpage = getTPage(1, 0, 128, 0);*/
-  map_model[5]->material[2].clut = GetClut(128+256, 496);
+  /*map_model[5]->material[2].clut = GetClut(128+256, 496);
   map_model[5]->material[2].tpage = getTPage(0, 0, 128+128+32, 0);
   map_model[5]->material[3].clut = GetClut(128+256, 496-17);
   map_model[5]->material[3].tpage = getTPage(0, 0, 128+128-32, 0);
@@ -1179,17 +1179,20 @@ void SceneLoad(Scene_Data * scene_data) {
   map_model[5]->material[4].tpage = getTPage(0, 0, 128+128+32, 0);
 
   map_model[5]->material[5].clut = GetClut(384+16+16, 496);
-  map_model[5]->material[5].tpage = getTPage(0, 0, 128+128+32, 64);
+  map_model[5]->material[5].tpage = getTPage(0, 0, 128+128+32, 64);*/
+
+  map_model[0]->material[0].clut = GetClut(128, 496);
+  map_model[0]->material[0].tpage = getTPage(1, 0, 128, 0);
+  map_model[0]->material[1].clut = GetClut(128, 496-17);
+  map_model[0]->material[1].tpage = getTPage(1, 0, 128+128, 0);
+
+  //map_model[0] = map_model[5];
 
   
 
   //map_model[6]->material[1].clut = GetClut(MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y+10);
   //map_model[6]->material[1].tpage = getTPage(0, 0, 128, 0);
 
-  printf("Room 005 Model Material Count: %d\n", map_model[5]->mat_count);
-
-  printf("Material 0: clut 0x%04X tpage 0x%04X\n", map_model[6]->material[0].clut, map_model[6]->material[0].tpage);
-  printf("Material 0: clut 0x%04X tpage 0x%04X\n", map_model[6]->material[1].clut, map_model[6]->material[1].tpage);
   // map_col
 
   // Initialize player object
@@ -1283,8 +1286,8 @@ void SceneLoad(Scene_Data * scene_data) {
   //SetFarColor(0,3,30);
   //SetBackColor(89,140,255);
   //load_texture_pos_fog((unsigned long)dataptr, 0, 0, 512, 496, FOG_LEVELS);
-  load_texture_pos_fog((unsigned long)scene_tim, 0, 0, MAP_TEXTURE_CLUT_X, MAP_TEXTURE_CLUT_Y, FOG_LEVELS);
-  load_texture_pos_fog((unsigned long)iwakabe_tim, 128, 0, MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y, FOG_LEVELS);
+  //load_texture_pos_fog((unsigned long)scene_tim, 0, 0, MAP_TEXTURE_CLUT_X, MAP_TEXTURE_CLUT_Y, FOG_LEVELS);
+  //load_texture_pos_fog((unsigned long)iwakabe_tim, 128, 0, MAP_TEXTURE_CLUT_X+256+32, MAP_TEXTURE_CLUT_Y, FOG_LEVELS);
   load_texture_pos_fog((unsigned long)deku_shrine_block000a, 128, 0, 128, 496,  FOG_LEVELS);
   load_texture_pos_fog((unsigned long)deku_shrine_block000b, 128+128, 0, 128, 496-17,  FOG_LEVELS);
   load_texture_pos_fog((unsigned long)deku_shrine_block000b_000, 128+128, 128, 384, 496,  FOG_LEVELS);
@@ -1535,36 +1538,6 @@ void SceneMain() {
   if(scene->room_swap) {
     scene->room_swap = 0;
     Scene_LoadRoom(&room_data[scene->current_room_id], scene);
-    switch(scene->current_room_id) {
-      default:
-        break;
-      case 2:
-        for(int i = 0; i < 50; i++) {
-          ObjGrassCutActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjGrassCutActor));
-          actor->base.room = scene->current_room_id;
-          actor->base.pos.vx = (3514/2)-(rand() * 3514 / RAND_MAX);
-          actor->base.pos.vy = -4096-256;//(rand() >> 8)-4096-200;
-          actor->base.pos.vz = (1142/2)-(rand() *1142 / RAND_MAX);
-          actor->base.rot.vx = 0;
-          actor->base.rot.vy = rand() >> 4;
-          actor->base.rot.vz = 0;
-          ObjGrassCutActorInitialize((Actor*)actor, NULL, scene);
-        }
-        break;
-      case 4:
-        for(int i = 0; i < 512; i++) {
-          ObjGrassActor * actor = Scene_AllocActor(&Scene_ActorList[ACTOR_GROUP_BG], ACTOR_GROUP_BG, sizeof(ObjGrassActor));
-          actor->base.room = scene->current_room_id;
-          actor->base.pos.vx = (rand() >> 2)-4096+(4221);
-          actor->base.pos.vy = -6157;
-          actor->base.pos.vz = (rand() >> 2)-4096-(10864);
-          actor->base.rot.vx = 0;
-          actor->base.rot.vy = rand() >> 4;
-          actor->base.rot.vz = 0;
-          ObjGrassActorInitialize((Actor*)actor, NULL, scene);
-        }
-        break;
-    }
   }
 
   if(scene->actor_cleanup) {
@@ -1653,7 +1626,7 @@ void SceneMain() {
         tdist.vz = fastabs(tdist.vz);
         // Calculate distance to player
         current->xzDistanceSq = tdist.vx * tdist.vx + tdist.vz * tdist.vz;
-        current->xzDistance = SquareRoot0(current->xzDistanceSq);
+        //current->xzDistance = SquareRoot0(current->xzDistanceSq);
 
 
         ResetSpadStack();
@@ -1954,13 +1927,15 @@ void SceneDraw() {
 
   SetSpadStack(SPAD_STACK_ADDR);
   if(!__DEBUG_TOGGLE){  // SGM2_RENDER_SUBDIV | 
-    packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 40, SGM2_RENDER_SUBDIV | SGM2_RENDER_AMBIENT, scene);
+    
   } else {
-    packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 40, SGM2_RENDER_SUBDIV, scene);
+    //packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 40, SGM2_RENDER_SUBDIV, scene);
   }
+
+  packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 30, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_CLUTFOG, scene);
   
   //packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_AMBIENT | SGM2_RENDER_CLUTFOG, scene); // SGM2_RENDER_SUBDIV_HIGH
-  packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 30, SGM2_RENDER_SUBDIV | SGM2_RENDER_CLUTFOG, scene);
+  //packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 30, SGM2_RENDER_SUBDIV | SGM2_RENDER_CLUTFOG, scene);
   ResetSpadStack();
   if(scene->previous_room_m){
     SetSpadStack(SPAD_STACK_ADDR);
@@ -2724,18 +2699,18 @@ u_char * Draw_ContactShadow(SVECTOR * pos, short angle, u_short scale, u_short s
 }
 
 void Draw_CalcNearestLight(Actor * actor, void * scene) {
-    if(actor->xzDistance < 4096) {
+    if(actor->xzDistanceSq < 4096) {
       Scene_Ctx * scene_ctx = (Scene_Ctx*)scene;
       PlayerActor * player = scene_ctx->player;
-      u_short dist_lvl = (4096 - actor->xzDistance) << 1;
+      u_short dist_lvl = (4096 - actor->xzDistanceSq) << 1;
       for(int i = 0; i < 2; i++) {
-        if(player->nearest_light_dist[i] > actor->xzDistance) {
+        if(player->nearest_light_dist[i] > actor->xzDistanceSq) {
           short delta_x = (player->base.pos.vx - actor->pos.vx);
           short delta_z = (player->base.pos.vz - actor->pos.vz);
-          short dist_x = (delta_x << 12) / actor->xzDistance;
-          short dist_z = (delta_z << 12) / actor->xzDistance;
+          short dist_x = (delta_x << 12) / actor->xzDistanceSq;
+          short dist_z = (delta_z << 12) / actor->xzDistanceSq;
           player->nearest_shadow_ang[i] = fix12_atan2s(dist_x, dist_z);
-          player->nearest_light_dist[i] = actor->xzDistance;
+          player->nearest_light_dist[i] = actor->xzDistanceSq;
           player->nearest_light_str[i] = dist_lvl;
           //player->light_matrix.m[i][0] = -dist_x; 
           //player->light_matrix.m[i][1] = 0;
