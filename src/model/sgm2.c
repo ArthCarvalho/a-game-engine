@@ -26,10 +26,10 @@ SGM2_File * SGM2_LoadFile(u_long * addr) {
   // Parse the offsets inside the file and change them to memory addresses instead of offsets.
   SGM2_File * dest = (SGM2_File *)addr;
 
-  //printf("Loading SGM2\n");
-  //printf("vtx num: %d normal num: %d color num: %d mat num: %d\n",dest->vertex_count, dest->normal_count, dest->color_count, dest->mat_count);
-  //printf("g4 %d g3 %d gt4 %d gt3 %d\n",dest->poly_g4_count, dest->poly_g3_count, dest->poly_gt4_count, dest->poly_gt3_count);
-  //printf("g4 %x g3 %x gt4 %x gt3 %x\n",dest->poly_g4, dest->poly_g3, dest->poly_gt4, dest->poly_gt3);
+  ////printf("Loading SGM2\n");
+  ////printf("vtx num: %d normal num: %d color num: %d mat num: %d\n",dest->vertex_count, dest->normal_count, dest->color_count, dest->mat_count);
+  ////printf("g4 %d g3 %d gt4 %d gt3 %d\n",dest->poly_g4_count, dest->poly_g3_count, dest->poly_gt4_count, dest->poly_gt3_count);
+  ////printf("g4 %x g3 %x gt4 %x gt3 %x\n",dest->poly_g4, dest->poly_g3, dest->poly_gt4, dest->poly_gt3);
 
   dest->vertex_data = (SVECTOR*)((char*)addr + ((long)dest->vertex_data));
   dest->normal_data = (SVECTOR*)((char*)addr + ((long)dest->normal_data));
@@ -56,7 +56,7 @@ SGM2_File * SGM2_LoadFile(u_long * addr) {
     gt3itr++;
   }
 
-  //printf("g4 %x g3 %x gt4 %x gt3 %x\n",dest->poly_g4, dest->poly_g3, dest->poly_gt4, dest->poly_gt3);
+  ////printf("g4 %x g3 %x gt4 %x gt3 %x\n",dest->poly_g4, dest->poly_g3, dest->poly_gt4, dest->poly_gt3);
   return dest;
 }
 
@@ -145,7 +145,7 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
     tempz1 = vec1->vz;
     tempz2 = vec2->vz;
     tempz3 = vec3->vz;
-    //printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
+    ////printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
     gte_ldsz4(tempz0,tempz1,tempz2,tempz3);
     // Get the average Z value
     gte_avsz4();
@@ -160,10 +160,12 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
     //if(otz >= OTSIZE) otz = OTSIZE-1;
 
     if (otz < OTSIZE) {
-      if(quad_clip( (DVECTOR*)&vec0->vx,
-                  (DVECTOR*)&vec1->vx,
-                  (DVECTOR*)&vec2->vx,
-                  (DVECTOR*)&vec3->vx)) continue;
+      if(flags & SGM2_RENDER_SCREEN_CLIP) {
+        if(quad_clip( (DVECTOR*)&vec0->vx,
+                    (DVECTOR*)&vec1->vx,
+                    (DVECTOR*)&vec2->vx,
+                    (DVECTOR*)&vec3->vx)) continue;
+      }
       if(otz < subdiv_lvl1 && flags & SGM2_RENDER_SUBDIV) {
         u_long uvcode0, uvcode1, uvcode2, uvcode3;
         CVECTOR col0, col1, col2, col3;
@@ -326,12 +328,12 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
         // Check side
         if(outer_product <= 0) continue; // Skip back facing polys
       }
-      //printf("rendering face %d\n",i);
+      ////printf("rendering face %d\n",i);
       // Load Z coordinates into GTE
       tempz0 = vec0->vz;
       tempz1 = vec1->vz;
       tempz2 = vec2->vz;
-      //printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
+      ////printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
       gte_ldsz3(tempz0,tempz1,tempz2);
       // Get the average Z value
       gte_avsz3();
@@ -343,9 +345,12 @@ u_char * SGM2_UpdateModel(SGM2_File * model, u_char * packet_ptr, u_long * ot, s
       if(otz >= OTSIZE) otz = OTSIZE-1;
       if (otz > OTMIN) {
         // Clip quads that are offscreen before any other operation
-        if(tri_clip((DVECTOR*)vec0,
+        if(flags & SGM2_RENDER_SCREEN_CLIP) {
+          if(tri_clip((DVECTOR*)vec0,
                     (DVECTOR*)vec1,
                     (DVECTOR*)vec2)) continue;
+        }
+        
         if(otz < subdiv_lvl1 && flags & SGM2_RENDER_SUBDIV) {
           u_long uvcode0, uvcode1, uvcode2;
           CVECTOR col0, col1, col2;
@@ -747,7 +752,7 @@ u_char * SGM2_UpdateModelColor(SGM2_File * model, u_char * packet_ptr, u_long * 
     tempz1 = vec1->vz;
     tempz2 = vec2->vz;
     tempz3 = vec3->vz;
-    //printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
+    ////printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
     gte_ldsz4(tempz0,tempz1,tempz2,tempz3);
     // Get the average Z value
     gte_avsz4();
@@ -762,10 +767,12 @@ u_char * SGM2_UpdateModelColor(SGM2_File * model, u_char * packet_ptr, u_long * 
     //if(otz >= OTSIZE) otz = OTSIZE-1;
 
     if (otz < OTSIZE) {
-      if(quad_clip( (DVECTOR*)&vec0->vx,
-                  (DVECTOR*)&vec1->vx,
-                  (DVECTOR*)&vec2->vx,
-                  (DVECTOR*)&vec3->vx)) continue;
+      if(flags & SGM2_RENDER_SCREEN_CLIP) {
+        if(quad_clip( (DVECTOR*)&vec0->vx,
+                    (DVECTOR*)&vec1->vx,
+                    (DVECTOR*)&vec2->vx,
+                    (DVECTOR*)&vec3->vx)) continue;
+      }
       if(otz < subdiv_lvl1 && flags & SGM2_RENDER_SUBDIV) {
         u_long uvcode0, uvcode1, uvcode2, uvcode3;
         CVECTOR col0, col1, col2, col3;
@@ -924,12 +931,12 @@ u_char * SGM2_UpdateModelColor(SGM2_File * model, u_char * packet_ptr, u_long * 
         // Check side
         if(outer_product <= 0) continue; // Skip back facing polys
       }
-      //printf("rendering face %d\n",i);
+      ////printf("rendering face %d\n",i);
       // Load Z coordinates into GTE
       tempz0 = vec0->vz;
       tempz1 = vec1->vz;
       tempz2 = vec2->vz;
-      //printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
+      ////printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
       gte_ldsz3(tempz0,tempz1,tempz2);
       // Get the average Z value
       gte_avsz3();
@@ -941,9 +948,11 @@ u_char * SGM2_UpdateModelColor(SGM2_File * model, u_char * packet_ptr, u_long * 
       if(otz >= OTSIZE) otz = OTSIZE-1;
       if (otz > OTMIN) {
         // Clip quads that are offscreen before any other operation
-        if(tri_clip((DVECTOR*)vec0,
-                    (DVECTOR*)vec1,
-                    (DVECTOR*)vec2)) continue;
+        if(flags & SGM2_RENDER_SCREEN_CLIP) {
+          if(tri_clip((DVECTOR*)vec0,
+                      (DVECTOR*)vec1,
+                      (DVECTOR*)vec2)) continue;
+        }
         if(otz < subdiv_lvl1 && flags & SGM2_RENDER_SUBDIV) {
           u_long uvcode0, uvcode1, uvcode2;
           CVECTOR col0, col1, col2;

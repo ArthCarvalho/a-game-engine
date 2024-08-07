@@ -90,6 +90,8 @@ extern int fpmathTest_atan2(int inY, int inX);
 
 extern unsigned short fxpt_atan2(const short y, const short x);
 
+extern int fix12_atan2s(int inY , int inX);
+
 extern int vec_mag(int x, int y);
 
 extern int fix12_mul(int inArg0, int inArg1);

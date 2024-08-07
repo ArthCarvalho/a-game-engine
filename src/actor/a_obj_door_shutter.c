@@ -147,7 +147,7 @@ void ObjDoorShutterActorUpdate(struct Actor * a, void * scene) {
       actor->sub_timer = 1;
       scene_ctx->cinema_mode = 1;
       scene_ctx->interface_fade = 1;
-      Player_ForceIdle(pl);
+      Player_ForceIdle((Actor *)pl);
       pl->state |= PLAYER_CUTSCENE_MODE;
       if(actor->back_room != actor->front_room) {
         scene_ctx->room_swap = 1;

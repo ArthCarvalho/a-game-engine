@@ -69,7 +69,7 @@ static _CARD HEAD;
 
 /* TODO: Check for a button combo to start additional debug menu */
 void module_debug_start() {
-  printf("module_debug_start\n");
+  //printf("module_debug_start\n");
   G.clear.r = 0;
 	G.clear.g = 0;
 	G.clear.b = 0;
@@ -88,7 +88,7 @@ void module_main_loop() {
   static u_char load_state = 0;
   static int nsector;
   static int cnt;
-  printf("module_main_loop\n");
+  //printf("module_main_loop\n");
   G.clear.r = 0;
 	G.clear.g = 0;
 	G.clear.b = 0;
@@ -118,8 +118,8 @@ void main() {
   RECT rect;
   unsigned int * alt;
   
-  //printf("Heap base: %x\nHeap size: %x\n",__heapbase,__heapsize);
-  //printf("BSS start: %x\nBSS length: %x\n",__bss,__bsslen);
+  ////printf("Heap base: %x\nHeap size: %x\n",__heapbase,__heapsize);
+  ////printf("BSS start: %x\nBSS length: %x\n",__bss,__bsslen);
   
   // EnterCriticalSection();
   // InitHeap3((void*)__heapbase, __heapsize);
@@ -220,8 +220,8 @@ void main() {
 
   
   /* Memory Card Debug Generate Save */
-  /*GetTimInfo(saveicon,&save_tim);
-  printf("Waiting for memory card...\n");
+  GetTimInfo(saveicon,&save_tim);
+  //printf("Waiting for memory card...\n");
   {
     long channel = 0;
     unsigned long result;
@@ -260,24 +260,24 @@ void main() {
     // Open Channel 0 (Memory Card A)
 
     MemCardSync(0,0,&result);
-    printf("Mem result 0x%02X\n", result);
+    //printf("Mem result 0x%02X\n", result);
 
-    printf("Opening Memory Card A...\n");
+    //printf("Opening Memory Card A...\n");
     MemCardAccept(channel);
     // Wait for results, stall
     MemCardSync(0,0,&result);
-    printf("Syncing...\n");
+    //printf("Syncing...\n");
 
     if(result != McErrNone && result != McErrNewCard) {
       // Memory card error
-      printf("Memory card error: 0x%02x\n", result);
+      //printf("Memory card error: 0x%02x\n", result);
     } else {
-      printf("Creating Memory Card File...\n");
+      //printf("Creating Memory Card File...\n");
       // Create file
       result = MemCardCreateFile(channel, "BASLUS-27588ZELDAMM", 1);
       if(result != McErrNone) {
         // Error!
-        printf("Memory card error creating file: 0x%02x\n", result);
+        //printf("Memory card error creating file: 0x%02x\n", result);
       } else {
         HEAD.Magic[0] = 'S';
         HEAD.Magic[1] = 'C';
@@ -295,12 +295,12 @@ void main() {
         MemCardSync(0,0,&result);
 
         if(result != McErrNone) {
-          printf("Memory card error writing: 0x%02x", result);
+          //printf("Memory card error writing: 0x%02x", result);
           return;
         }
       }
     }
-  }*/
+  }
   
   /* Start on DEBUG module */
   G.module = MODULE_DEBUG_START;

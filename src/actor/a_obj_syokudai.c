@@ -97,7 +97,7 @@ void ObjSyokudaiActorUpdate(struct Actor * a, void * scene) {
     ActorCollision_DisplaceActor(player, dist, intersect, deltax, deltaz);
   }
 
-  Draw_CalcNearestLight(actor, scene);
+  Draw_CalcNearestLight((Actor *)actor, scene);
 
   /*if(actor->base.xzDistance < 1024) {
     Scene_Ctx * scene_ctx = (Scene_Ctx*)scene;

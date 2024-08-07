@@ -22,14 +22,14 @@ int SoundInit(){
 
 int LoadSoundTest(u_char * vab_hdata, u_char * vab_bdata, u_long * seq_data){
   vabId = SsVabOpenHead (vab_hdata, -1);
-  printf("VAB HEAD ID: %d addr: %x\n",vabId, vab_hdata);
+  //printf("VAB HEAD ID: %d addr: %x\n",vabId, vab_hdata);
   if (vabId == -1) {
-    printf ("SsVabOpenHead : failed !!!\n");
+    //printf ("SsVabOpenHead : failed !!!\n");
     return 1;
   }
   
   if (SsVabTransBody (vab_bdata, vabId) != vabId) {
-    printf ("SsVabTransBody : failed !!!\n");
+    //printf ("SsVabTransBody : failed !!!\n");
     return 1;
   }
   SsVabTransCompleted(SS_WAIT_COMPLETED);

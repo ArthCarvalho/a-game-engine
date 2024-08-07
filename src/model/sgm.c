@@ -83,7 +83,7 @@ void SGM_LoadFile(u_long * addr, SGM_FILESTR * dest) {
   // Vertices
   file_itr = ((u_char*)addr)+dest->dh->vertex_offset;
   
-  //printf("file_itr = %p (from file offset)\n", file_itr);
+  ////printf("file_itr = %p (from file offset)\n", file_itr);
   dest->pgt4_vtx = (POLY_GT4_VERTEX*)file_itr;
   file_itr += sizeof(POLY_GT4_VERTEX) * dest->dh->poly_gt4_count;
   

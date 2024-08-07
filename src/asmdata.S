@@ -78,11 +78,11 @@
 
 player_agm:
   //.incbin "../AGAME_PCDATA/player_new.agm"
-  .incbin "../zelda_assets/models/link_reference.agm" #_global_normal
+  .incbin "../zelda_assets/models/link_reference_new_clean.agm" #_global_normal
   .balign 16
 
-player_anm:
-  .incbin "../zelda_assets/models/link_reference.agm.anm" #_global_normal
+player_anm: 
+  .incbin "../zelda_assets/models/link_reference_new_clean.agm.anm" #_global_normal
   .balign 16
 
 sword_sg2:
@@ -123,7 +123,7 @@ scene_room05_sg2_ext:
 */
 scene_col:
   //.incbin "../AGAME_PCDATA/Map/Test/Collision/map_collision.col2" 
-  .incbin "../zelda_assets/scenes/test_dampei/collision/complete_test_room_deku_shrine.col2"
+  .incbin "../zelda_assets/scenes/test_dampei/collision/complete_test_room_deku_shrine.col2    "
   .balign 16
 
 obj_flame_sgm2:
@@ -195,7 +195,7 @@ iwayuka_tim:
   .incbin "../AGAME_PCDATA/iwayuka_4bit.tim"
   .balign 16
 */
-deku_shrine_block000a:
+deku_shrine_block000a:   
   .incbin "../zelda_assets/textures_png/scenes/deku_shrine_block000a.tim"
   .balign 16
 

@@ -12,6 +12,7 @@
 
 #include "actor/a_obj_collectable.h"
 #include "scene/scene.h"
+#include "texture/texture.h"
 
 #define REFLECTION_VRAM_X 448
 #define REFLECTION_VRAM_Y 256
@@ -88,7 +89,7 @@ void ObjCollectableActorUpdate(struct Actor * a, void * scene) {
   Scene_Ctx * scene_ctx = (Scene_Ctx *)scene;
   actor->roty = (actor->roty+64) & 0x0FFF;
 
-  PlayerActor * player = scene_ctx->player;
+  PlayerActor * player = (PlayerActor *)scene_ctx->player;
 
   switch(actor->state) {
     case 0:

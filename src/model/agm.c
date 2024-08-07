@@ -60,10 +60,10 @@ void AGM_LoadModel(AGM_model * model, u_long * addr){
     vertex->vx = ((vertex->vx)<<12)/len;
     vertex->vy = ((vertex->vy)<<12)/len;
     vertex->vz = ((vertex->vz)<<12)/len;
-    //printf("index %d: normal x %d y %d z %d\n",i, vertex->vx, vertex->vy, vertex->vz);
+    ////printf("index %d: normal x %d y %d z %d\n",i, vertex->vx, vertex->vy, vertex->vz);
   }*/
   
-  //printf("checking for skeleton data: %x\n",model->file->skeleton);
+  ////printf("checking for skeleton data: %x\n",model->file->skeleton);
   
   if(model->file->skeleton != 0){
     long i,b;
@@ -75,13 +75,13 @@ void AGM_LoadModel(AGM_model * model, u_long * addr){
     model->file->skeleton->matrix_list = (MATRIX*)((char*)addr + ((long)model->file->skeleton->matrix_list));
     model->file->skeleton->vertex_indices = (u_short*)((char*)addr + ((long)model->file->skeleton->vertex_indices));
     
-    //printf("bone_count=%d\nvertex_count=%d\n",model->file->skeleton->bone_count,model->file->skeleton->vertex_count);
+    ////printf("bone_count=%d\nvertex_count=%d\n",model->file->skeleton->bone_count,model->file->skeleton->vertex_count);
     
     for(i = 0; i<model->file->skeleton->bone_count; i++){
       AGM_BONE * boneptr = &model->file->skeleton->bone_list[i];
       MATRIX * bonemtxptr;
       
-      //printf("matrix_index=%d\nfirst_child=%d\nnext_sibling=%d\nvertex_start=%d\nvertex_count=%d\n",
+      ////printf("matrix_index=%d\nfirst_child=%d\nnext_sibling=%d\nvertex_start=%d\nvertex_count=%d\n",
       //  boneptr->matrix_idx,
       //  boneptr->first_child,
       //  boneptr->next_sibling,
@@ -97,7 +97,7 @@ void AGM_LoadModel(AGM_model * model, u_long * addr){
       
       //PrintMatrix(bonemtxptr);
       
-      //printf("matrix address: %x\n",bonemtxptr);
+      ////printf("matrix address: %x\n",bonemtxptr);
       
     }
   }
@@ -127,7 +127,7 @@ void AGM_Init(unsigned long buffer_size){
    
    TransformBufferSize = buffer_size;
    
-   printf("AGM_TransformBuffer: %x (size: %d)\n",AGM_TransformBuffer, TransformBufferSize);
+   //printf("AGM_TransformBuffer: %x (size: %d)\n",AGM_TransformBuffer, TransformBufferSize);
 }
 
 void AGM_DeInit() {
@@ -150,13 +150,13 @@ void AGM_TransformModel(SVECTOR * source, unsigned short vtx_count) {
   
   vtx_div3 = vtx_count / 3;
   vtx_rem = vtx_count % 3;
-  //printf("t vtx count: total=%d, div3=%d, rem=%d\n",vtx_count,vtx_div3,vtx_rem);
+  ////printf("t vtx count: total=%d, div3=%d, rem=%d\n",vtx_count,vtx_div3,vtx_rem);
   // Transform vertices in groups of 3
   for(i = 0; i < vtx_div3;){
     SVECTOR * z_temp[3];
     long tempz0, tempz1, tempz2;
 
-    /*printf("vtx %d, v0 x%d y%d z%d, v1 x%d y%d z%d, v2 x%d y%d z%d\n",
+    /*//printf("vtx %d, v0 x%d y%d z%d, v1 x%d y%d z%d, v2 x%d y%d z%d\n",
     i,
     vertex_source[0].vx, vertex_source[0].vy, vertex_source[0].vz, 
     vertex_source[1].vx, vertex_source[1].vy, vertex_source[1].vz, 
@@ -271,8 +271,8 @@ void AGM_ProcessBone(AGM_BONE * bones, u_short current_bone, SVECTOR * vtxbuff, 
   // Advance stack pointer
   AGM_MatrixStackPointer++;
 
-  //printf("call: bone[%d]\n",current_bone);
-  //printf("addr[%x]\n",AGM_MatrixStackPointer);
+  ////printf("call: bone[%d]\n",current_bone);
+  ////printf("addr[%x]\n",AGM_MatrixStackPointer);
   
    while(1) {
     MATRIX * matrix;
@@ -288,8 +288,8 @@ void AGM_ProcessBone(AGM_BONE * bones, u_short current_bone, SVECTOR * vtxbuff, 
     //temp.t[1] = matrix->t[1];
     //temp.t[2] = matrix->t[2];
     
-    //printf("processing bone[%d]\n",current_bone);
-    //printf("next_sibling[%d]\n",cBone->next_sibling);
+    ////printf("processing bone[%d]\n",current_bone);
+    ////printf("next_sibling[%d]\n",cBone->next_sibling);
     /*if(current_bone <= 9){
       RotMatrix_gte(&temp_animvector,&temp);
       
@@ -310,7 +310,7 @@ void AGM_ProcessBone(AGM_BONE * bones, u_short current_bone, SVECTOR * vtxbuff, 
 
     //anim_vec.vy = 0;
     //anim_vec.vz = 0;
-    //printf("bone[%d] anim_vec: x:%d y:%d z:%d (%d)\n",current_bone,anim_vec.vx,anim_vec.vy,anim_vec.vz,compare_bit);
+    ////printf("bone[%d] anim_vec: x:%d y:%d z:%d (%d)\n",current_bone,anim_vec.vx,anim_vec.vy,anim_vec.vz,compare_bit);
     if(compare_bit == 0){
       RotMatrixZYX_gte(anim_vec,temp);
     } else {
@@ -671,8 +671,8 @@ void AGM_TransformBlock(AGM_BONE * bone, SVECTOR * vtxbuff, u_short * idxbuff, S
   vtx_div3 = bone->vertex_count / 3;
   vtx_rem = bone->vertex_count % 3;
   
-  //printf("bone count=%d\n",bone->vertex_count);
-  //printf("bone vtx_div3=%d vtx_rem=%d\n",vtx_div3,vtx_rem);
+  ////printf("bone count=%d\n",bone->vertex_count);
+  ////printf("bone vtx_div3=%d vtx_rem=%d\n",vtx_div3,vtx_rem);
   
   vertex_indices = &idxbuff[bone->vertex_start];
   
@@ -740,8 +740,8 @@ void AGM_LightBlock(AGM_BONE * bone, SVECTOR * normalbuff, u_short * idxbuff, CV
   vtx_div3 = bone->vertex_count / 3;
   vtx_rem = bone->vertex_count % 3;
   
-  //printf("bone count=%d\n",bone->vertex_count);
-  //printf("bone vtx_div3=%d vtx_rem=%d\n",vtx_div3,vtx_rem);
+  ////printf("bone count=%d\n",bone->vertex_count);
+  ////printf("bone vtx_div3=%d vtx_rem=%d\n",vtx_div3,vtx_rem);
   
   vertex_indices = &idxbuff[bone->vertex_start];
 
@@ -839,13 +839,13 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
       gte_stopz(&outer_product);
       // Check side
       if(outer_product <= 0) continue; // Skip back facing polys
-      //printf("rendering face %d\n",i);
+      ////printf("rendering face %d\n",i);
       // Load Z coordinates into GTE
       tempz0 = vec0->vz;
       tempz1 = vec1->vz;
       tempz2 = vec2->vz;
       tempz3 = vec3->vz;
-      //printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
+      ////printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
       gte_ldsz4(tempz0,tempz1,tempz2,tempz3);
       // Get the average Z value
       gte_avsz4();
@@ -933,7 +933,7 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
 
         setPolyG4(dest_pg4_ptr);
         
-        //printf("Poly Address: %x\n",dest_pg4_ptr);
+        ////printf("Poly Address: %x\n",dest_pg4_ptr);
         
         // Add primitive to Ordering Table and advance pointer
         // to point to the next primitive to be processed.
@@ -944,7 +944,7 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
   }
   dest_pg3_ptr = (POLY_G3*)dest_pg4_ptr;
   
-  //printf("rendering tris count[%d]\n",pg3_count);
+  ////printf("rendering tris count[%d]\n",pg3_count);
   
   for(i = 0; i < pg3_count; i++, pg3_ptr++) {
       SVECTOR * vec0 = &AGM_TransformBuffer[pg3_ptr->idx0];
@@ -964,12 +964,12 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
       gte_stopz(&outer_product);
       // Check side
       if(outer_product <= 0) continue; // Skip back facing polys
-      //printf("rendering face %d\n",i);
+      ////printf("rendering face %d\n",i);
       // Load Z coordinates into GTE
       tempz0 = vec0->vz;
       tempz1 = vec1->vz;
       tempz2 = vec2->vz;
-      //printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
+      ////printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
       gte_ldsz3(tempz0,tempz1,tempz2);
       // Get the average Z value
       gte_avsz3();
@@ -1056,13 +1056,13 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
       gte_stopz(&outer_product);
       // Check side
       if(outer_product <= 0) continue; // Skip back facing polys
-      //printf("rendering face %d\n",i);
+      ////printf("rendering face %d\n",i);
       // Load Z coordinates into GTE
       tempz0 = vec0->vz;
       tempz1 = vec1->vz;
       tempz2 = vec2->vz;
       tempz3 = vec3->vz;
-      //printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
+      ////printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
       gte_ldsz4(tempz0,tempz1,tempz2,tempz3);
       // Get the average Z value
       gte_avsz4();
@@ -1174,7 +1174,7 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
 
         setPolyGT4(dest_pgt4_ptr);
         
-        //printf("Poly Address: %x\n",dest_pgt4_ptr);
+        ////printf("Poly Address: %x\n",dest_pgt4_ptr);
         
         // Add primitive to Ordering Table and advance pointer
         // to point to the next primitive to be processed.
@@ -1203,12 +1203,12 @@ u_char * AGM_DrawModel(AGM_model * model, u_char * packet_ptr, u_long * ot, shor
       gte_stopz(&outer_product);
       // Check side
       if(outer_product <= 0) continue; // Skip back facing polys
-      //printf("rendering face %d\n",i);
+      ////printf("rendering face %d\n",i);
       // Load Z coordinates into GTE
       tempz0 = vec0->vz;
       tempz1 = vec1->vz;
       tempz2 = vec2->vz;
-      //printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
+      ////printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
       gte_ldsz3(tempz0,tempz1,tempz2);
       // Get the average Z value
       gte_avsz3();
@@ -1314,20 +1314,21 @@ void ANM_LoadAnimation(ANM_ANIMATION ** anim, u_char * addr) {
   temp->animation_data = (SVECTOR*) ((char*)addr + ((long)temp->animation_data));
 }
 
-void PrintMatrix(MATRIX * mat) {
-  printf("matrix:\n[%d,%d,%d]m\n",
+/*void PrintMatrix(MATRIX * mat) {
+  //printf("matrix:\n[%d,%d,%d]m\n",
         mat->m[0][0],mat->m[0][1],mat->m[0][2]
       );
-      printf("[%d,%d,%d]m\n",
+      //printf("[%d,%d,%d]m\n",
         mat->m[1][0],mat->m[1][1],mat->m[1][2]
       );
-      printf("[%d,%d,%d]m\n",
+      //printf("[%d,%d,%d]m\n",
         mat->m[2][0],mat->m[2][1],mat->m[2][2]
       );
-      printf("[%d,%d,%d]t\n",
+      //printf("[%d,%d,%d]t\n",
         mat->t[0],mat->t[1],mat->t[2]
       );
 }
+*/
 
 void ANM_InterpolateSVECTOR( SVECTOR * dest, SVECTOR * a, SVECTOR * b, short factor) {
   QUATERNION qa,qb;
@@ -1422,13 +1423,13 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
       gte_stopz(&outer_product);
       // Check side
       if(outer_product <= 0 && !(mat_flags & AGM_MATERIAL_NOCULLING)) continue; // Skip back facing polys
-      //printf("rendering face %d\n",i);
+      ////printf("rendering face %d\n",i);
       // Load Z coordinates into GTE
       tempz0 = vec0->vz;
       tempz1 = vec1->vz;
       tempz2 = vec2->vz;
       tempz3 = vec3->vz;
-      //printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
+      ////printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
       gte_ldsz4(tempz0,tempz1,tempz2,tempz3);
       // Get the average Z value
       gte_avsz4();
@@ -1522,7 +1523,7 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
       gte_stopz(&outer_product);
       // Check side
       if(outer_product <= 0 && !(mat_flags & AGM_MATERIAL_NOCULLING)) continue; // Skip back facing polys
-      //printf("rendering face %d\n",i);
+      ////printf("rendering face %d\n",i);
       // Load Z coordinates into GTE
       tempz0 = vec0->vz;
       tempz1 = vec1->vz;
@@ -1607,13 +1608,13 @@ u_char * AGM_DrawModelTPage(AGM_model * model, u_char * packet_ptr, u_long * ot,
       gte_stopz(&outer_product);
       // Check side
       if(outer_product <= 0 && !(mat_flags & AGM_MATERIAL_NOCULLING)) continue; // Skip back facing polys
-      //printf("rendering face %d\n",i);
+      ////printf("rendering face %d\n",i);
       // Load Z coordinates into GTE
       tempz0 = vec0->vz;
       tempz1 = vec1->vz;
       tempz2 = vec2->vz;
       tempz3 = vec3->vz;
-      //printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
+      ////printf("Poly %d z: %d, %d, %d, %d\n",i,tempz0,tempz1,tempz2,tempz3);
       gte_ldsz4(tempz0,tempz1,tempz2,tempz3);
       // Get the average Z value
       gte_avsz4();

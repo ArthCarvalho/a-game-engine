@@ -289,10 +289,10 @@ void file_load_temp(char * filename, unsigned long ** dest) {
   unsigned long * prev;
   //unsigned long * next;
   if((long)DsSearchFile(&fp, filename) <= 0) {
-    printf("File not found: %s\n", filename);
+    //printf("File not found: %s\n", filename);
     return;
   }
-  printf("Loading %s\n",filename);
+  //printf("Loading %s\n",filename);
   nsector = (fp.size+2047)/2048;
   *dest = LStack_Alloc(nsector * 2048);
   DsControl(DslSetloc, (u_char *)&fp.pos, 0);
@@ -312,18 +312,18 @@ void file_load_temp(char * filename, unsigned long ** dest) {
   
   //*dest = realloc3(*dest, fp.size);
   //next = *dest;
-  printf("File %s realloc: %x => %x\n", filename, prev, *dest);
-  //printf("Realloc size: %d => %d\n", nsector * 2048, fp.size);
+  //printf("File %s realloc: %x => %x\n", filename, prev, *dest);
+  ////printf("Realloc size: %d => %d\n", nsector * 2048, fp.size);
 }
 
 unsigned long file_load_temp_noalloc(char * filename, unsigned long * dest) {
   DslFILE		fp;
   int nsector, cnt;
   if((long)DsSearchFile(&fp, filename) <= 0) {
-    printf("File not found: %s\n", filename);
+    //printf("File not found: %s\n", filename);
     return 0;
   }
-  printf("Loading %s\n",filename);
+  //printf("Loading %s\n",filename);
   nsector = (fp.size+2047)/2048;
   DsControl(DslSetloc, (u_char *)&fp.pos, 0);
   DsRead(&fp.pos, nsector, dest, DslModeSpeed);

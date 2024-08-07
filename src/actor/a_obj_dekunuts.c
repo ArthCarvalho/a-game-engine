@@ -10,6 +10,7 @@
 
 #include "actor/a_obj_dekunuts.h"
 #include "scene/scene.h"
+#include "texture/texture.h"
 
 #include "spadstk.h"
 

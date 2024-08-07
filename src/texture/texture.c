@@ -132,7 +132,7 @@ void load_texture_pos_fog(u_long addr, u_long x, u_long y, u_long c_x, u_long c_
     rect.w = tim.cw;
     rect.h = tim.ch;
 
-    //printf('clut address: %x\n', &tim.clut);
+    ////printf('clut address: %x\n', &tim.clut);
 
     make_clut(&rect, (u_short*)tim.clut, fog);
 
@@ -159,7 +159,7 @@ void load_clut_pos(u_long addr, u_long c_x, u_long c_y, u_char c_w, u_char c_h) 
   rect.y = c_y;
   rect.w = c_w;
   rect.h = c_h;
-  LoadImage(&rect,addr);
+  LoadImage(&rect, (u_long*)addr);
 }
 
 void GetTimInfo(unsigned long *im, TIMIMAGE * tim) {

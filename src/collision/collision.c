@@ -81,7 +81,7 @@ Col_Info * Col_Init(Col2 * file) {
 
   col->grid_ptr = (unsigned short*)LStack_Alloc(col->grid_num * sizeof(unsigned short));
 
-  printf("bbox min: x=%d y=%d z=%d\n", file->minx, file->miny, file->minz);
+  //printf("bbox min: x=%d y=%d z=%d\n", file->minx, file->miny, file->minz);
 
   /* Set grid cells to 0x8000 (no element) */
   for(i = 0; i < col->grid_num; i++) {
@@ -131,13 +131,13 @@ Col_Info * Col_Init(Col2 * file) {
     if(cvert2_z > max_cell_z) max_cell_z = cvert2_z;
 
     if(cvert0_y >= col->grid_y) {
-      printf("cell y error: %d vertex 0 (index: %d)\n",cvert0_y,i);
+      //printf("cell y error: %d vertex 0 (index: %d)\n",cvert0_y,i);
     }
     if(cvert1_y >= col->grid_y) {
-      printf("cell y error: %d vertex 1 (index: %d)\n",cvert1_y,i);
+      //printf("cell y error: %d vertex 1 (index: %d)\n",cvert1_y,i);
     }
     if(cvert2_y >= col->grid_y) {
-      printf("cell y error: %d vertex 2 (index: %d)\n",cvert2_y,i);
+      //printf("cell y error: %d vertex 2 (index: %d)\n",cvert2_y,i);
     }
 
     /* If all faces are in the same cell, skip additional checks */
@@ -146,7 +146,7 @@ Col_Info * Col_Init(Col2 * file) {
     cell_pos_v1 = cvert1_x + col->grid_x * (cvert1_z + col->grid_z * cvert1_y);
     cell_pos_v2 = cvert2_x + col->grid_x * (cvert2_z + col->grid_z * cvert2_y);
 
-    printf("face %d, verts [%d] [%d] [%d]\n",i,cell_pos_v0,cell_pos_v1,cell_pos_v2);
+    //printf("face %d, verts [%d] [%d] [%d]\n",i,cell_pos_v0,cell_pos_v1,cell_pos_v2);
 
 
     if(cell_pos_v0 == cell_pos_v1 && cell_pos_v0 == cell_pos_v2) {
@@ -156,7 +156,7 @@ Col_Info * Col_Init(Col2 * file) {
       //unsigned short cell_pos = cvert0_x + col->grid_x * (cvert0_z + col->grid_z * cvert0_y);
       unsigned short cell = col->grid_ptr[cell_pos_v0];
 
-      //printf("face %d - cell[%d][%d][%d]\n", i, cvert0_x, cvert0_y, cvert0_z);
+      ////printf("face %d - cell[%d][%d][%d]\n", i, cvert0_x, cvert0_y, cvert0_z);
       if(cell == 0xFFFF) {
         /* cell is empty */
         cell = 1;
@@ -174,26 +174,26 @@ Col_Info * Col_Init(Col2 * file) {
   {
     long z, y, x;
     for(y = 0; y < col->grid_y; y++) {
-      printf("y = %d\n",y);
+      //printf("y = %d\n",y);
       for(z = 0; z < col->grid_z; z++) {
         for(x = 0; x < col->grid_x; x++) {
           /* x + xn * ( y + yn * z ) */
           unsigned short cell_pos = x + col->grid_x * (z + col->grid_z * y);
           unsigned short cell = col->grid_ptr[cell_pos];
           if(cell == 0xFFFF){
-            printf("[XXX] ");
+            //printf("[XXX] ");
           } else {
-            printf("[%03d] ",cell);
+            //printf("[%03d] ",cell);
           }
         }
-        printf("\n");
+        //printf("\n");
       }
-      printf("\n");
+      //printf("\n");
     }
   }
 
-  printf("%d triangles unaccounted for. (belongs to multiple cells)\n", unnacounted);
-  printf("max cell: x=%d y=%d z=%d\n",max_cell_x,max_cell_y,max_cell_z);
+  //printf("%d triangles unaccounted for. (belongs to multiple cells)\n", unnacounted);
+  //printf("max cell: x=%d y=%d z=%d\n",max_cell_x,max_cell_y,max_cell_z);
 
   return col;
 }
@@ -214,13 +214,13 @@ Col_Info * Col_Init2(Col2 * file) {
 
   col->grid_ptr = (unsigned short*)LStack_Alloc(col->grid_num * sizeof(unsigned short));
 
-  printf("bbox min: x=%d y=%d z=%d\n", file->minx, file->miny, file->minz);
+  //printf("bbox min: x=%d y=%d z=%d\n", file->minx, file->miny, file->minz);
 
   /* Set grid cells to 0x8000 (no element) */
   for(i = 0; i < col->grid_num; i++) {
     col->grid_ptr[i] = 0xFFFF;
   }
-  printf("entering massive check!");
+  //printf("entering massive check!");
 
   /* Check if grid cell contain any faces */
   {
@@ -234,13 +234,13 @@ Col_Info * Col_Init2(Col2 * file) {
     active_cell.h = 2048;
     
     for(y = 0; y < col->grid_y; y++) {
-      printf("y level = %d\n",y);
+      //printf("y level = %d\n",y);
       for(z = 0; z < col->grid_z; z++) {
-        //printf("z level = %d\n",z);
+        ////printf("z level = %d\n",z);
         for(x = 0; x < col->grid_x; x++) {
           unsigned short cell_pos = x + col->grid_x * (z + col->grid_z * y);
           unsigned short cell = col->grid_ptr[cell_pos];
-         //printf("x level = %d\n",x);
+         ////printf("x level = %d\n",x);
           /* BIG CHECK AHEAD! Every Cell for Every Triangle! */
           active_cell.x = ((long)x << 11) + ((long)file->minx);
           for(i = 0; i < col->file->face_num; i++) {
@@ -294,26 +294,26 @@ Col_Info * Col_Init2(Col2 * file) {
   {
     long z, y, x;
     for(y = 0; y < col->grid_y; y++) {
-      printf("y = %d\n",y);
+      //printf("y = %d\n",y);
       for(z = 0; z < col->grid_z; z++) {
         for(x = 0; x < col->grid_x; x++) {
           /* x + xn * ( y + yn * z ) */
           unsigned short cell_pos = x + col->grid_x * (z + col->grid_z * y);
           unsigned short cell = col->grid_ptr[cell_pos];
           if(cell == 0xFFFF){
-            printf("[XXX] ");
+            //printf("[XXX] ");
           } else {
-            printf("[%03d] ",cell);
+            //printf("[%03d] ",cell);
           }
         }
-        printf("\n");
+        //printf("\n");
       }
-      printf("\n");
+      //printf("\n");
     }
   }
 
-  printf("%d triangles unaccounted for. (belongs to multiple cells)\n", unnacounted);
-  printf("max cell: x=%d y=%d z=%d\n",max_cell_x,max_cell_y,max_cell_z);
+  //printf("%d triangles unaccounted for. (belongs to multiple cells)\n", unnacounted);
+  //printf("max cell: x=%d y=%d z=%d\n",max_cell_x,max_cell_y,max_cell_z);
 
   return col;
 }
@@ -531,7 +531,7 @@ short Col_GroundCheckPoint(Col2 * col, SVECTOR * pos, unsigned short dist, Col_R
       unsigned short collide; 
 
       if(test_list[BITLIST_POS(bucket_node->face)] & BITLIST_BIT(bucket_node->face)) {
-        //printf("testing same face? %d pos: %d bit: %x cont: %x\n", bucket_node->face, BITLIST_POS(bucket_node->face), BITLIST_BIT(bucket_node->face),test_list[BITLIST_POS(bucket_node->face)]);
+        ////printf("testing same face? %d pos: %d bit: %x cont: %x\n", bucket_node->face, BITLIST_POS(bucket_node->face), BITLIST_BIT(bucket_node->face),test_list[BITLIST_POS(bucket_node->face)]);
         if(bucket_node->next == 0xFFFF) break;
           bucket_node++;
           continue; // skip of outside triangle
@@ -664,8 +664,8 @@ int PointInTriangleScratch (SVECTOR * pt, SVECTOR * v1, SVECTOR * v2, SVECTOR * 
 }
 
 short Col_GroundCheckPointScratch(Col2 * col, SVECTOR * pos) {
-  struct GroundCheckScratch * scratchPadLocal;
-  struct GroundCheckScratch * scratchPad = &scratchPadLocal;// = (struct GroundCheckScratch *) SCRATCH_PAD;
+    struct GroundCheckScratch scratchPadLocal;
+  struct GroundCheckScratch * scratchPad = &scratchPadLocal;
   Col_CellPos cell_pos;
   unsigned short cell_element;
   Col_Bucket * bucket;

@@ -13,7 +13,7 @@
 #include "spadstk.h"
 
 //#include "../../AGAME_PCDATA/player_new.agm.anm.h"
-#include "../../zelda_assets/models/link_reference.agm.anm.h"
+#include "../../zelda_assets/models/link_reference_new_clean.agm.anm.h"
 
 short col_queries_test = 0;
 
@@ -120,7 +120,7 @@ void PlayerLoadData() {
     
     if(!(PlayerDataLoaded & 0x0002)){
       file_load_temp("\\DATA\\PLAYER.ANM;1", &PlayerAnmData);
-      printf("PLAYER LOADED\n");
+      //printf("PLAYER LOADED\n");
       PlayerDataLoaded |= 0x0002;
     }
 }
@@ -210,7 +210,7 @@ void PlayerCreateInstance(Actor * a, void * col_ctx) {
   }*/
 
   actor->L_Hand_matrix = &player_bone_matrix[5];
-  //printf("transfomed: %x\n",player_bone_matrix);
+  ////printf("transfomed: %x\n",player_bone_matrix);
 }
 
 // Player Functions
@@ -397,7 +397,7 @@ void PlayerUpdate(Actor * a, void * scene) {
           SVECTOR plane_normal = {actor->floor->plane->nx0, actor->floor->plane->ny0, actor->floor->plane->nz0, 0};
           SVECTOR move_vec_dir = {actor->xzvector.vx, 0, actor->xzvector.vy, 0};
           short m_p_dot = dotProductXYZ(&move_vec_dir, &plane_normal);
-          model_head_arch_s = (m_p_dot>>4) - 80;
+          model_head_arch_s = (m_p_dot>>4) ;
 
           m_p_dot = 1638 + (2458 - asm_fpmul64(fastabs(m_p_dot), 2458));
 
@@ -916,8 +916,16 @@ void Player_Normal(Actor * a) {
 
         if(actor->xzspeed > 0) {
           // ANM_AttackRoll ANM_RunFree
-          actor->current_anim = ANM_RunFree;
-          anim_spd = fix12_mul(actor->xzspeed,256*0.59);
+          
+          if(actor->xzspeed < 90000) {
+            actor->current_anim = ANM_WalkFree;
+            anim_spd = fix12_mul(actor->xzspeed,256*0.9);
+          } else {
+            actor->current_anim = ANM_RunFree;
+            anim_spd = fix12_mul(actor->xzspeed,256*0.59);
+            
+          }
+          
         }
         //FntPrint("PLAYER SPD: %d\n", actor->xzspeed);
         //if(actor->state & PLAYER_STATE_MOVE && actor->xzspeed > 100000) actor->action = ACTION_ATTACK;

@@ -99,7 +99,7 @@ u_long ActorDataSizes[] = {
 };
 
 /*
-  printf("Actor_SwapPlane_Init 2\n");
+  //printf("Actor_SwapPlane_Init 2\n");
   {
     Actor_Descriptor newactor;
     Actor_SwapPlane_Initializer * plane_init;
@@ -125,12 +125,12 @@ u_long ActorDataSizes[] = {
 
     // Allocate
     scene->transition_actors[2] = LStack_Alloc(sizeof(Actor_SwapPlane));
-    //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
+    ////printf("//printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
     // Create each transition actor
     Scene_AddActor(&Scene_ActorList[ACTOR_GROUP_DOOR], scene->transition_actors[2]);
     Actor_SwapPlane_Init(scene->transition_actors[2], &newactor, scene);
   }
-  printf("Actor_SwapPlane_Init 3 Begin\n");
+  //printf("Actor_SwapPlane_Init 3 Begin\n");
   {
     Actor_Descriptor newactor;
     Actor_SwapPlane_Initializer * plane_init;
@@ -155,7 +155,7 @@ u_long ActorDataSizes[] = {
 
     // Allocate
     scene->transition_actors[3] = LStack_Alloc(sizeof(Actor_SwapPlane));
-    //printf("printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
+    ////printf("//printf: sizeof: actor=%d swapplane=%d\n",sizeof(Actor),sizeof(Actor_SwapPlane));
     // Create each transition actor
     Scene_AddActor(&Scene_ActorList[ACTOR_GROUP_DOOR], scene->transition_actors[3]);
     Actor_SwapPlane_Init(scene->transition_actors[3], &newactor, scene);
@@ -220,7 +220,7 @@ Actor_Descriptor transition_actors[] = {
     }
   }
 };
-
+/*
 Actor_Descriptor room0_actors[] = {
   {
     8832, -4096, 0,          // short x, y, z;
@@ -343,9 +343,69 @@ Actor_Descriptor room0_actors[] = {
       5, 1, 4096*0.6, 256*20, 0, 0, 0, 0, 0 // Color, Show Flare, Flare Scale, Flare Draw Distance
     }
   },
+*/
 
+#define ROOM0_ACTORS_COUNT 5
+
+Actor_Descriptor room0_actors[ROOM0_ACTORS_COUNT] = {
+  {
+    -1132, 0, 5768,
+    0, 0, 0,
+    4096, 4096, 4096,
+    0,
+    NULL,
+    OBJ_SYOKUDAI,
+    {
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    1132, 0, 5768,
+    0, 0, 0,
+    4096, 4096, 4096,
+    0,
+    NULL,
+    OBJ_SYOKUDAI,
+    {
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    -2446, 0, 5121,
+    0, 0, 0,
+    4096, 4096, 4096,
+    0,
+    NULL,
+    OBJ_SYOKUDAI,
+    {
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    2045, 0, -363,
+    0, 0, 0,
+    4096, 4096, 4096,
+    0,
+    NULL,
+    OBJ_SYOKUDAI,
+    {
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  },
+  {
+    1282, 339, -8860,
+    0, 0, 0,
+    4096, 4096, 4096,
+    0,
+    NULL,
+    OBJ_SYOKUDAI,
+    {
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+  }
+};
 /*  (256.0*(80.9656*-1.0)), (256.0*-16.9229), (256.0*-23.3968)*/
-  
+/*  
   {
     4855, -4096-256, 10726,          // short x, y, z;
     0, 1024, 0,          // short rot_x, rot_y, rot_z;
@@ -468,7 +528,7 @@ Actor_Descriptor room0_actors[] = {
     }
   }
 };
-
+*/
 //
 Actor_Descriptor room1_actors[] = {
   {
@@ -677,7 +737,7 @@ Room_Data room_data[] = {
       0                     // Skybox Type
     },
     room0_actors,           // List of actor initialization parameters
-    22,                      // Number of actors in initialization list
+    ROOM0_ACTORS_COUNT,                      // Number of actors in initialization list
     NULL,                   // Pointer to list of models in this room's background
     0,                      // Number of background models
   },
@@ -777,7 +837,7 @@ Scene_Data scene_data[] = {
     NUM_TRANSITION_ACTORS,                        // Number of transition actors
     room_data,                // List of rooms
     5,                        // Number of rooms
-    scene_col                 // Map Collision Mesh
+    (struct COL2*) scene_col                 // Map Collision Mesh
   },
 };
 
@@ -977,7 +1037,7 @@ Scene_Ctx * scene;
 void SceneInitialize() {
   void * dataptr;
   unsigned long datasize;
-  printf("SceneInitialize\n");
+  //printf("SceneInitialize\n");
   // The linear stack heap is initialized here because
   // when overlays are implemented it needs to tell
   // where the free memory for that overlay starts and end
@@ -986,8 +1046,8 @@ void SceneInitialize() {
   // (actually it will probably crash the game)
   u_long ram_bytes = (RAM_SIZE - (((u_long)&__heap_start) & 0xFFFFFF));
   __heap_size = ram_bytes - __stack_size;
-  printf("__heap_start 0x%0X, __heap_size 0x%0X\n", &__heap_start, __heap_size);
-  printf("Total heap size: %dKB (%d bytes) %d\n",ram_bytes >> 10, ram_bytes, ((u_long)&__heap_start) & 0xFFFFFF);
+  //printf("__heap_start 0x%0X, __heap_size 0x%0X\n", &__heap_start, __heap_size);
+  //printf("Total heap size: %dKB (%d bytes) %d\n",ram_bytes >> 10, ram_bytes, ((u_long)&__heap_start) & 0xFFFFFF);
   
   EnterCriticalSection();
   LStack_InitArea(&__heap_start, __heap_size);
@@ -1066,7 +1126,7 @@ void SceneInitialize() {
 
   // Save stack pointer so we can restore it when changing scenes
   LStack_SaveCurrentPosition();
-  printf("Total free memory: %dKB (load start)\n",LStack_GetFree() >> 10);
+  //printf("Total free memory: %dKB (load start)\n",LStack_GetFree() >> 10);
   // Load initial scene data
   SceneLoad(scene_data);
 }
@@ -1118,7 +1178,7 @@ void SceneLoad(Scene_Data * scene_data) {
   //map_model[5] = (SGM2_File*)scene_room05_sg2;
   //map_model[6] = (SGM2_File*)scene_room05_sg2_ext;
 
-  printf("Col_LoadFile\n");
+  //printf("Col_LoadFile\n");
 
 
   // Initialize collision
@@ -1126,10 +1186,10 @@ void SceneLoad(Scene_Data * scene_data) {
 
   scene_data->collision_mesh = Col_LoadFile((u_long*)scene_data->collision_mesh);
 
-  printf("collision addr: %x vertices: %x faces: %x planes: %x\n",scene_data->collision_mesh,scene_data->collision_mesh->vertices,scene_data->collision_mesh->faces,scene_data->collision_mesh->planes);
-  printf("vert num: %d face num: %d plane num: %d\n",scene_data->collision_mesh->vertex_num, scene_data->collision_mesh->face_num, scene_data->collision_mesh->plane_num);
+  //printf("collision addr: %x vertices: %x faces: %x planes: %x\n",scene_data->collision_mesh,scene_data->collision_mesh->vertices,scene_data->collision_mesh->faces,scene_data->collision_mesh->planes);
+  //printf("vert num: %d face num: %d plane num: %d\n",scene_data->collision_mesh->vertex_num, scene_data->collision_mesh->face_num, scene_data->collision_mesh->plane_num);
 
-  printf("map: vert num %d (%d bytes)\n",map_model[4]->vertex_count, map_model[4]->vertex_count * sizeof(SVECTOR));
+  //printf("map: vert num %d (%d bytes)\n",map_model[4]->vertex_count, map_model[4]->vertex_count * sizeof(SVECTOR));
   // Initialize Transform Buffer
   //AGM_Init(map_model->vertex_count * sizeof(SVECTOR)); // Initialize to the size of the largest model to be transformed
   AGM_Init(2000 * sizeof(SVECTOR));
@@ -1230,7 +1290,7 @@ void SceneLoad(Scene_Data * scene_data) {
   scene->previous_room_id =  scene->current_room_id = 0;
   scene->current_room_m = map_model[scene->current_room_id];
   scene->previous_room_m = NULL;
-  printf("Total free memory: %dKB (heap area)\n",LStack_GetFree() >> 10);
+  //printf("Total free memory: %dKB (heap area)\n",LStack_GetFree() >> 10);
 
   {
     // Initialize actor memory area
@@ -1240,14 +1300,14 @@ void SceneLoad(Scene_Data * scene_data) {
     arena_size = (arena_size >> 2) << 2;
     arena_start = LStack_Alloc(arena_size);
     Arena_Init(arena_start, arena_size);
-    printf("arena size: %x\n",arena_size);
-    printf("arena start: %x\n", _arena_start_ptr);
+    //printf("arena size: %x\n",arena_size);
+    //printf("arena start: %x\n", _arena_start_ptr);
     //test_pointer = Arena_Malloc(1);
     //*test_pointer = 0xFCFCFCFC;
-    //printf("malloc(1): %x (content: %x)\n", test_pointer, *test_pointer);
+    ////printf("malloc(1): %x (content: %x)\n", test_pointer, *test_pointer);
     //testptr = Arena_Malloc(1);
     //*testptr = 0xFBFBFBFB;
-    //printf("malloc(1): %x (content: %x)\n", testptr, *testptr);
+    ////printf("malloc(1): %x (content: %x)\n", testptr, *testptr);
   }
 
   for(int i = 0; i < scene_data->transition_count; i++) {
@@ -1336,7 +1396,7 @@ void SceneLoad(Scene_Data * scene_data) {
   obj_syokudai_model->material[0].tpage = getTPage(0, 0, 36, 256);
   SGM2_OffsetTexCoords(obj_syokudai_model, (36*4-1) & 0xFF, (256) & 0xFF);
   // Tsubo
-  printf("Loading Obj Tsubo\n");
+  //printf("Loading Obj Tsubo\n");
   obj_tsubo_model = (struct SGM2 *) SGM2_LoadFile((u_long*)obj_tsubo_sgm2);
   obj_tsubo_model->material[0].clut = GetClut(FLAME_TEX_CLUT_X, FLAME_TEX_CLUT_Y+7);
   obj_tsubo_model->material[0].tpage = getTPage(0, 0, 36, 320);
@@ -1490,16 +1550,16 @@ void SceneLoad(Scene_Data * scene_data) {
   }
 
 
-  printf("Last actor pointer: 0x%0X\n", actptr);  
+  //printf("Last actor pointer: 0x%0X\n", actptr);  
   scene->draw_dist = 1024;
 
   scene->ambient.r = 207>>1;
   scene->ambient.g = 191>>1;
   scene->ambient.b = 139>>1;
 
-  printf("Texture Data Start: 0x%08X End: 0x%08X (Size: %d)\n", texture_data_start, texture_data_end, texture_data_end - texture_data_start);
+  //printf("Texture Data Start: 0x%08X End: 0x%08X (Size: %d)\n", texture_data_start, texture_data_end, texture_data_end - texture_data_start);
 }
-    //printf("a actor: 0x%08X <<prev [0x%08X] next>> 0x%08X\n", current->prev, current, current->next);
+    ////printf("a actor: 0x%08X <<prev [0x%08X] next>> 0x%08X\n", current->prev, current, current->next);
 /* __attribute__((optimize("O0"))) */
 /* __attribute__((optimize("Os"))) */
 void Scene_RemoveOldActors(int actor_group, Scene_Ctx * scene) {
@@ -1507,7 +1567,7 @@ void Scene_RemoveOldActors(int actor_group, Scene_Ctx * scene) {
     if(c->room == scene->current_room_id) continue;
     Scene_RemoveActor(&Scene_ActorList[actor_group], c);
     c->Destroy(c, scene);
-    //printf("removing actor 0x%08X\n", c);
+    ////printf("removing actor 0x%08X\n", c);
     Arena_Free(c);
   }
 }
@@ -1524,7 +1584,7 @@ void SceneMain() {
     Actor * current = Scene_ActorList[ACTOR_GROUP_BG].start;
     int idx = 0;
     while(current != NULL) {
-      printf("list[%d] actor->prev = 0x%0X actor->next = 0x%0X\n", idx++, current->prev, current->next);
+      //printf("list[%d] actor->prev = 0x%0X actor->next = 0x%0X\n", idx++, current->prev, current->next);
       current = current->next;
     }
   }
@@ -1932,7 +1992,7 @@ void SceneDraw() {
     //packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 40, SGM2_RENDER_SUBDIV, scene);
   }
 
-  packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 30, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_CLUTFOG, scene);
+  packet_b_ptr = SGM2_UpdateModel(scene->current_room_m, packet_b_ptr, (u_long*)G.pOt, 30, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_CLUTFOG | SGM2_RENDER_SCREEN_CLIP, scene);
   
   //packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 60, SGM2_RENDER_SUBDIV | SGM2_RENDER_SUBDIV_HIGH | SGM2_RENDER_AMBIENT | SGM2_RENDER_CLUTFOG, scene); // SGM2_RENDER_SUBDIV_HIGH
   //packet_b_ptr = SGM2_UpdateModel(map_model[5], packet_b_ptr, (u_long*)G.pOt, 30, SGM2_RENDER_SUBDIV | SGM2_RENDER_CLUTFOG, scene);
@@ -2479,7 +2539,7 @@ struct ParticleEmitter * Scene_ParticleCreate(struct ParticleEmitter * emitter, 
       //Particle3D * buff = NULL;
       if(particle_list[i].buffer) {
         //buff = particle_list[i].buffer;
-        //printf("Buffer prev 0x%08X\n", particle_list[i].buffer);
+        ////printf("Buffer prev 0x%08X\n", particle_list[i].buffer);
       }
       particle_list[i] = *emitter;
       particle_list[i].flags = 1;
@@ -2701,7 +2761,7 @@ u_char * Draw_ContactShadow(SVECTOR * pos, short angle, u_short scale, u_short s
 void Draw_CalcNearestLight(Actor * actor, void * scene) {
     if(actor->xzDistanceSq < 4096) {
       Scene_Ctx * scene_ctx = (Scene_Ctx*)scene;
-      PlayerActor * player = scene_ctx->player;
+      PlayerActor * player = (PlayerActor *)scene_ctx->player;
       u_short dist_lvl = (4096 - actor->xzDistanceSq) << 1;
       for(int i = 0; i < 2; i++) {
         if(player->nearest_light_dist[i] > actor->xzDistanceSq) {

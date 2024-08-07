@@ -37,4 +37,6 @@ void Lights_Destroy(Light * light);
 
 void Lights_CalcNearest(Actor * a, void * scene);
 
+void Lights_Initialize();
+
 #endif // _LIGHTS_H_

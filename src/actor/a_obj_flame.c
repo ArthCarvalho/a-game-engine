@@ -80,14 +80,14 @@ void ObjFlameActorInitialize(struct Actor * a, void * descriptor, void * scene) 
 }
 
 void ObjFlameActorDestroy(struct Actor * a, void * scene) {
-  ObjFlameActor * actor = (ObjSyokudaiActor *)a;
+  ObjFlameActor * actor = (ObjFlameActor *)a;
   Lights_Destroy(actor->light);
   actor->light = NULL;
 
 }
 
 void ObjFlameActorUpdate(struct Actor * a, void * scene) {
-  ObjFlameActor * actor = (ObjSyokudaiActor *)a;
+  ObjFlameActor * actor = (ObjFlameActor *)a;
   Draw_CalcNearestLight(a, scene);
   if(actor->light) {
     actor->light->color.r = flame_colors[actor->flame.flame_color].r - (actor->flame.flicker_value*4); 
